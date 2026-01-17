@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 57
-**Current Task:** 57 of 101
+**Session:** 58
+**Current Task:** 58 of 101
 
 ## Task List
 
@@ -61,8 +61,8 @@
 ✓ [x] **Task 54:** `[coding]` Create `src/features/dashboard/components/RecentTransactions.tsx` - Last 5 transactions preview
 ✓ [x] **Task 55:** `[coding]` Create `src/features/dashboard/components/SpendingChart.tsx` - Weekly/monthly spending visualization (Victory Native)
 ✓ [x] **Task 56:** `[coding]` Create `src/features/dashboard/components/AccountsOverview.tsx` - Bank accounts summary cards
-→ [ ] **Task 57:** `[coding]` Create `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
-  [ ] **Task 58:** `[coding]` Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
+✓ [x] **Task 57:** `[coding]` Create `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
+→ [ ] **Task 58:** `[coding]` Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
   [ ] **Task 59:** `[general]` Write tests for dashboard components in `src/features/dashboard/__tests__/`
   [ ] **Task 60:** `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
   [ ] **Task 61:** `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
@@ -108,38 +108,33 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 57:** `[coding]` Create `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
+**Task 58:** `[coding]` Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
 
 ### Summary
 ## Summary
 
-**Task Completed:** Created `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
+**What was completed:**
+Created `src/app/(tabs)/index.tsx` - the Home/Dashboard screen for the Monea digital wallet app.
 
-**What was done:**
-1. Created the `hooks` directory under `src/features/dashboard/`
-2. Implemented `useDashboardData.ts` hook that aggregates:
-   - Total balance from all active accounts
-   - List of active accounts for AccountsOverview
-   - Recent transactions (configurable limit)
-   - Transaction summaries for current and previous periods
-   - Spending data points for charts (weekly/monthly breakdown)
-   - Percentage change and trend direction calculations
-3. Created query keys (`DASHBOARD_QUERY_KEYS`) for React Query cache management
-4. Updated `src/infrastructure/database/index.ts` to export `AccountRepository` and related types
-5. Created index file for hooks exports
-6. Wrote comprehensive test suite with 14 passing tests
+**Features implemented:**
+- Time-based greeting header (Good morning/afternoon/evening)
+- Balance card showing total balance with percentage change trend
+- Accounts overview with horizontal scrolling account cards
+- Spending chart with weekly/monthly toggle
+- Recent transactions list with "See All" navigation
+- Pull-to-refresh functionality
+- All components properly connected to `useDashboardData` hook
+
+**Tests run and results:**
+- TypeScript type check: Passed (no errors in index.tsx)
+- ESLint: Passed (no errors)
+- Dashboard tests: 5 test suites, 71 tests passed
 
 **Files modified:**
-- `src/features/dashboard/hooks/useDashboardData.ts` (new)
-- `src/features/dashboard/hooks/index.ts` (new)
-- `src/features/dashboard/__tests__/useDashboardData.test.tsx` (new)
-- `src/infrastructure/database/index.ts` (modified to export AccountRepository)
+- `src/app/(tabs)/index.tsx` (new file)
 
-**Tests run:**
-- 14 tests passed in `useDashboardData.test.tsx`
-- All linting passed
-- TypeScript compilation verified
+**Commit hash:** `ae78418fa3102cbb6f306a23a46ff4e0c15d3f5d`
 
-**Commit hash:** `421d381`
+**No blockers.**
 
 TASK COMPLETE
