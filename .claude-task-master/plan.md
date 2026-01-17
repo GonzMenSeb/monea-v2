@@ -183,7 +183,7 @@ src/
 - [x] `[coding]` Create `src/features/settings/components/AccountForm.tsx` - Bank account form with validation
 - [x] `[coding]` Create `src/app/(tabs)/settings.tsx` - Settings tab screen
 - [x] `[coding]` Create `src/app/settings/accounts.tsx` - Accounts management nested screen
-- [ ] `[general]` Write tests for settings feature in `src/features/settings/__tests__/`
+- [x] `[general]` Write tests for settings feature in `src/features/settings/__tests__/`
 
 ### PR 12: Navigation & Tab Structure
 *Complete navigation setup*
