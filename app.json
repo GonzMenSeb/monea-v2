@@ -51,6 +51,9 @@
         "expo-build-properties",
         {
           "android": {
+            "minSdkVersion": 34,
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
             "packagingOptions": {
               "pickFirst": ["**/libc++_shared.so"]
             }
