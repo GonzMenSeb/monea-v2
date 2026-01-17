@@ -162,12 +162,12 @@ src/
 - [x] `[coding]` Create `src/features/dashboard/components/AccountsOverview.tsx` - Bank accounts summary cards
 - [x] `[coding]` Create `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
 - [x] `[coding]` Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
-- [ ] `[general]` Write tests for dashboard components in `src/features/dashboard/__tests__/`
+- [x] `[general]` Write tests for dashboard components in `src/features/dashboard/__tests__/`
 
 ### PR 10: SMS Sync Service
 *Background SMS processing*
 
-- [ ] `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
+- [x] `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
 - [ ] `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
 - [ ] `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
 - [ ] `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
