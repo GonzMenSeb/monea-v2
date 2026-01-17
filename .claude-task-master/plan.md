@@ -151,7 +151,7 @@ src/
 - [x] `[coding]` Create `src/features/transactions/components/TransactionItem.tsx` - Single transaction row component
 - [x] `[coding]` Create `src/features/transactions/components/TransactionDetail.tsx` - Full transaction view modal
 - [x] `[coding]` Create `src/app/(tabs)/transactions.tsx` - Main transactions screen
-- [ ] `[general]` Write tests for transaction feature in `src/features/transactions/__tests__/`
+- [x] `[general]` Write tests for transaction feature in `src/features/transactions/__tests__/`
 
 ### PR 9: Dashboard & Home Screen
 *Main dashboard with financial overview*
