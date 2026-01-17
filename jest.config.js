@@ -1,16 +1,10 @@
-module.exports = {
-  preset: 'jest-expo',
+const baseConfig = {
   globals: {
     __DEV__: true,
   },
-  transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)',
-  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^expo/src/winter/(.*)$': '<rootDir>/node_modules/expo/src/winter/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
@@ -31,6 +25,37 @@ module.exports = {
       statements: 80,
     },
   },
-  testEnvironment: 'node',
-  testMatch: ['**/__tests__/**/*.test.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
+};
+
+module.exports = {
+  ...baseConfig,
+  projects: [
+    {
+      displayName: 'core',
+      testMatch: ['<rootDir>/src/core/**/__tests__/**/*.test.[jt]s?(x)'],
+      testEnvironment: 'node',
+      transform: {
+        '^.+\\.(ts|tsx)$': 'babel-jest',
+      },
+      moduleNameMapper: baseConfig.moduleNameMapper,
+    },
+    {
+      displayName: 'react-native',
+      preset: 'jest-expo',
+      testMatch: [
+        '<rootDir>/src/features/**/__tests__/**/*.test.[jt]s?(x)',
+        '<rootDir>/src/shared/**/__tests__/**/*.test.[jt]s?(x)',
+        '<rootDir>/src/infrastructure/**/__tests__/**/*.test.[jt]s?(x)',
+        '<rootDir>/src/app/**/__tests__/**/*.test.[jt]s?(x)',
+      ],
+      transformIgnorePatterns: [
+        'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)',
+      ],
+      moduleNameMapper: {
+        ...baseConfig.moduleNameMapper,
+        '^expo/src/winter/(.*)$': '<rootDir>/node_modules/expo/src/winter/$1',
+      },
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    },
+  ],
 };
