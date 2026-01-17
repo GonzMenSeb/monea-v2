@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 21
-**Current Task:** 21 of 101
+**Session:** 22
+**Current Task:** 22 of 101
 
 ## Task List
 
@@ -25,8 +25,8 @@
 ✓ [x] **Task 18:** `[coding]` Create `src/shared/components/ui/Button.tsx` - Primary, Secondary, Outline variants with NativeWind
 ✓ [x] **Task 19:** `[coding]` Create `src/shared/components/ui/Card.tsx` - Transaction card, Account card variants
 ✓ [x] **Task 20:** `[coding]` Create `src/shared/components/ui/Typography.tsx` - Heading, Body, Caption, Amount (currency formatting)
-→ [ ] **Task 21:** `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
-  [ ] **Task 22:** `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
+✓ [x] **Task 21:** `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
+→ [ ] **Task 22:** `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
   [ ] **Task 23:** `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
   [ ] **Task 24:** `[general]` Write unit tests for all shared components in `src/shared/components/__tests__/`
   [ ] **Task 25:** `[coding]` Install `react-native-get-sms-android` and configure in `app.json` plugins
@@ -108,34 +108,35 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 21:** `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
+**Task 22:** `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
 
 ### Summary
 ## Summary
 
-**Task Completed:** Create `src/shared/components/ui/Input.tsx` - Text input with validation states
+**Task Completed:** Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
 
-### What was completed:
-Created a comprehensive Input component with the following features:
-- **Validation states**: `default`, `error`, `success` with appropriate border and message colors
-- **Three sizes**: `sm`, `md`, `lg` with consistent styling
-- **Icons**: Left and right icon support with optional press handler for right icon
-- **Labels and feedback**: Label, hint, error message, and success message display
-- **Focus handling**: Border color changes on focus
-- **Disabled state**: Proper disabled styling and behavior
-- **Automatic state inference**: When `errorMessage` or `successMessage` is provided, the validation state is automatically set
-- **Accessibility**: Proper `accessibilityState`, `accessibilityLabel`, and `accessibilityHint` attributes
+**What was completed:**
+1. Created the `Screen` component at `src/shared/components/layout/Screen.tsx` with:
+   - `SafeAreaView` wrapper from `react-native-safe-area-context`
+   - `KeyboardAvoidingView` support with proper platform-specific behavior
+   - Two variants: `fixed` (default) and `scroll` (with ScrollView)
+   - Configurable safe area edges
+   - StatusBar configuration (style and background color)
+   - Support for NativeWind className and additional props
 
-### Tests run and results:
-- TypeScript check: ✅ Passed
-- ESLint: ✅ Passed (after auto-fix)
-- No test suite configured yet for this project
+2. Created the layout module index at `src/shared/components/layout/index.ts`
 
-### Files modified:
-1. `src/shared/components/ui/Input.tsx` (created)
-2. `src/shared/components/ui/index.ts` (updated export)
+3. Updated `src/shared/components/index.ts` to export the layout module
 
-### Commit hash:
-`3122523`
+**Tests run and results:**
+- `npm run typecheck` - ✅ Passed
+- `npm run lint` - ✅ Passed (after auto-fix)
+
+**Files modified:**
+- `src/shared/components/layout/Screen.tsx` (new)
+- `src/shared/components/layout/index.ts` (new)
+- `src/shared/components/index.ts` (modified)
+
+**Commit hash:** `5178b7c`
 
 TASK COMPLETE

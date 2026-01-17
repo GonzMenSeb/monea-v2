@@ -1205,3 +1205,41 @@ Goal: I want to create a React Native application specifically for android mobil
 Current Task (#22): Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
 
 Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task Completed:** Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
+
+**What was completed:**
+1. Created the `Screen` component at `src/shared/components/layout/Screen.tsx` with:
+   - `SafeAreaView` wrapper from `react-native-safe-area-context`
+   - `KeyboardAvoidingView` support with proper platform-specific behavior
+   - Two variants: `fixed` (default) and `scroll` (with ScrollView)
+   - Configurable safe area edges
+   - StatusBar configuration (style and background color)
+   - Support for NativeWind className and additional props
+
+2. Created the layout module index at `src/shared/components/layout/index.ts`
+
+3. Updated `src/shared/components/index.ts` to export the layout module
+
+**Tests run and results:**
+- `npm run typecheck` - ✅ Passed
+- `npm run lint` - ✅ Passed (after auto-fix)
+
+**Files modified:**
+- `src/shared/components/layout/Screen.tsx` (new)
+- `src/shared/components/layout/index.ts` (new)
+- `src/shared/components/index.ts` (modified)
+
+**Commit hash:** `5178b7c`
+
+TASK COMPLETE
+=== END | completed | 115.9s ===
+=== SESSION 23 | WORKING | 22:24:10 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#23): Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
+
+Please complete this task.

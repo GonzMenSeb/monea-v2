@@ -105,7 +105,7 @@ src/
 - [x] `[coding]` Create `src/shared/components/ui/Card.tsx` - Transaction card, Account card variants
 - [x] `[coding]` Create `src/shared/components/ui/Typography.tsx` - Heading, Body, Caption, Amount (currency formatting)
 - [x] `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
-- [ ] `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
+- [x] `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
 - [ ] `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
 - [ ] `[general]` Write unit tests for all shared components in `src/shared/components/__tests__/`
 
