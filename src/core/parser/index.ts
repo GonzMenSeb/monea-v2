@@ -1,5 +1,5 @@
 export { TransactionParser, transactionParser } from './TransactionParser';
-export { BANK_INFO, BANK_PATTERNS, getBankBySender, parseDate } from './BankPatterns';
+export { BANK_INFO, BANK_PATTERNS, getBankBySender } from './BankPatterns';
 export {
   extractAmount,
   formatCOP,
@@ -7,6 +7,16 @@ export {
   parseAmount,
   type AmountExtractionResult,
 } from './AmountExtractor';
+export {
+  extractDate,
+  formatCODate,
+  formatCODateTime,
+  isValidDateString,
+  isValidTimeString,
+  parseDate,
+  parseTimeOnly,
+  type DateExtractionResult,
+} from './DateExtractor';
 export type {
   BankCode,
   BankInfo,

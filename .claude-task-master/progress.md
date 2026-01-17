@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 33
-**Current Task:** 33 of 101
+**Session:** 34
+**Current Task:** 34 of 101
 
 ## Task List
 
@@ -37,8 +37,8 @@
 ✓ [x] **Task 30:** `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
 ✓ [x] **Task 31:** `[coding]` Create `src/core/parser/types.ts` - Transaction types (income, expense, transfer), BankInfo, ParsedTransaction interfaces
 ✓ [x] **Task 32:** `[coding]` Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
-→ [ ] **Task 33:** `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
-  [ ] **Task 34:** `[coding]` Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
+✓ [x] **Task 33:** `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
+→ [ ] **Task 34:** `[coding]` Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
   [ ] **Task 35:** `[coding]` Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
   [ ] **Task 36:** `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
   [ ] **Task 37:** `[coding]` Write comprehensive unit tests in `src/core/parser/__tests__/` with real SMS samples from Colombian banks
@@ -108,46 +108,35 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 33:** `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
+**Task 34:** `[coding]` Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
 
 ### Summary
 ## Summary
 
-**Task Completed:** Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
-
 **What was completed:**
+- Created `src/core/parser/AmountExtractor.ts` - A dedicated module for parsing Colombian Peso (COP) currency amounts with proper handling of:
+  - Peso sign ($) with optional spaces
+  - Thousands separator (dots) - Colombian format uses dots as thousand separators
+  - Decimal separator (commas) - Colombian format uses commas for decimals
+  - Automatic rounding (COP doesn't use decimals in practice)
 
-1. Created `TransactionParser.ts` with:
-   - `TransactionParser` class as the main parsing engine
-   - Strategy pattern using `BankParser` interface for bank-specific parsing
-   - `ParserRegistry` class for managing and finding appropriate parsers
-   - `createBankParser()` factory function for each bank
-   - `extractTransaction()` helper to pull data from regex matches
-   - `transactionParser` singleton export for convenient usage
-   - Clean error handling with `ParseOutcome` discriminated union
-
-2. Created `index.ts` barrel file for clean module exports
-
-3. Fixed bug in `BankPatterns.ts`:
-   - Updated `MERCHANT_PATTERN` regex from non-greedy `([A-Za-z0-9\s]+?)` to properly bounded `([A-Za-z0-9][A-Za-z0-9\s]*[A-Za-z0-9]|[A-Za-z0-9])` to correctly capture multi-word merchant names
-
-4. Created comprehensive test suite `TransactionParser.test.ts` with 30 test cases covering:
-   - Bank detection from sender
-   - `canParse()` validation
-   - Full parsing for all 5 Colombian banks (Bancolombia, Nequi, Daviplata, Davivienda, BBVA)
-   - Error handling scenarios
-   - Singleton functionality
+**Key functions exported:**
+- `extractAmount(input)` - Returns full extraction result with value, raw input, and formatted output
+- `parseAmount(input)` - Simple function returning numeric value (backward compatible)
+- `formatCOP(amount)` - Formats numbers to Colombian Peso format ($1.234.567)
+- `isValidCOPAmount(input)` - Validation helper
 
 **Tests run and results:**
-- All 53 parser tests pass (30 new TransactionParser tests + 23 existing BankPatterns tests)
-- TypeScript type checking passes for all parser files
+- 34 tests for AmountExtractor - ALL PASSED
+- 30 tests for TransactionParser (backward compatibility) - ALL PASSED
 
 **Files modified:**
-- `src/core/parser/TransactionParser.ts` (created)
-- `src/core/parser/__tests__/TransactionParser.test.ts` (created)
-- `src/core/parser/index.ts` (created)
-- `src/core/parser/BankPatterns.ts` (fixed merchant pattern)
+- `src/core/parser/AmountExtractor.ts` (NEW)
+- `src/core/parser/__tests__/AmountExtractor.test.ts` (NEW)
+- `src/core/parser/BankPatterns.ts` (refactored to use new module)
+- `src/core/parser/index.ts` (updated exports)
+- `src/core/parser/types.ts` (unchanged from previous task state)
 
-**Commit hash:** b44b886
+**Commit hash:** `00abcce`
 
 TASK COMPLETE

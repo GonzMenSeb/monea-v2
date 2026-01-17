@@ -1,8 +1,9 @@
 import { parseAmount } from './AmountExtractor';
+import { parseDate } from './DateExtractor';
 
 import type { BankCode, BankInfo, TransactionType } from './types';
 
-export { parseAmount };
+export { parseAmount, parseDate };
 
 export const BANK_INFO: Record<BankCode, BankInfo> = {
   bancolombia: {
@@ -236,27 +237,6 @@ export const BANK_PATTERNS: Record<BankCode, TransactionPattern[]> = {
   nequi: NEQUI_PATTERNS,
   daviplata: DAVIPLATA_PATTERNS,
 };
-
-export function parseDate(dateStr: string | undefined, timeStr?: string): Date {
-  if (!dateStr) {
-    return new Date();
-  }
-
-  const parts = dateStr.split('/').map(Number);
-  const day = parts[0] ?? 1;
-  const month = parts[1] ?? 1;
-  const year = parts[2] ?? new Date().getFullYear();
-  const date = new Date(year, month - 1, day);
-
-  if (timeStr) {
-    const timeParts = timeStr.split(':').map(Number);
-    const hours = timeParts[0] ?? 0;
-    const minutes = timeParts[1] ?? 0;
-    date.setHours(hours, minutes);
-  }
-
-  return date;
-}
 
 export function matchesSender(sender: string, bank: BankInfo): boolean {
   return bank.senderPatterns.some((pattern) => pattern.test(sender));

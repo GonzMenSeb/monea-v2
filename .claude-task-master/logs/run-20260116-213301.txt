@@ -1729,3 +1729,41 @@ Goal: I want to create a React Native application specifically for android mobil
 Current Task (#34): Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
 
 Please complete this task.
+[RESPONSE]
+## Summary
+
+**What was completed:**
+- Created `src/core/parser/AmountExtractor.ts` - A dedicated module for parsing Colombian Peso (COP) currency amounts with proper handling of:
+  - Peso sign ($) with optional spaces
+  - Thousands separator (dots) - Colombian format uses dots as thousand separators
+  - Decimal separator (commas) - Colombian format uses commas for decimals
+  - Automatic rounding (COP doesn't use decimals in practice)
+
+**Key functions exported:**
+- `extractAmount(input)` - Returns full extraction result with value, raw input, and formatted output
+- `parseAmount(input)` - Simple function returning numeric value (backward compatible)
+- `formatCOP(amount)` - Formats numbers to Colombian Peso format ($1.234.567)
+- `isValidCOPAmount(input)` - Validation helper
+
+**Tests run and results:**
+- 34 tests for AmountExtractor - ALL PASSED
+- 30 tests for TransactionParser (backward compatibility) - ALL PASSED
+
+**Files modified:**
+- `src/core/parser/AmountExtractor.ts` (NEW)
+- `src/core/parser/__tests__/AmountExtractor.test.ts` (NEW)
+- `src/core/parser/BankPatterns.ts` (refactored to use new module)
+- `src/core/parser/index.ts` (updated exports)
+- `src/core/parser/types.ts` (unchanged from previous task state)
+
+**Commit hash:** `00abcce`
+
+TASK COMPLETE
+=== END | completed | 176.6s ===
+=== SESSION 35 | WORKING | 23:09:27 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#35): Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
+
+Please complete this task.

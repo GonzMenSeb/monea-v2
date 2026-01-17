@@ -1,5 +1,5 @@
-import { TransactionParser, transactionParser } from '../TransactionParser';
 import { BANK_INFO } from '../BankPatterns';
+import { TransactionParser, transactionParser } from '../TransactionParser';
 
 describe('TransactionParser', () => {
   let parser: TransactionParser;
@@ -86,7 +86,8 @@ describe('TransactionParser', () => {
     });
 
     it('parses income/transfer received message', () => {
-      const sms = 'Bancolombia le informa transferencia recibida por $100.000 de EMPRESA. Saldo: $600.000';
+      const sms =
+        'Bancolombia le informa transferencia recibida por $100.000 de EMPRESA. Saldo: $600.000';
       const result = parser.parse(sms, sender);
 
       expect(result.success).toBe(true);
@@ -233,7 +234,8 @@ describe('TransactionParser', () => {
     const sender = 'BBVA';
 
     it('parses purchase message', () => {
-      const sms = 'BBVA: compra por $60.000 en SUPERMERCADO Cta. 1234 15/03/2024. Disponible: $340.000';
+      const sms =
+        'BBVA: compra por $60.000 en SUPERMERCADO Cta. 1234 15/03/2024. Disponible: $340.000';
       const result = parser.parse(sms, sender);
 
       expect(result.success).toBe(true);
