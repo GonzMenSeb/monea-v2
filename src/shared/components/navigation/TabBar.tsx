@@ -10,6 +10,7 @@ import Animated, {
   interpolateColor,
 } from 'react-native-reanimated';
 
+import { useHaptics } from '@/shared/hooks/useHaptics';
 import { colors } from '@/shared/theme';
 
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
@@ -32,6 +33,7 @@ const SPRING_CONFIG = {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function TabItem({ isFocused, onPress, onLongPress, options }: TabItemProps): React.ReactElement {
+  const { selection } = useHaptics();
   const scale = useSharedValue(1);
   const progress = useSharedValue(isFocused ? 1 : 0);
 
@@ -66,9 +68,10 @@ function TabItem({ isFocused, onPress, onLongPress, options }: TabItemProps): Re
   }));
 
   const handlePressIn = useCallback(() => {
+    selection();
     // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are mutable by design
     scale.value = withSpring(0.9, SPRING_CONFIG);
-  }, [scale]);
+  }, [scale, selection]);
 
   const handlePressOut = useCallback(() => {
     // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are mutable by design
@@ -116,6 +119,9 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps): R
     <View style={styles.container}>
       {state.routes.map((route, index) => {
         const descriptor = descriptors[route.key];
+        if (!descriptor) {
+          return null;
+        }
         const { options } = descriptor;
         const isFocused = state.index === index;
 

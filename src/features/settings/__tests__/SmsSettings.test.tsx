@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-
 import { useRouter } from 'expo-router';
 
 import { useSmsSync } from '@/features/sms-sync/hooks';

@@ -21,6 +21,60 @@ jest.mock('expo', () => ({
 jest.mock('@expo/vector-icons', () => ({
   MaterialCommunityIcons: 'MaterialCommunityIcons',
 }));
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(),
+  notificationAsync: jest.fn(),
+  selectionAsync: jest.fn(),
+  ImpactFeedbackStyle: {
+    Light: 'LIGHT',
+    Medium: 'MEDIUM',
+    Heavy: 'HEAVY',
+  },
+  NotificationFeedbackType: {
+    Success: 'SUCCESS',
+    Warning: 'WARNING',
+    Error: 'ERROR',
+  },
+}));
+jest.mock('react-native-gesture-handler', () => {
+  const { View } = require('react-native');
+  return {
+    Swipeable: ({ children, renderRightActions, renderLeftActions }) => {
+      const sharedValue = { value: 0 };
+      return (
+        <>
+          {renderLeftActions && renderLeftActions(sharedValue)}
+          {children}
+          {renderRightActions && renderRightActions(sharedValue)}
+        </>
+      );
+    },
+    GestureHandlerRootView: View,
+    PanGestureHandler: View,
+    TapGestureHandler: View,
+    State: {},
+    Directions: {},
+  };
+});
+jest.mock('expo-network', () => ({
+  getNetworkStateAsync: jest.fn(() =>
+    Promise.resolve({
+      isConnected: true,
+      isInternetReachable: true,
+      type: 'WIFI',
+    })
+  ),
+  NetworkStateType: {
+    UNKNOWN: 'UNKNOWN',
+    NONE: 'NONE',
+    WIFI: 'WIFI',
+    CELLULAR: 'CELLULAR',
+  },
+}));
+jest.mock('expo-linking', () => ({
+  openSettings: jest.fn(() => Promise.resolve()),
+  openURL: jest.fn(() => Promise.resolve()),
+}));
 jest.mock('expo-router', () => ({
   useRouter: jest.fn(),
   router: {
@@ -50,28 +104,6 @@ jest.mock('@nozbe/watermelondb/adapters/sqlite', () => {
     default: mockAdapter,
   };
 });
-jest.mock('@nozbe/watermelondb', () => ({
-  Database: jest.fn(() => ({
-    write: jest.fn(),
-    read: jest.fn(),
-  })),
-  Model: class Model {},
-  tableSchema: jest.fn(),
-  appSchema: jest.fn(),
-  associations: jest.fn(() => []),
-}));
-jest.mock('@nozbe/watermelondb/decorators', () => ({
-  field: () => () => {},
-  date: () => () => {},
-  readonly: () => () => {},
-  text: () => () => {},
-  children: () => () => {},
-  relation: () => () => {},
-  immutableRelation: () => () => {},
-  lazy: () => () => {},
-  action: () => () => {},
-  writer: () => () => {},
-}));
 jest.mock('@/infrastructure/database', () => ({
   database: {
     write: jest.fn(),
@@ -109,9 +141,35 @@ jest.mock('react-native-reanimated', () => {
     useSharedValue: (initialValue) => ({ value: initialValue }),
     useAnimatedStyle: (styleFactory) => styleFactory(),
     withSpring: (toValue) => toValue,
-    withTiming: (toValue) => toValue,
+    withTiming: (toValue, config, callback) => {
+      if (callback) callback(true);
+      return toValue;
+    },
+    withRepeat: (animation) => animation,
+    withSequence: (...animations) => animations[animations.length - 1],
+    withDelay: (delay, animation) => animation,
+    interpolate: (value, inputRange, outputRange) => {
+      if (typeof value !== 'number') return outputRange[0];
+      const inputMin = inputRange[0];
+      const inputMax = inputRange[inputRange.length - 1];
+      const outputMin = outputRange[0];
+      const outputMax = outputRange[outputRange.length - 1];
+      if (value <= inputMin) return outputMin;
+      if (value >= inputMax) return outputMax;
+      const ratio = (value - inputMin) / (inputMax - inputMin);
+      return outputMin + ratio * (outputMax - outputMin);
+    },
     interpolateColor: (progress, input, output) => output[Math.round(progress)] || 'transparent',
     Extrapolate: { CLAMP: 'clamp' },
+    Easing: {
+      linear: (t) => t,
+      ease: (t) => t,
+      bezier: () => (t) => t,
+      in: (fn) => fn,
+      out: (fn) => fn,
+      inOut: (fn) => fn,
+    },
+    runOnJS: (fn) => fn,
     createAnimatedComponent: createMockAnimatedComponent,
   };
 });

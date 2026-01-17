@@ -215,7 +215,9 @@ describe('AccountForm', () => {
       accountNumber: '1234567890',
     };
 
-    render(<AccountForm {...mockProps} formData={validFormData} isSubmitting onDelete={jest.fn()} />);
+    render(
+      <AccountForm {...mockProps} formData={validFormData} isSubmitting onDelete={jest.fn()} />
+    );
 
     expect(screen.getByText('Cancel')).toBeDisabled();
     const buttons = screen.getAllByRole('button');

@@ -156,15 +156,15 @@ describe('Input', () => {
     it('does not make right icon pressable without onRightIconPress', () => {
       const icon = <View testID="right-icon" />;
       render(<Input rightIcon={icon} />);
-      const iconWrapper = screen.getByTestId('right-icon').parent;
-      expect(iconWrapper?.props.accessibilityRole).toBe('none');
+      const pressable = screen.getByTestId('right-icon-pressable');
+      expect(pressable.props.accessibilityRole).toBe('none');
     });
 
     it('makes right icon pressable with onRightIconPress', () => {
       const icon = <View testID="right-icon" />;
       render(<Input rightIcon={icon} onRightIconPress={() => {}} />);
-      const iconWrapper = screen.getByTestId('right-icon').parent;
-      expect(iconWrapper?.props.accessibilityRole).toBe('button');
+      const pressable = screen.getByTestId('right-icon-pressable');
+      expect(pressable.props.accessibilityRole).toBe('button');
     });
   });
 

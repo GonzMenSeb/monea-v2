@@ -39,7 +39,7 @@ export function LoadingState({
 
   return (
     <View className={containerStyle}>
-      <ActivityIndicator size={sizeConfig.indicator} color={color} />
+      <ActivityIndicator testID="activity-indicator" size={sizeConfig.indicator} color={color} />
       {message && (
         <Text className={`${sizeConfig.text} ${isInline ? INLINE_MESSAGE_STYLES : MESSAGE_STYLES}`}>
           {message}

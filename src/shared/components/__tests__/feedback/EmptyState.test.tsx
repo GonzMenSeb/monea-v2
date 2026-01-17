@@ -28,7 +28,7 @@ describe('EmptyState', () => {
     });
 
     it('does not render description when not provided', () => {
-      const { queryByText } = render(<EmptyState title="Just Title" />);
+      render(<EmptyState title="Just Title" />);
       expect(screen.getByText('Just Title')).toBeTruthy();
     });
   });

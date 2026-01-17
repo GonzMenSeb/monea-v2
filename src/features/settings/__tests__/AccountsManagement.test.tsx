@@ -1,8 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-
 import { Alert } from 'react-native';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { useRouter } from 'expo-router';
 
 import { AccountRepository } from '@/infrastructure/database';
@@ -16,16 +15,17 @@ const mockRouter = {
   back: jest.fn(),
 };
 
-const createWrapper = () => {
+const createWrapper = (): React.FC<{ children: React.ReactNode }> => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
       mutations: { retry: false },
     },
   });
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  function Wrapper({ children }: { children: React.ReactNode }): React.ReactElement {
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  }
+  return Wrapper;
 };
 
 const mockAccount = {
@@ -364,14 +364,19 @@ describe('AccountsManagement', () => {
       fireEvent.changeText(input, '123');
 
       const saveButtons = screen.getAllByRole('button');
-      const saveButton = saveButtons.find((btn) => btn.props.children?.props?.children === 'Add Account');
+      const saveButton = saveButtons.find(
+        (btn) => btn.props.children?.props?.children === 'Add Account'
+      );
       if (saveButton) {
         fireEvent.press(saveButton);
       }
 
-      await waitFor(() => {
-        expect(mockAccountRepository.create).not.toHaveBeenCalled();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(mockAccountRepository.create).not.toHaveBeenCalled();
+        },
+        { timeout: 2000 }
+      );
     });
 
     it('renders bank and account type selectors', async () => {

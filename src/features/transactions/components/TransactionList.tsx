@@ -6,6 +6,7 @@ import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { colors } from '@/shared/theme';
 
 import { TransactionItem } from './TransactionItem';
 
@@ -173,7 +174,13 @@ export function TransactionList({
   }
 
   const refreshControl = onRefresh ? (
-    <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+    <RefreshControl
+      refreshing={isRefreshing}
+      onRefresh={onRefresh}
+      colors={[colors.primary.DEFAULT]}
+      tintColor={colors.primary.DEFAULT}
+      progressBackgroundColor={colors.background.primary}
+    />
   ) : undefined;
 
   return (

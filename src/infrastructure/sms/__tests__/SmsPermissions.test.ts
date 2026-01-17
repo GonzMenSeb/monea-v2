@@ -1,19 +1,20 @@
 import { openSettings } from 'expo-linking';
 
 import { SmsPermissions } from '../SmsPermissions';
+import { smsReader } from '../SmsReader';
 
 import type { SmsPermissionStatus } from '../types';
 
-const mockCheckPermissions = jest.fn<Promise<SmsPermissionStatus>, []>();
-const mockRequestPermissions = jest.fn<Promise<boolean>, []>();
-const mockOpenSettings = openSettings as jest.Mock;
-
 jest.mock('../SmsReader', () => ({
   smsReader: {
-    checkPermissions: mockCheckPermissions,
-    requestPermissions: mockRequestPermissions,
+    checkPermissions: jest.fn(),
+    requestPermissions: jest.fn(),
   },
 }));
+
+const mockCheckPermissions = smsReader.checkPermissions as jest.Mock;
+const mockRequestPermissions = smsReader.requestPermissions as jest.Mock;
+const mockOpenSettings = openSettings as jest.Mock;
 
 const GRANTED_STATUS: SmsPermissionStatus = {
   hasReadSmsPermission: true,
@@ -102,7 +103,7 @@ describe('SmsPermissions', () => {
       mockCheckPermissions.mockResolvedValue(DENIED_STATUS);
       mockRequestPermissions.mockResolvedValue(false);
 
-      await smsPermissions.requestWithRetry(1);
+      await smsPermissions.requestWithRetry(2);
 
       const result = await smsPermissions.checkPermissionState();
 
@@ -244,6 +245,8 @@ describe('SmsPermissions', () => {
       mockCheckPermissions
         .mockResolvedValueOnce(DENIED_STATUS)
         .mockResolvedValueOnce(PARTIAL_READ_STATUS)
+        .mockResolvedValueOnce(PARTIAL_READ_STATUS)
+        .mockResolvedValueOnce(PARTIAL_READ_STATUS)
         .mockResolvedValueOnce(PARTIAL_READ_STATUS);
       mockRequestPermissions.mockResolvedValue(true);
 
@@ -276,7 +279,7 @@ describe('SmsPermissions', () => {
       mockCheckPermissions.mockResolvedValue(DENIED_STATUS);
       mockRequestPermissions.mockResolvedValue(false);
 
-      await smsPermissions.requestWithRetry(1);
+      await smsPermissions.requestWithRetry(2);
 
       const beforeReset = await smsPermissions.checkPermissionState();
       expect(beforeReset.canRetry).toBe(false);

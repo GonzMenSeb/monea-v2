@@ -153,6 +153,7 @@ export function Input({
 
         {rightIcon && (
           <Pressable
+            testID="right-icon-pressable"
             onPress={onRightIconPress}
             disabled={disabled || !onRightIconPress}
             className="pr-3"

@@ -1,7 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-
 import { Linking } from 'react-native';
 
+import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { useRouter } from 'expo-router';
 
 import { smsPermissions } from '@/infrastructure/sms';

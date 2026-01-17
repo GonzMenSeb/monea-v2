@@ -34,8 +34,8 @@ The Monea v2 application is built on these core principles:
 | Document | Status | Last Updated |
 |----------|--------|--------------|
 | ARCHITECTURE.md | ✅ Complete | 2026-01-16 |
-| DATA_FLOW.md | ⏳ Pending | - |
-| TESTING_STRATEGY.md | ⏳ Pending | - |
+| DATA_FLOW.md | ✅ Complete | 2026-01-16 |
+| TESTING_STRATEGY.md | ✅ Complete | 2026-01-16 |
 
 ## Related Files
 

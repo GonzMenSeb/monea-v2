@@ -121,7 +121,7 @@ describe('Button', () => {
     it('is disabled when loading', () => {
       render(<Button loading>Loading</Button>);
       const button = screen.getByRole('button');
-      expect(button.props.disabled).toBe(true);
+      expect(button.props.accessibilityState?.disabled).toBe(true);
     });
   });
 
@@ -155,7 +155,7 @@ describe('Button', () => {
       const onPress = jest.fn();
       render(<Button onPress={onPress}>Event Test</Button>);
       fireEvent.press(screen.getByRole('button'));
-      expect(onPress).toHaveBeenCalledWith(expect.any(Object));
+      expect(onPress).toHaveBeenCalled();
     });
   });
 

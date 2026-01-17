@@ -1,7 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
 .pnp
 .pnp.js
 
@@ -109,11 +107,10 @@ build/
 dist/
 coverage/
 
-# Lock files (optional - uncomment if preferred)
-# package-lock.json
-# yarn.lock
-
 # OS
 .DS_Store
 Thumbs.db
 .Thumbs.db
+
+# Claude task tracking
+.claude-task-master/

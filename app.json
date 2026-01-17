@@ -25,6 +25,23 @@
       "permissions": [
         "android.permission.READ_SMS",
         "android.permission.RECEIVE_SMS"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "monea"
+            },
+            {
+              "scheme": "https",
+              "host": "monea.app",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ]
     },
     "plugins": [

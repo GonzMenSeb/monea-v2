@@ -100,7 +100,7 @@ module.exports = {
     'react-native/no-inline-styles': 'warn',
     'react-native/no-color-literals': 'off',
     'react-native/no-raw-text': ['error', {
-      skip: ['Text', 'TextInput', 'Heading', 'Body', 'Caption', 'Amount'],
+      skip: ['Text', 'TextInput', 'Heading', 'Body', 'Caption', 'Amount', 'Button'],
     }],
     'react-native/no-single-element-style-arrays': 'error',
     'react-native/sort-styles': 'off',
@@ -161,6 +161,21 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/unbound-method': 'off',
+        '@typescript-eslint/require-await': 'off',
+        'import/order': 'off',
+      },
+    },
+    {
+      files: ['e2e/**/*.ts'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/await-thenable': 'off',
+        '@typescript-eslint/no-floating-promises': 'off',
       },
     },
     {
@@ -189,5 +204,7 @@ module.exports = {
     'babel.config.js',
     'metro.config.js',
     'coverage/',
+    'jest.setup.js',
+    'plugins/',
   ],
 };

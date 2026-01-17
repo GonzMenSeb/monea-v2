@@ -2,6 +2,8 @@ import { useCallback } from 'react';
 
 import { ActivityIndicator, Pressable, Text, View, type PressableProps } from 'react-native';
 
+import { useHaptics } from '@/shared/hooks/useHaptics';
+
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -13,6 +15,7 @@ interface ButtonProps extends Omit<PressableProps, 'children'> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
+  haptic?: boolean;
 }
 
 const VARIANT_STYLES: Record<ButtonVariant, { base: string; pressed: string; text: string }> = {
@@ -61,10 +64,12 @@ export function Button({
   leftIcon,
   rightIcon,
   fullWidth = false,
+  haptic = true,
   disabled,
   onPress,
   ...pressableProps
 }: ButtonProps): React.ReactElement {
+  const { light } = useHaptics();
   const variantStyle = VARIANT_STYLES[variant];
   const sizeStyle = SIZE_STYLES[size];
   const isDisabled = disabled || loading;
@@ -72,10 +77,13 @@ export function Button({
   const handlePress = useCallback(
     (event: Parameters<NonNullable<PressableProps['onPress']>>[0]) => {
       if (!isDisabled && onPress) {
+        if (haptic) {
+          light();
+        }
         onPress(event);
       }
     },
-    [isDisabled, onPress]
+    [isDisabled, onPress, haptic, light]
   );
 
   const getContainerStyle = (pressed: boolean): string => {
