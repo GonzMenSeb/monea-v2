@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 22
-**Current Task:** 22 of 101
+**Session:** 23
+**Current Task:** 23 of 101
 
 ## Task List
 
@@ -26,8 +26,8 @@
 ✓ [x] **Task 19:** `[coding]` Create `src/shared/components/ui/Card.tsx` - Transaction card, Account card variants
 ✓ [x] **Task 20:** `[coding]` Create `src/shared/components/ui/Typography.tsx` - Heading, Body, Caption, Amount (currency formatting)
 ✓ [x] **Task 21:** `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
-→ [ ] **Task 22:** `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
-  [ ] **Task 23:** `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
+✓ [x] **Task 22:** `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
+→ [ ] **Task 23:** `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
   [ ] **Task 24:** `[general]` Write unit tests for all shared components in `src/shared/components/__tests__/`
   [ ] **Task 25:** `[coding]` Install `react-native-get-sms-android` and configure in `app.json` plugins
   [ ] **Task 26:** `[coding]` Create `src/infrastructure/sms/SmsReader.ts` - Native module wrapper with TypeScript types
@@ -108,35 +108,37 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 22:** `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
+**Task 23:** `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
 
 ### Summary
 ## Summary
 
-**Task Completed:** Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
-
 **What was completed:**
-1. Created the `Screen` component at `src/shared/components/layout/Screen.tsx` with:
-   - `SafeAreaView` wrapper from `react-native-safe-area-context`
-   - `KeyboardAvoidingView` support with proper platform-specific behavior
-   - Two variants: `fixed` (default) and `scroll` (with ScrollView)
-   - Configurable safe area edges
-   - StatusBar configuration (style and background color)
-   - Support for NativeWind className and additional props
+- Created `src/shared/components/feedback/EmptyState.tsx` with:
+  - Variants: `default`, `transactions`, `accounts`, `search`
+  - Support for custom title, description, icon, and optional action button
+  - Follows existing component patterns with NativeWind styling
+  
+- Created `src/shared/components/feedback/LoadingState.tsx` with:
+  - Size variants: `sm`, `md`, `lg`
+  - Display variants: `default` (centered), `overlay` (full screen with backdrop), `inline` (horizontal)
+  - Optional loading message
+  - Customizable color (defaults to primary theme color)
 
-2. Created the layout module index at `src/shared/components/layout/index.ts`
-
-3. Updated `src/shared/components/index.ts` to export the layout module
+- Created `src/shared/components/feedback/index.ts` barrel export
+- Updated `src/shared/components/index.ts` to export feedback components
 
 **Tests run and results:**
-- `npm run typecheck` - ✅ Passed
-- `npm run lint` - ✅ Passed (after auto-fix)
+- TypeScript check: ✅ Passed
+- ESLint: ✅ Passed (after auto-fix)
+- Jest tests: Not configured yet (no test script)
 
 **Files modified:**
-- `src/shared/components/layout/Screen.tsx` (new)
-- `src/shared/components/layout/index.ts` (new)
+- `src/shared/components/feedback/EmptyState.tsx` (new)
+- `src/shared/components/feedback/LoadingState.tsx` (new)
+- `src/shared/components/feedback/index.ts` (new)
 - `src/shared/components/index.ts` (modified)
 
-**Commit hash:** `5178b7c`
+**Commit hash:** `1d8d564`
 
 TASK COMPLETE

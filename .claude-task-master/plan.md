@@ -106,7 +106,7 @@ src/
 - [x] `[coding]` Create `src/shared/components/ui/Typography.tsx` - Heading, Body, Caption, Amount (currency formatting)
 - [x] `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
 - [x] `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
-- [ ] `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
+- [x] `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
 - [ ] `[general]` Write unit tests for all shared components in `src/shared/components/__tests__/`
 
 ### PR 5: SMS Reading Infrastructure

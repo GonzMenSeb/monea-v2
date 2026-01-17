@@ -5,12 +5,15 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "typecheck": "tsc --noEmit",
-    "validate": "npm run typecheck && npm run lint && npm run format:check"
+    "validate": "npm run typecheck && npm run lint && npm run format:check && npm test"
   },
   "dependencies": {
     "@lovesworking/watermelondb-expo-plugin-sdk-52-plus": "^1.0.3",
@@ -35,10 +38,14 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.28.6",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.53.0",
     "babel-plugin-module-resolver": "^5.0.2",
+    "babel-preset-expo": "^54.0.9",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -47,7 +54,12 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-native": "^5.0.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "jest-expo": "^54.0.16",
     "prettier": "^3.8.0",
+    "react-native-worklets": "^0.7.2",
+    "react-test-renderer": "^19.1.0",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.2"
   },
