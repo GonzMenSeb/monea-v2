@@ -39,7 +39,8 @@
             }
           }
         }
-      ]
+      ],
+      "./plugins/withSmsReader.js"
     ],
     "experiments": {
       "typedRoutes": true
