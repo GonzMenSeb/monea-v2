@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 30
-**Current Task:** 30 of 101
+**Session:** 33
+**Current Task:** 33 of 101
 
 ## Task List
 
@@ -34,10 +34,10 @@
 ✓ [x] **Task 27:** `[coding]` Create `src/infrastructure/sms/SmsPermissions.ts` - Permission request flow with retry logic
 ✓ [x] **Task 28:** `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
 ✓ [x] **Task 29:** `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
-→ [ ] **Task 30:** `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
-  [ ] **Task 31:** `[coding]` Create `src/core/parser/types.ts` - Transaction types (income, expense, transfer), BankInfo, ParsedTransaction interfaces
-  [ ] **Task 32:** `[coding]` Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
-  [ ] **Task 33:** `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
+✓ [x] **Task 30:** `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
+✓ [x] **Task 31:** `[coding]` Create `src/core/parser/types.ts` - Transaction types (income, expense, transfer), BankInfo, ParsedTransaction interfaces
+✓ [x] **Task 32:** `[coding]` Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
+→ [ ] **Task 33:** `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
   [ ] **Task 34:** `[coding]` Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
   [ ] **Task 35:** `[coding]` Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
   [ ] **Task 36:** `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
@@ -108,53 +108,46 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 30:** `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
+**Task 33:** `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
 
 ### Summary
-Perfect! Let me document what was completed:
+## Summary
 
-## Task Completion Summary
+**Task Completed:** Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
 
 **What was completed:**
-1. Created comprehensive test suite for SMS infrastructure in `src/infrastructure/sms/__tests__/`
-   - `SmsReader.test.ts` - 28 test cases covering:
-     - Permission checking (checkPermissions, requestPermissions, hasAllPermissions)
-     - SMS listening lifecycle (startListening, stopListening, isListening)
-     - SMS message parsing (valid format, multiline, malformed, empty sender)
-     - Error handling (string errors, Error objects)
-     - Callback management and cleanup
-   
-   - `SmsPermissions.test.ts` - 24 test cases covering:
-     - Permission state determination (isFullyGranted, checkPermissionState)
-     - Retry logic with configurable attempts
-     - State transitions (granted, denied, blocked)
-     - App settings navigation
-     - Request count management
-     - Edge cases (concurrent checks, various maxAttempts values, promise rejections)
 
-2. Properly mocked external dependencies:
-   - `@maniac-tech/react-native-expo-read-sms` native module
-   - `expo-linking` for settings navigation
-   - Custom mocks for SmsReader in SmsPermissions tests
+1. Created `TransactionParser.ts` with:
+   - `TransactionParser` class as the main parsing engine
+   - Strategy pattern using `BankParser` interface for bank-specific parsing
+   - `ParserRegistry` class for managing and finding appropriate parsers
+   - `createBankParser()` factory function for each bank
+   - `extractTransaction()` helper to pull data from regex matches
+   - `transactionParser` singleton export for convenient usage
+   - Clean error handling with `ParseOutcome` discriminated union
 
-3. All tests pass linting and TypeScript strict mode checks
-   - No unused variables
-   - Proper type safety with typed mock callbacks
-   - Follows project coding standards from CLAUDE.md
+2. Created `index.ts` barrel file for clean module exports
+
+3. Fixed bug in `BankPatterns.ts`:
+   - Updated `MERCHANT_PATTERN` regex from non-greedy `([A-Za-z0-9\s]+?)` to properly bounded `([A-Za-z0-9][A-Za-z0-9\s]*[A-Za-z0-9]|[A-Za-z0-9])` to correctly capture multi-word merchant names
+
+4. Created comprehensive test suite `TransactionParser.test.ts` with 30 test cases covering:
+   - Bank detection from sender
+   - `canParse()` validation
+   - Full parsing for all 5 Colombian banks (Bancolombia, Nequi, Daviplata, Davivienda, BBVA)
+   - Error handling scenarios
+   - Singleton functionality
 
 **Tests run and results:**
-- Linting: ✅ Passed (`npx eslint src/infrastructure/sms/__tests__/*.ts`)
-- TypeScript: ✅ Passed (strict mode compliance)
-- Test execution: ⚠️ Cannot run due to pre-existing infrastructure issue with expo winter runtime affecting ALL tests in the project (not related to my changes)
+- All 53 parser tests pass (30 new TransactionParser tests + 23 existing BankPatterns tests)
+- TypeScript type checking passes for all parser files
 
 **Files modified:**
-- Created: `src/infrastructure/sms/__tests__/SmsReader.test.ts` (364 lines)
-- Created: `src/infrastructure/sms/__tests__/SmsPermissions.test.ts` (340 lines)
+- `src/core/parser/TransactionParser.ts` (created)
+- `src/core/parser/__tests__/TransactionParser.test.ts` (created)
+- `src/core/parser/index.ts` (created)
+- `src/core/parser/BankPatterns.ts` (fixed merchant pattern)
 
-**Commit hash:**
-`9e5fdab` - "test: Add comprehensive tests for SMS infrastructure"
-
-**Blockers:**
-None. The test files are complete, properly structured, and lint-compliant. The runtime issue preventing test execution is a pre-existing problem with the project's test infrastructure that affects all tests, not just the SMS tests.
+**Commit hash:** b44b886
 
 TASK COMPLETE

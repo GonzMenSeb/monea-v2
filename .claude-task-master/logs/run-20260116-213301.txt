@@ -1597,3 +1597,135 @@ Goal: I want to create a React Native application specifically for android mobil
 Current Task (#31): Create `src/core/parser/types.ts` - Transaction types (income, expense, transfer), BankInfo, ParsedTransaction interfaces
 
 Please complete this task.
+[RESPONSE]
+## Task Completion Report
+
+### What was completed
+Created `src/core/parser/types.ts` containing:
+- **TransactionType**: Union type for `'income' | 'expense' | 'transfer_in' | 'transfer_out'` (aligned with existing Transaction model)
+- **BankCode**: Type literal for supported Colombian banks (`bancolombia`, `davivienda`, `bbva`, `nequi`, `daviplata`)
+- **BankInfo**: Interface defining bank metadata with sender pattern matching via RegExp array
+- **ParsedTransaction**: Interface for extracted transaction data from SMS
+- **ParseResult/ParseError**: Discriminated union (`ParseOutcome`) for type-safe parse results
+- **BankParser**: Interface for implementing the strategy pattern per bank
+
+### Tests run and results
+- TypeScript check on the new file: **PASS** (no errors)
+- Full project typecheck shows pre-existing errors in test files (unrelated to this task)
+
+### Files modified
+- `src/core/parser/types.ts` (new file)
+
+### Commit hash
+`02f8b66`
+
+### Blockers
+None
+
+TASK COMPLETE
+=== END | completed | 72.5s ===
+=== SESSION 32 | WORKING | 22:57:24 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#32): Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
+
+Please complete this task.
+[RESPONSE]
+## Task Completion Summary
+
+### What was completed:
+Created `src/core/parser/BankPatterns.ts` with comprehensive regex patterns for Colombian bank SMS parsing:
+
+1. **Bank Information**: Defined sender patterns for all 5 Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata) including short codes
+2. **Transaction Patterns**: Created regex patterns for each bank covering:
+   - Expense (purchases, payments, withdrawals)
+   - Income (transfers received, deposits)
+   - Transfer out (sent transfers)
+3. **Utility Functions**:
+   - `parseAmount()`: Handles Colombian peso formatting (dots as thousand separators)
+   - `parseDate()`: Parses DD/MM/YYYY format with optional time
+   - `matchesSender()`: Matches SMS sender against bank patterns
+   - `getBankBySender()`: Returns bank info from sender ID
+
+4. **Jest Configuration Fix**: Updated jest.config.js to use projects configuration, separating core tests from React Native tests to avoid Expo module conflicts
+
+### Tests run and results:
+- **23 tests passed** covering:
+  - Bank info validation
+  - Pattern structure verification
+  - Amount parsing (with/without symbols, thousand separators)
+  - Date parsing
+  - Sender matching
+  - Pattern matching for Bancolombia, Nequi, and Daviplata
+
+### Files modified:
+- `src/core/parser/BankPatterns.ts` (new - 287 lines)
+- `src/core/parser/__tests__/BankPatterns.test.ts` (new - 193 lines)
+- `jest.config.js` (updated with projects configuration)
+- `jest.setup.js` (minor updates)
+
+### Commit hash: `e623cd5`
+
+### Notes:
+- The patterns are based on common Colombian bank SMS formats but may need refinement with real SMS samples
+- The `_REFERENCE_PATTERN` is defined but unused (prefixed with underscore) for future use
+
+TASK COMPLETE
+=== END | completed | 366.1s ===
+=== SESSION 33 | WORKING | 23:03:31 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#33): Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
+
+Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task Completed:** Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
+
+**What was completed:**
+
+1. Created `TransactionParser.ts` with:
+   - `TransactionParser` class as the main parsing engine
+   - Strategy pattern using `BankParser` interface for bank-specific parsing
+   - `ParserRegistry` class for managing and finding appropriate parsers
+   - `createBankParser()` factory function for each bank
+   - `extractTransaction()` helper to pull data from regex matches
+   - `transactionParser` singleton export for convenient usage
+   - Clean error handling with `ParseOutcome` discriminated union
+
+2. Created `index.ts` barrel file for clean module exports
+
+3. Fixed bug in `BankPatterns.ts`:
+   - Updated `MERCHANT_PATTERN` regex from non-greedy `([A-Za-z0-9\s]+?)` to properly bounded `([A-Za-z0-9][A-Za-z0-9\s]*[A-Za-z0-9]|[A-Za-z0-9])` to correctly capture multi-word merchant names
+
+4. Created comprehensive test suite `TransactionParser.test.ts` with 30 test cases covering:
+   - Bank detection from sender
+   - `canParse()` validation
+   - Full parsing for all 5 Colombian banks (Bancolombia, Nequi, Daviplata, Davivienda, BBVA)
+   - Error handling scenarios
+   - Singleton functionality
+
+**Tests run and results:**
+- All 53 parser tests pass (30 new TransactionParser tests + 23 existing BankPatterns tests)
+- TypeScript type checking passes for all parser files
+
+**Files modified:**
+- `src/core/parser/TransactionParser.ts` (created)
+- `src/core/parser/__tests__/TransactionParser.test.ts` (created)
+- `src/core/parser/index.ts` (created)
+- `src/core/parser/BankPatterns.ts` (fixed merchant pattern)
+
+**Commit hash:** b44b886
+
+TASK COMPLETE
+=== END | completed | 179.3s ===
+=== SESSION 34 | WORKING | 23:06:30 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#34): Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
+
+Please complete this task.

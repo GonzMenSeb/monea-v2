@@ -1,4 +1,8 @@
+import { parseAmount } from './AmountExtractor';
+
 import type { BankCode, BankInfo, TransactionType } from './types';
+
+export { parseAmount };
 
 export const BANK_INFO: Record<BankCode, BankInfo> = {
   bancolombia: {
@@ -232,12 +236,6 @@ export const BANK_PATTERNS: Record<BankCode, TransactionPattern[]> = {
   nequi: NEQUI_PATTERNS,
   daviplata: DAVIPLATA_PATTERNS,
 };
-
-export function parseAmount(amountStr: string): number {
-  const cleaned = amountStr.replace(/[$,]/g, '').replace(/\./g, '');
-  const parsed = parseInt(cleaned, 10);
-  return isNaN(parsed) ? 0 : parsed;
-}
 
 export function parseDate(dateStr: string | undefined, timeStr?: string): Date {
   if (!dateStr) {

@@ -122,9 +122,9 @@ src/
 ### PR 6: SMS Parsing Engine (Core Business Logic)
 *Bank transaction message parsing*
 
-- [ ] `[coding]` Create `src/core/parser/types.ts` - Transaction types (income, expense, transfer), BankInfo, ParsedTransaction interfaces
-- [ ] `[coding]` Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
-- [ ] `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
+- [x] `[coding]` Create `src/core/parser/types.ts` - Transaction types (income, expense, transfer), BankInfo, ParsedTransaction interfaces
+- [x] `[coding]` Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
+- [x] `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
 - [ ] `[coding]` Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
 - [ ] `[coding]` Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
 - [ ] `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic

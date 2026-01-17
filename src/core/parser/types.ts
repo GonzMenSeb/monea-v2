@@ -1,11 +1,6 @@
 export type TransactionType = 'income' | 'expense' | 'transfer_in' | 'transfer_out';
 
-export type BankCode =
-  | 'bancolombia'
-  | 'davivienda'
-  | 'bbva'
-  | 'nequi'
-  | 'daviplata';
+export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'daviplata';
 
 export interface BankInfo {
   code: BankCode;
