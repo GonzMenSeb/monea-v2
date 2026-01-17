@@ -1,0 +1,11 @@
+import { Stack } from 'expo-router';
+
+export default function SettingsLayout(): React.ReactElement {
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    />
+  );
+}
