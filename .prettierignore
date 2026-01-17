@@ -1,0 +1,10 @@
+node_modules/
+.expo/
+dist/
+build/
+android/
+ios/
+coverage/
+*.lock
+package-lock.json
+yarn.lock
