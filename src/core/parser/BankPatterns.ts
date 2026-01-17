@@ -47,7 +47,7 @@ const BALANCE_PATTERN = '\\$?([\\d.,]+(?:\\.\\d{2})?)';
 const ACCOUNT_PATTERN = '\\**(\\d{4})';
 const DATE_PATTERN = '(\\d{2}/\\d{2}/\\d{4})';
 const TIME_PATTERN = '(\\d{2}:\\d{2})';
-const MERCHANT_PATTERN = '([A-Za-z0-9\\s]+?)';
+const MERCHANT_PATTERN = '([A-Za-z0-9][A-Za-z0-9\\s]*[A-Za-z0-9]|[A-Za-z0-9])';
 const _REFERENCE_PATTERN = '(?:Ref\\.?|Referencia:?)\\s*([A-Za-z0-9]+)';
 
 export const BANCOLOMBIA_PATTERNS: TransactionPattern[] = [
