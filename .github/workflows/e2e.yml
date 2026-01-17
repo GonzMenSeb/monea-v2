@@ -65,9 +65,6 @@ jobs:
       - name: Generate Android native project
         run: npx expo prebuild --platform android --clean
 
-      - name: Debug - Show generated MainApplication.kt
-        run: cat android/app/src/main/java/com/monea/app/MainApplication.kt
-
       - name: Build Android app for Detox
         env:
           ORG_GRADLE_PROJECT_reactNativeArchitectures: x86_64
@@ -76,10 +73,15 @@ jobs:
             -DtestBuildType=debug \
             --build-cache \
             --no-daemon \
-            --stacktrace \
-            -Dorg.gradle.parallel=true \
-            -Dkotlin.compiler.execution.strategy=in-process \
-            2>&1 | tee build.log || (grep -A 50 "e:" build.log; exit 1)
+            -Dorg.gradle.parallel=true
+
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
 
       - name: Create AVD (if not cached)
         if: steps.avd-cache.outputs.cache-hit != 'true'
