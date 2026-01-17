@@ -1,41 +1,119 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# Dependencies
 node_modules/
+package-lock.json
+yarn.lock
+.pnp
+.pnp.js
 
 # Expo
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
+.env.local
+.env.*.local
 
-# Native
+# React Native + Android
+/android/
+/ios/
+.gradle/
 .kotlin/
-*.orig.*
+build/
+*.apk
+*.aab
+*.aar
+local.properties
+gradle.properties
+keystore/
 *.jks
+*.keystore
+
+# EAS (Expo Application Services)
+.eas/
+eas-build-on-simulator
+
+# Development builds
+artifacts/
+
+# Metro bundler
+.metro-health-check*
+.haste_cache/
+
+# Testing
+coverage/
+.nyc_output/
+__coverage__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+.DS_Store
+
+# Native code generation
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.pem
+
+# Certificates & Keys
 *.p8
 *.p12
 *.key
 *.mobileprovision
+*.cer
+*.csr
+*.pfx
 
-# Metro
-.metro-health-check*
+# Environment files
+.env
+.env.*.local
+.env.production.local
+.env.development.local
+.env.test.local
 
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
-*.pem
-
-# local env files
-.env*.local
-
-# typescript
+# TypeScript
 *.tsbuildinfo
+dist/
 
-# generated native folders
-/ios
-/android
+# Babel cache
+.babelcache/
+
+# Build artifacts
+build/
+dist/
+coverage/
+
+# Lock files (optional - uncomment if preferred)
+# package-lock.json
+# yarn.lock
+
+# OS
+.DS_Store
+Thumbs.db
+.Thumbs.db
