@@ -5,8 +5,8 @@ import { Account, Category, Transaction, SmsMessage } from '../models';
 import { schema } from '../schema';
 
 import type { BankCode, AccountType } from '../models/Account';
-import type { TransactionType } from '../models/Transaction';
 import type { CategoryIcon } from '../models/Category';
+import type { TransactionType } from '../models/Transaction';
 
 export function createTestDatabase(): Database {
   const adapter = new LokiJSAdapter({

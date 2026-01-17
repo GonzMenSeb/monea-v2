@@ -1,4 +1,3 @@
-import { TransactionRepository } from '../repositories/TransactionRepository';
 import {
   createTestDatabase,
   resetDatabase,
@@ -6,6 +5,7 @@ import {
   createMockTransaction,
   createMockCategory,
 } from './testHelpers';
+import { TransactionRepository } from '../repositories/TransactionRepository';
 
 import type { Database } from '@nozbe/watermelondb';
 

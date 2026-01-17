@@ -2251,3 +2251,228 @@ Goal: I want to create a React Native application specifically for android mobil
 Current Task (#47): Create `src/features/transactions/hooks/useTransactions.ts` - React Query hook for transaction data
 
 Please complete this task.
+[RESPONSE]
+## Summary
+
+**What was completed:**
+
+Created the `src/features/transactions/hooks/useTransactions.ts` React Query hook file with the following functionality:
+
+1. **Query Hooks:**
+   - `useTransactions(filters?)` - Fetches all transactions with optional filtering
+   - `useTransaction(id)` - Fetches a single transaction by ID
+   - `useTransactionsByAccount(accountId)` - Fetches transactions for a specific account
+   - `useRecentTransactions({ accountId, limit })` - Fetches recent transactions with customizable limit
+   - `useTransactionSummary({ startDate, endDate })` - Gets transaction summary for date range
+   - `useAccountTransactionSummary(accountId)` - Gets summary for a specific account
+
+2. **Mutation Hooks:**
+   - `useCreateTransaction()` - Creates a single transaction
+   - `useCreateTransactionBatch()` - Creates multiple transactions at once
+   - `useUpdateTransaction()` - Updates an existing transaction
+   - `useDeleteTransaction()` - Deletes a transaction
+
+3. **Store Integration Hooks:**
+   - `useSelectedTransaction()` - Uses Zustand store's selectedId with useTransaction
+   - `useFilteredTransactions()` - Maps store filters to repository filters
+   - `useInvalidateTransactions()` - Utility to invalidate all transaction queries
+
+4. **Query Keys:**
+   - `TRANSACTION_QUERY_KEYS` object for consistent cache key management
+
+**Tests run and results:**
+- 21 tests passed covering all major hooks and query key generation
+
+**Files modified:**
+- `src/features/transactions/hooks/useTransactions.ts` (new)
+- `src/features/transactions/hooks/index.ts` (new)  
+- `src/features/transactions/hooks/__tests__/useTransactions.test.tsx` (new)
+
+**Commit hash:** `88eac11`
+
+TASK COMPLETE
+=== END | completed | 239.7s ===
+=== SESSION 48 | WORKING | 07:05:48 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#48): Create `src/features/transactions/components/TransactionList.tsx` - Virtualized list with sections by date
+
+Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task #48 Completed**: Created `src/features/transactions/components/TransactionList.tsx` - Virtualized list with sections by date
+
+### What was completed:
+1. **Installed @shopify/flash-list v2.0.2** for high-performance virtualized lists
+2. **Created TransactionList component** with:
+   - FlashList-based virtualization for optimal scrolling performance
+   - Date-based section grouping (Today, Yesterday, weekday + date format)
+   - Sticky section headers
+   - Support for loading state, empty state, and refresh control
+   - Memoized sub-components (SectionHeader, TransactionItem, ItemSeparator)
+   - Proper TypeScript typing with TransactionListProps interface
+3. **Created comprehensive test suite** with 8 passing tests covering:
+   - Loading state rendering
+   - Empty state rendering
+   - Custom empty state props
+   - Transactions grouped by date
+   - onTransactionPress callback
+   - Grouping multiple transactions under one header
+   - Descending date sorting
+   - Refresh control integration
+4. **Created index.ts** export file for the components directory
+
+### Tests run and results:
+- 8/8 tests passing
+- TypeScript check: Pass (no errors in TransactionList files)
+- Lint: Pass (no errors in TransactionList files)
+
+### Files modified/created:
+- `src/features/transactions/components/TransactionList.tsx` (new)
+- `src/features/transactions/components/__tests__/TransactionList.test.tsx` (new)
+- `src/features/transactions/components/index.ts` (new)
+- `package.json` (added @shopify/flash-list dependency)
+- `package-lock.json` (updated)
+
+### Commit hash:
+`6f6bd00`
+
+TASK COMPLETE
+=== END | completed | 322.3s ===
+=== SESSION 49 | WORKING | 07:11:11 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#49): Create `src/features/transactions/components/TransactionItem.tsx` - Single transaction row component
+
+Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task Completed:** Create `src/features/transactions/components/TransactionItem.tsx` - Single transaction row component
+
+### What was completed:
+1. Created `TransactionItem.tsx` - A memoized component that displays a single transaction row
+   - Uses `TransactionCard` from shared UI components
+   - Supports customizable currency formatting via `formatCurrency` prop
+   - Supports customizable time formatting via optional `formatTime` prop (defaults to es-CO locale)
+   - Has `onPress` callback for tap handling
+   - Includes `showBankAccent` prop for optional bank color accents
+
+2. Updated `TransactionList.tsx` - Refactored to use the extracted `TransactionItem` component instead of inline definition
+
+3. Updated `index.ts` - Added export for `TransactionItem` and `TransactionItemProps`
+
+4. Created comprehensive test file `TransactionItem.test.tsx` with 10 test cases covering:
+   - Merchant display
+   - Currency formatting
+   - Income/expense/transfer type handling with correct signs (+/-)
+   - Press handling with transaction ID
+   - Description display
+   - Custom time formatter
+
+### Tests run and results:
+- **TransactionItem tests:** 10 passed ✓
+- **TransactionList tests:** 8 passed ✓ (integration tests still pass after refactoring)
+- **TypeScript check:** No errors in TransactionItem or TransactionList files
+
+### Files modified:
+- `src/features/transactions/components/TransactionItem.tsx` (NEW)
+- `src/features/transactions/components/__tests__/TransactionItem.test.tsx` (NEW)
+- `src/features/transactions/components/TransactionList.tsx` (modified - uses extracted component)
+- `src/features/transactions/components/index.ts` (modified - added export)
+
+### Commit hash: `cf3afce55deb53539da4569ed96428bb7f031e88`
+
+TASK COMPLETE
+=== END | completed | 158.1s ===
+=== SESSION 50 | WORKING | 07:13:49 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#50): Create `src/features/transactions/components/TransactionDetail.tsx` - Full transaction view modal
+
+Please complete this task.
+[RESPONSE]
+## Summary
+
+**Completed:** Created `src/features/transactions/components/TransactionDetail.tsx` - a full transaction view modal component.
+
+**What was done:**
+1. Created `TransactionDetail.tsx` - A modal component that displays full transaction details including:
+   - Large formatted amount with correct sign (+/-) and color based on transaction type
+   - Merchant/description as title
+   - Transaction type label (Income, Expense, Transfer In, Transfer Out)
+   - Formatted date/time
+   - Bank name with accent color indicator (supports Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
+   - Masked account number
+   - Balance after transaction
+   - Reference number
+   - Category ID
+
+2. Created comprehensive test suite with 16 tests covering:
+   - Null transaction handling
+   - Amount formatting with signs for all transaction types
+   - Display of all transaction fields
+   - Accessibility (close button, backdrop)
+   - onClose callback
+
+3. Exported the component from the feature's index.ts
+
+**Tests run:** All 16 tests pass
+**Lint:** No errors in the new files
+**Files modified:**
+- `src/features/transactions/components/TransactionDetail.tsx` (new)
+- `src/features/transactions/components/__tests__/TransactionDetail.test.tsx` (new)
+- `src/features/transactions/components/index.ts` (updated exports)
+
+**Commit hash:** 96c5300
+
+TASK COMPLETE
+=== END | completed | 219.1s ===
+=== SESSION 51 | WORKING | 07:17:28 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#51): Create `src/app/(tabs)/transactions.tsx` - Main transactions screen
+
+Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task Completed:** Create `src/app/(tabs)/transactions.tsx` - Main transactions screen
+
+**What was completed:**
+1. Created the `(tabs)` directory structure for Expo Router tab navigation
+2. Implemented `transactions.tsx` screen with:
+   - Monthly summary header showing income, expenses, and net balance
+   - Integration with `useTransactions` hook for fetching transaction data
+   - Integration with `useTransactionSummary` hook for monthly summary data
+   - Pull-to-refresh functionality
+   - Transaction selection via `useTransactionStore`
+   - Proper currency formatting for Colombian Pesos (COP)
+   - Loading and empty states handled by `TransactionList` component
+
+**Tests run and results:**
+- `npm test -- src/features/transactions` - All 83 tests pass (5 test suites)
+- Lint check: No errors in the new file
+- TypeScript check: No errors in the new file
+
+**Files modified:**
+- `src/app/(tabs)/transactions.tsx` (new file - 131 lines)
+
+**Commit hash:** `b3b76c350cdabce68b6644a98637adb4c9b2a1c1`
+
+**Any blockers:** None
+
+TASK COMPLETE
+=== END | completed | 176.7s ===
+=== SESSION 52 | WORKING | 07:20:25 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#52): Write tests for transaction feature in `src/features/transactions/__tests__/`
+
+Please complete this task.

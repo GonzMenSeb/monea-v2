@@ -1,5 +1,5 @@
-import { AccountRepository } from '../repositories/AccountRepository';
 import { createTestDatabase, resetDatabase, createMockAccount } from './testHelpers';
+import { AccountRepository } from '../repositories/AccountRepository';
 
 import type { Database } from '@nozbe/watermelondb';
 

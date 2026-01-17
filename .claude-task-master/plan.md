@@ -146,11 +146,11 @@ src/
 *Main transaction list and detail views*
 
 - [x] `[coding]` Create `src/features/transactions/store/transactionStore.ts` - Zustand store for transaction state
-- [ ] `[coding]` Create `src/features/transactions/hooks/useTransactions.ts` - React Query hook for transaction data
-- [ ] `[coding]` Create `src/features/transactions/components/TransactionList.tsx` - Virtualized list with sections by date
-- [ ] `[coding]` Create `src/features/transactions/components/TransactionItem.tsx` - Single transaction row component
-- [ ] `[coding]` Create `src/features/transactions/components/TransactionDetail.tsx` - Full transaction view modal
-- [ ] `[coding]` Create `src/app/(tabs)/transactions.tsx` - Main transactions screen
+- [x] `[coding]` Create `src/features/transactions/hooks/useTransactions.ts` - React Query hook for transaction data
+- [x] `[coding]` Create `src/features/transactions/components/TransactionList.tsx` - Virtualized list with sections by date
+- [x] `[coding]` Create `src/features/transactions/components/TransactionItem.tsx` - Single transaction row component
+- [x] `[coding]` Create `src/features/transactions/components/TransactionDetail.tsx` - Full transaction view modal
+- [x] `[coding]` Create `src/app/(tabs)/transactions.tsx` - Main transactions screen
 - [ ] `[general]` Write tests for transaction feature in `src/features/transactions/__tests__/`
 
 ### PR 9: Dashboard & Home Screen

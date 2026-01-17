@@ -138,7 +138,16 @@ describe('MerchantExtractor', () => {
 
   describe('categorizeMerchant', () => {
     describe('supermarket category', () => {
-      const supermarkets = ['EXITO', 'CARULLA', 'JUMBO', 'OLIMPICA', 'D1', 'ARA', 'ALKOSTO', 'MAKRO'];
+      const supermarkets = [
+        'EXITO',
+        'CARULLA',
+        'JUMBO',
+        'OLIMPICA',
+        'D1',
+        'ARA',
+        'ALKOSTO',
+        'MAKRO',
+      ];
 
       it.each(supermarkets)('categorizes "%s" as supermarket', (merchant) => {
         expect(categorizeMerchant(merchant)).toBe('supermarket');
@@ -165,7 +174,16 @@ describe('MerchantExtractor', () => {
     });
 
     describe('transport category', () => {
-      const transport = ['UBER', 'DIDI', 'BEAT', 'CABIFY', 'TAXI', 'TERPEL', 'TEXACO', 'TRANSMILENIO'];
+      const transport = [
+        'UBER',
+        'DIDI',
+        'BEAT',
+        'CABIFY',
+        'TAXI',
+        'TERPEL',
+        'TEXACO',
+        'TRANSMILENIO',
+      ];
 
       it.each(transport)('categorizes "%s" as transport', (merchant) => {
         expect(categorizeMerchant(merchant)).toBe('transport');
@@ -181,7 +199,15 @@ describe('MerchantExtractor', () => {
     });
 
     describe('entertainment category', () => {
-      const entertainment = ['NETFLIX', 'SPOTIFY', 'DISNEY', 'HBO', 'YOUTUBE', 'CINEMARK', 'PROCINAL'];
+      const entertainment = [
+        'NETFLIX',
+        'SPOTIFY',
+        'DISNEY',
+        'HBO',
+        'YOUTUBE',
+        'CINEMARK',
+        'PROCINAL',
+      ];
 
       it.each(entertainment)('categorizes "%s" as entertainment', (merchant) => {
         expect(categorizeMerchant(merchant)).toBe('entertainment');
@@ -189,7 +215,14 @@ describe('MerchantExtractor', () => {
     });
 
     describe('health category', () => {
-      const health = ['DROGUERIA', 'FARMACIA', 'LA REBAJA', 'CRUZ VERDE', 'COLSUBSIDIO', 'HOSPITAL'];
+      const health = [
+        'DROGUERIA',
+        'FARMACIA',
+        'LA REBAJA',
+        'CRUZ VERDE',
+        'COLSUBSIDIO',
+        'HOSPITAL',
+      ];
 
       it.each(health)('categorizes "%s" as health', (merchant) => {
         expect(categorizeMerchant(merchant)).toBe('health');
@@ -197,7 +230,14 @@ describe('MerchantExtractor', () => {
     });
 
     describe('education category', () => {
-      const education = ['UNIVERSIDAD', 'COLEGIO', 'INSTITUTO', 'ICETEX', 'LIBRERIA', 'PANAMERICANA'];
+      const education = [
+        'UNIVERSIDAD',
+        'COLEGIO',
+        'INSTITUTO',
+        'ICETEX',
+        'LIBRERIA',
+        'PANAMERICANA',
+      ];
 
       it.each(education)('categorizes "%s" as education', (merchant) => {
         expect(categorizeMerchant(merchant)).toBe('education');
@@ -205,7 +245,15 @@ describe('MerchantExtractor', () => {
     });
 
     describe('shopping category', () => {
-      const shopping = ['FALABELLA', 'HOMECENTER', 'KTRONIX', 'ADIDAS', 'NIKE', 'MERCADO LIBRE', 'AMAZON'];
+      const shopping = [
+        'FALABELLA',
+        'HOMECENTER',
+        'KTRONIX',
+        'ADIDAS',
+        'NIKE',
+        'MERCADO LIBRE',
+        'AMAZON',
+      ];
 
       it.each(shopping)('categorizes "%s" as shopping', (merchant) => {
         expect(categorizeMerchant(merchant)).toBe('shopping');

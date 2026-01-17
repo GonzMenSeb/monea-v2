@@ -69,7 +69,8 @@ describe('Real SMS Samples - Colombian Banks', () => {
 
     describe('withdrawal (retiro)', () => {
       it('parses ATM withdrawal', () => {
-        const sms = 'Bancolombia le informa retiro por $100.000 en ATM BANCOLOMBIA. Saldo: $900.000';
+        const sms =
+          'Bancolombia le informa retiro por $100.000 en ATM BANCOLOMBIA. Saldo: $900.000';
         const result = parser.parse(sms, sender);
         expect(result.success).toBe(true);
         if (result.success) {
@@ -334,7 +335,8 @@ describe('Real SMS Samples - Colombian Banks', () => {
 
     describe('transfer sent', () => {
       it('parses outgoing transfer', () => {
-        const sms = 'Davivienda: transferencia enviada por $200.000 a CARLOS GOMEZ. Saldo: $800.000';
+        const sms =
+          'Davivienda: transferencia enviada por $200.000 a CARLOS GOMEZ. Saldo: $800.000';
         const result = parser.parse(sms, sender);
         expect(result.success).toBe(true);
         if (result.success) {
@@ -561,7 +563,10 @@ describe('Real SMS Samples - Colombian Banks', () => {
     describe('merchant name variations', () => {
       const merchantCases = [
         { merchant: 'EXITO', sms: 'Nequi: Pagaste $10.000 en EXITO. Saldo: $90.000' },
-        { merchant: 'EXITO COLOMBIA', sms: 'Nequi: Pagaste $10.000 en EXITO COLOMBIA. Saldo: $90.000' },
+        {
+          merchant: 'EXITO COLOMBIA',
+          sms: 'Nequi: Pagaste $10.000 en EXITO COLOMBIA. Saldo: $90.000',
+        },
         { merchant: 'RAPPI SAS', sms: 'Nequi: Pagaste $10.000 en RAPPI SAS. Saldo: $90.000' },
         { merchant: 'D1', sms: 'Nequi: Pagaste $10.000 en D1. Saldo: $90.000' },
         { merchant: 'CC SANTAFE', sms: 'Nequi: Pagaste $10.000 en CC SANTAFE. Saldo: $90.000' },
@@ -700,7 +705,8 @@ describe('Real SMS Samples - Colombian Banks', () => {
     });
 
     it('extracts account last 4 digits from Bancolombia Cta.* format', () => {
-      const sms = 'Bancolombia le informa retiro por $100.000 en CAJERO. Cta.*5678. Saldo: $900.000';
+      const sms =
+        'Bancolombia le informa retiro por $100.000 en CAJERO. Cta.*5678. Saldo: $900.000';
       const result = parser.parse(sms, 'Bancolombia');
       expect(result.success).toBe(true);
       if (result.success) {
