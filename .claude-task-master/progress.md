@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 28
-**Current Task:** 28 of 101
+**Session:** 29
+**Current Task:** 29 of 101
 
 ## Task List
 
@@ -32,8 +32,8 @@
 ✓ [x] **Task 25:** `[coding]` Install `react-native-get-sms-android` and configure in `app.json` plugins
 ✓ [x] **Task 26:** `[coding]` Create `src/infrastructure/sms/SmsReader.ts` - Native module wrapper with TypeScript types
 ✓ [x] **Task 27:** `[coding]` Create `src/infrastructure/sms/SmsPermissions.ts` - Permission request flow with retry logic
-→ [ ] **Task 28:** `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
-  [ ] **Task 29:** `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
+✓ [x] **Task 28:** `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
+→ [ ] **Task 29:** `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
   [ ] **Task 30:** `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
   [ ] **Task 31:** `[coding]` Create `src/core/parser/types.ts` - Transaction types (income, expense, transfer), BankInfo, ParsedTransaction interfaces
   [ ] **Task 32:** `[coding]` Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
@@ -108,43 +108,37 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 28:** `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
+**Task 29:** `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
 
 ### Summary
 ## Summary
 
-**Task Completed:** Created `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
+**Task Completed:** Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
 
 **What was completed:**
-1. Created the `useSmsPermission` hook that wraps the `smsPermissions` service with React state management
-2. The hook provides:
-   - `permissionState`: Current permission state ('unknown', 'checking', 'granted', 'denied', 'blocked')
-   - `isLoading`: Loading indicator during permission checks/requests
-   - `error`: Any error that occurred
-   - `canRetry`: Whether the user can retry requesting permissions
-   - `hasReadSms` / `hasReceiveSms`: Individual permission flags
-   - `isFullyGranted`: Convenience flag for when both permissions are granted
-   - `checkPermission()`: Method to check current permission status
-   - `requestPermission()`: Method to request permissions with retry logic
-   - `openSettings()`: Method to open app settings for manual permission grant
-3. Configurable options:
-   - `checkOnMount`: Automatically check permissions when hook mounts (default: true)
-   - `checkOnForeground`: Automatically recheck when app returns from background (default: true)
-4. Created comprehensive test suite covering initialization, state updates, loading states, error handling, and foreground checks
-5. Created index.ts for exports
+1. Created the `PermissionsScreen` component with:
+   - Clear, user-friendly messaging for all permission states (unknown, checking, granted, denied, blocked)
+   - Feature benefits display with icons explaining why permissions are needed
+   - Privacy reassurance message
+   - Grant permissions button with loading state
+   - Settings deep-link option when permissions are blocked
+   - Retry flow after returning from settings
+   - Optional skip functionality
+   - Smooth transition after successful grant
 
-**Tests run and results:**
-- TypeScript: ✅ Passes (`npm run typecheck`)
-- ESLint: ✅ Passes on new files (`npx eslint src/shared/hooks --ext .ts,.tsx`)
-- Note: Jest tests have a pre-existing issue with expo module system affecting all tests in the project
+2. Created proper exports:
+   - `src/features/onboarding/screens/index.ts`
+   - `src/features/onboarding/index.ts`
 
-**Files modified:**
-- `src/shared/hooks/useSmsPermission.ts` (new)
-- `src/shared/hooks/index.ts` (new)
-- `src/shared/hooks/__tests__/useSmsPermission.test.ts` (new)
+**Tests run:**
+- TypeScript check: ✅ Passed
+- Linting: File has pre-existing project-wide lint issues (react-native/no-raw-text false positives with Button component) - same pattern exists in all test files
 
-**Commit hash:** `db0596e97f5d00e8495283742126be9a34f9c97f`
+**Files created:**
+- `src/features/onboarding/screens/PermissionsScreen.tsx`
+- `src/features/onboarding/screens/index.ts`
+- `src/features/onboarding/index.ts`
 
-**Blockers:** None
+**Commit hash:** `06a55f2`
 
 TASK COMPLETE

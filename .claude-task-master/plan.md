@@ -116,7 +116,7 @@ src/
 - [x] `[coding]` Create `src/infrastructure/sms/SmsReader.ts` - Native module wrapper with TypeScript types
 - [x] `[coding]` Create `src/infrastructure/sms/SmsPermissions.ts` - Permission request flow with retry logic
 - [x] `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
-- [ ] `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
+- [x] `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
 - [ ] `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
 
 ### PR 6: SMS Parsing Engine (Core Business Logic)
