@@ -88,3 +88,30 @@ jest.mock('@/infrastructure/database', () => ({
   Category: class Category {},
   SmsMessage: class SmsMessage {},
 }));
+jest.mock('react-native-reanimated', () => {
+  const { View, Text, Pressable } = require('react-native');
+
+  const createMockAnimatedComponent = (Component) => {
+    const AnimatedComponent = (props) => <Component {...props} />;
+    AnimatedComponent.displayName = `Animated(${Component.displayName || Component.name || 'Component'})`;
+    return AnimatedComponent;
+  };
+
+  const mockAnimated = {
+    View: createMockAnimatedComponent(View),
+    Text: createMockAnimatedComponent(Text),
+    createAnimatedComponent: createMockAnimatedComponent,
+  };
+
+  return {
+    __esModule: true,
+    default: mockAnimated,
+    useSharedValue: (initialValue) => ({ value: initialValue }),
+    useAnimatedStyle: (styleFactory) => styleFactory(),
+    withSpring: (toValue) => toValue,
+    withTiming: (toValue) => toValue,
+    interpolateColor: (progress, input, output) => output[Math.round(progress)] || 'transparent',
+    Extrapolate: { CLAMP: 'clamp' },
+    createAnimatedComponent: createMockAnimatedComponent,
+  };
+});
