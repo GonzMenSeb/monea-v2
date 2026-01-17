@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 13
-**Current Task:** 13 of 101
+**Session:** 14
+**Current Task:** 14 of 101
 
 ## Task List
 
@@ -17,8 +17,8 @@
 ✓ [x] **Task 10:** `[coding]` Set up ESLint + Prettier configuration in `.eslintrc.js` and `.prettierrc` following Airbnb style guide adapted for RN
 ✓ [x] **Task 11:** `[quick]` Create `babel.config.js` with NativeWind and module resolver plugins
 ✓ [x] **Task 12:** `[coding]` Install and configure NativeWind (TailwindCSS) with `tailwind.config.js` and custom theme (Colombian bank colors, typography)
-→ [ ] **Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
-  [ ] **Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
+✓ [x] **Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
+→ [ ] **Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
   [ ] **Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
   [ ] **Task 16:** `[coding]` Install and configure WatermelonDB with initial schema in `src/infrastructure/database/`
   [ ] **Task 17:** `[coding]` Create `src/app/_layout.tsx` root layout with all providers (Theme, Query, Paper)
@@ -108,40 +108,33 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
+**Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
 
 ### Summary
-## Task Completion Summary
+## Task Completed
 
 **What was completed:**
-1. Installed `react-native-paper` v5.14.5 (with `react-native-vector-icons`)
-2. Created `src/shared/theme/paperTheme.ts` with:
-   - Custom MD3 light theme integrated with existing color palette
-   - Custom MD3 dark theme for dark mode support
-   - Font configuration using the existing typography settings
-   - Theme colors mapped to Colombian bank colors and semantic tokens
-3. Created `src/shared/theme/ThemeContext.tsx` with:
-   - React Context for theme state management
-   - Support for light, dark, and system (auto) theme modes
-   - `useAppTheme` hook for consuming theme
-   - `ThemeProvider` component
-4. Created `src/shared/providers/PaperProvider.tsx` combining React Native Paper with custom theme
-5. Created `src/shared/providers/index.ts` exporter
-6. Updated `src/shared/theme/index.ts` to export new theme utilities
+- Installed Zustand and `@react-native-async-storage/async-storage` for state management with persistence
+- Created `src/shared/store/` directory with:
+  - `createPersistedStore.ts` - Utility function for creating AsyncStorage-backed Zustand stores
+  - `appStore.ts` - Global app store with theme mode, onboarding status, and last sync timestamp
+  - `types.ts` - Common store types (BaseStoreActions, SetState, GetState)
+  - `index.ts` - Central exports
 
 **Tests run and results:**
 - `npm run typecheck` - ✅ Passed
 - `npm run lint` - ✅ Passed (after auto-fix)
+- `npm run format:check` - ✅ Passed
+- `npm run validate` - ✅ All checks passed
 
 **Files modified:**
-- `package.json` - Added react-native-paper dependency
-- `package-lock.json` - Lockfile updated
-- `src/shared/theme/index.ts` - Added exports for Paper theme
-- `src/shared/theme/paperTheme.ts` - NEW: Material Design 3 theme config
-- `src/shared/theme/ThemeContext.tsx` - NEW: Theme context and hook
-- `src/shared/providers/PaperProvider.tsx` - NEW: Paper provider wrapper
-- `src/shared/providers/index.ts` - NEW: Providers exporter
+- `package.json` - Added zustand and @react-native-async-storage/async-storage dependencies
+- `package-lock.json` - Updated lockfile
+- `src/shared/store/appStore.ts` - New file
+- `src/shared/store/createPersistedStore.ts` - New file
+- `src/shared/store/index.ts` - New file
+- `src/shared/store/types.ts` - New file
 
-**Commit hash:** `4e5288f`
+**Commit hash:** `04a97e2`
 
 TASK COMPLETE

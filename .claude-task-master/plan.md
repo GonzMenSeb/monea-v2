@@ -93,7 +93,7 @@ src/
 
 - [x] `[coding]` Install and configure NativeWind (TailwindCSS) with `tailwind.config.js` and custom theme (Colombian bank colors, typography)
 - [x] `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
-- [ ] `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
+- [x] `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
 - [ ] `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
 - [ ] `[coding]` Install and configure WatermelonDB with initial schema in `src/infrastructure/database/`
 - [ ] `[coding]` Create `src/app/_layout.tsx` root layout with all providers (Theme, Query, Paper)
