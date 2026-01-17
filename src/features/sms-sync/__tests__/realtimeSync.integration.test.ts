@@ -1,9 +1,6 @@
 import type { Database } from '@nozbe/watermelondb';
 
-import {
-  createTestDatabase,
-  resetDatabase,
-} from '@/infrastructure/database/__tests__/testHelpers';
+import { createTestDatabase, resetDatabase } from '@/infrastructure/database/__tests__/testHelpers';
 
 jest.mock('@/infrastructure/sms/SmsReader', () => ({
   smsReader: {
@@ -13,6 +10,7 @@ jest.mock('@/infrastructure/sms/SmsReader', () => ({
 }));
 
 import { smsReader } from '@/infrastructure/sms/SmsReader';
+
 import { SmsSyncService, resetSmsSyncService } from '../services/SmsSyncService';
 
 const mockSmsReader = smsReader as jest.Mocked<typeof smsReader>;

@@ -172,17 +172,17 @@ src/
 - [x] `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
 - [x] `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
 - [x] `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
-- [ ] `[general]` Write integration tests for SMS sync in `src/features/sms-sync/__tests__/`
+- [x] `[general]` Write integration tests for SMS sync in `src/features/sms-sync/__tests__/`
 
 ### PR 11: Settings & Account Management
 *User settings and bank account configuration*
 
-- [ ] `[coding]` Create `src/features/settings/screens/SettingsScreen.tsx` - Main settings list
-- [ ] `[coding]` Create `src/features/settings/screens/AccountsManagement.tsx` - Add/edit/delete bank accounts
-- [ ] `[coding]` Create `src/features/settings/screens/SmsSettings.tsx` - Configure SMS reading preferences
-- [ ] `[coding]` Create `src/features/settings/components/AccountForm.tsx` - Bank account form with validation
-- [ ] `[coding]` Create `src/app/(tabs)/settings.tsx` - Settings tab screen
-- [ ] `[coding]` Create `src/app/settings/accounts.tsx` - Accounts management nested screen
+- [x] `[coding]` Create `src/features/settings/screens/SettingsScreen.tsx` - Main settings list
+- [x] `[coding]` Create `src/features/settings/screens/AccountsManagement.tsx` - Add/edit/delete bank accounts
+- [x] `[coding]` Create `src/features/settings/screens/SmsSettings.tsx` - Configure SMS reading preferences
+- [x] `[coding]` Create `src/features/settings/components/AccountForm.tsx` - Bank account form with validation
+- [x] `[coding]` Create `src/app/(tabs)/settings.tsx` - Settings tab screen
+- [x] `[coding]` Create `src/app/settings/accounts.tsx` - Accounts management nested screen
 - [ ] `[general]` Write tests for settings feature in `src/features/settings/__tests__/`
 
 ### PR 12: Navigation & Tab Structure

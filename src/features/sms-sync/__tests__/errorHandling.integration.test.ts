@@ -6,10 +6,9 @@ import {
   createMockAccount,
 } from '@/infrastructure/database/__tests__/testHelpers';
 
-import Account from '@/infrastructure/database/models/Account';
-import SmsMessage from '@/infrastructure/database/models/SmsMessage';
-import Transaction from '@/infrastructure/database/models/Transaction';
-
+import type Account from '@/infrastructure/database/models/Account';
+import type SmsMessage from '@/infrastructure/database/models/SmsMessage';
+import type Transaction from '@/infrastructure/database/models/Transaction';
 import type { ParsedSmsMessage } from '@/infrastructure/sms/types';
 
 jest.mock('@/infrastructure/sms/SmsReader', () => ({
@@ -136,7 +135,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const validMessage: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en @#$%^&. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en @#$%^&. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en @#$%^&. Saldo: $500.000]',
       };
 
       const result = await service.processMessage(validMessage);
@@ -153,7 +153,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
       };
 
       await service.processMessage(message);
@@ -175,13 +176,15 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message1: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
       };
 
       const message2: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $450.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $450.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $450.000]',
       };
 
       const result1 = await service.processMessage(message1);
@@ -198,7 +201,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
       };
 
       await service.processMessage(message);
@@ -215,7 +219,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
       };
 
       await service.processMessage(message);
@@ -243,7 +248,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
       };
 
       await service.processMessage(message);
@@ -277,7 +283,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const smallAmountMessage: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $100 en TIENDA. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $100 en TIENDA. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $100 en TIENDA. Saldo: $500.000]',
       };
 
       const result = await service.processMessage(smallAmountMessage);
@@ -324,7 +331,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(2);
-      expect(accounts.map(a => a.accountNumber).sort()).toEqual(['1234', '5678']);
+      expect(accounts.map((a) => a.accountNumber).sort()).toEqual(['1234', '5678']);
     });
   });
 
@@ -357,7 +364,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message2: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $550.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $550.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $550.000]',
       };
 
       await service.processMessage(message1);
@@ -386,14 +394,15 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(2);
-      expect(accounts.every(a => a.accountType === 'digital_wallet')).toBe(true);
+      expect(accounts.every((a) => a.accountType === 'digital_wallet')).toBe(true);
     });
 
     it('sets savings account type for traditional banks', async () => {
       const bancolombiaMessage: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
       };
 
       await service.processMessage(bancolombiaMessage);
@@ -431,7 +440,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $950.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $950.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $950.000]',
       };
 
       await service.processMessage(message);
@@ -450,7 +460,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       const message: ParsedSmsMessage = {
         sender: 'Bancolombia',
         body: 'Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000',
-        rawMessage: '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
+        rawMessage:
+          '[Bancolombia, Bancolombia le informa compra por $50.000 en STORE. Saldo: $500.000]',
       };
 
       await service.processMessage(message);
