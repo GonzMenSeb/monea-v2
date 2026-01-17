@@ -11,8 +11,7 @@ function withSmsReader(config) {
 
     const smsReceiverExists = mainApplication.receiver.some(
       (receiver) =>
-        receiver.$?.['android:name'] ===
-        'com.reactlibrary.SmsReceiver'
+        receiver.$?.['android:name'] === 'com.reactlibrary.SmsReceiver'
     );
 
     if (!smsReceiverExists) {
@@ -41,38 +40,41 @@ function withSmsReader(config) {
   });
 
   config = withMainApplication(config, async (config) => {
-    const mainApplication = config.modResults;
-    const contents = mainApplication.contents;
+    let contents = config.modResults.contents;
 
-    if (!contents.includes('SmsPackage')) {
-      const importStatement = 'import com.reactlibrary.SmsPackage;';
-      const packageStatement = 'packages.add(new SmsPackage());';
+    if (contents.includes('SmsPackage')) {
+      return config;
+    }
 
-      if (!contents.includes(importStatement)) {
-        const lastImportIndex = contents.lastIndexOf('import ');
-        const endOfLastImport = contents.indexOf(';', lastImportIndex);
-        mainApplication.contents =
-          contents.slice(0, endOfLastImport + 1) +
+    const importStatement = 'import com.reactlibrary.SmsPackage';
+
+    if (!contents.includes(importStatement)) {
+      const packageMatch = contents.match(/^package\s+[\w.]+\s*\n/m);
+      if (packageMatch) {
+        const insertPos = packageMatch.index + packageMatch[0].length;
+        contents =
+          contents.slice(0, insertPos) +
           '\n' +
           importStatement +
-          contents.slice(endOfLastImport + 1);
-      }
-
-      if (!contents.includes(packageStatement)) {
-        const getPackagesIndex = contents.indexOf('getPackages()');
-        if (getPackagesIndex !== -1) {
-          const returnIndex = contents.indexOf('return packages;', getPackagesIndex);
-          if (returnIndex !== -1) {
-            mainApplication.contents =
-              contents.slice(0, returnIndex) +
-              packageStatement +
-              '\n            ' +
-              contents.slice(returnIndex);
-          }
-        }
+          '\n' +
+          contents.slice(insertPos);
       }
     }
 
+    if (!contents.includes('SmsPackage()')) {
+      const packagesApplyMatch = contents.match(
+        /PackageList\(this\)\.packages\.apply\s*\{/
+      );
+      if (packagesApplyMatch) {
+        const insertPos = packagesApplyMatch.index + packagesApplyMatch[0].length;
+        contents =
+          contents.slice(0, insertPos) +
+          '\n              add(SmsPackage())' +
+          contents.slice(insertPos);
+      }
+    }
+
+    config.modResults.contents = contents;
     return config;
   });
 

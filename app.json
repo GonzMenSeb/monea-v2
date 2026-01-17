@@ -60,6 +60,7 @@
           }
         }
       ],
+      "./plugins/withGradleOptimizations.js",
       "./plugins/withSmsReader.js"
     ],
     "experiments": {
