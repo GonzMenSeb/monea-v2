@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 36
-**Current Task:** 36 of 101
+**Session:** 41
+**Current Task:** 41 of 101
 
 ## Task List
 
@@ -40,12 +40,12 @@
 ✓ [x] **Task 33:** `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
 ✓ [x] **Task 34:** `[coding]` Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
 ✓ [x] **Task 35:** `[coding]` Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
-→ [ ] **Task 36:** `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
-  [ ] **Task 37:** `[coding]` Write comprehensive unit tests in `src/core/parser/__tests__/` with real SMS samples from Colombian banks
+✓ [x] **Task 36:** `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
+✓ [x] **Task 37:** `[coding]` Write comprehensive unit tests in `src/core/parser/__tests__/` with real SMS samples from Colombian banks
   [ ] **Task 38:** `[coding]` Create `src/infrastructure/database/schema.ts` - WatermelonDB schema (transactions, accounts, banks, categories)
-  [ ] **Task 39:** `[coding]` Create `src/infrastructure/database/models/Transaction.ts` - Transaction model with relations
-  [ ] **Task 40:** `[coding]` Create `src/infrastructure/database/models/Account.ts` - Bank account model
-  [ ] **Task 41:** `[coding]` Create `src/infrastructure/database/models/Category.ts` - Transaction category model
+✓ [x] **Task 39:** `[coding]` Create `src/infrastructure/database/models/Transaction.ts` - Transaction model with relations
+✓ [x] **Task 40:** `[coding]` Create `src/infrastructure/database/models/Account.ts` - Bank account model
+→ [ ] **Task 41:** `[coding]` Create `src/infrastructure/database/models/Category.ts` - Transaction category model
   [ ] **Task 42:** `[coding]` Create `src/infrastructure/database/repositories/TransactionRepository.ts` - CRUD + queries
   [ ] **Task 43:** `[coding]` Create `src/infrastructure/database/repositories/AccountRepository.ts` - Account operations
   [ ] **Task 44:** `[coding]` Create `src/infrastructure/database/migrations/` - Initial migration setup
@@ -108,39 +108,51 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 36:** `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
+**Task 41:** `[coding]` Create `src/infrastructure/database/models/Category.ts` - Transaction category model
 
 ### Summary
 ## Summary
 
-**Task Complete:** Created `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
+**Task Completed:** Create `src/infrastructure/database/models/Category.ts` - Transaction category model
 
-**What was completed:**
-1. Created `MerchantExtractor.ts` with the following functionality:
-   - `MerchantExtractionResult` interface for structured extraction results
-   - `MerchantCategory` type for categorizing merchants (supermarket, restaurant, transport, utilities, entertainment, health, education, shopping, transfer, atm, other)
-   - Category patterns for Colombian merchants (Exito, Carulla, Rappi, Uber, Netflix, etc.)
-   - Noise removal patterns for business suffixes (S.A.S, LTDA, NIT, etc.)
-   - `extractMerchant()` - Main extraction and normalization function
-   - `normalizeMerchant()` - Simple normalization helper
-   - `categorizeMerchant()` - Category detection helper
-   - `isKnownMerchant()` - Check if merchant matches known patterns
-   - `extractDescription()` - Extract description/concept from SMS
-   - `extractReference()` - Extract reference numbers from SMS
+**What was done:**
+1. Created `Category.ts` model with:
+   - `name`: Category name (e.g., "Food", "Transport")
+   - `icon`: CategoryIcon type with predefined options (food, transport, shopping, etc.)
+   - `color`: Hex color for category display
+   - `isSystem`: Flag for built-in vs user-created categories
+   - `isIncome`: Flag to distinguish income vs expense categories
+   - `createdAt`/`updatedAt`: Timestamps
+   - `transactions`: Relation to associated transactions
 
-2. Updated `src/core/parser/index.ts` to export the new functions and types
+2. Updated `schema.ts`:
+   - Added `categories` table with all required columns
+   - Added `category_id` (optional, indexed) to transactions table
+   - Bumped SCHEMA_VERSION from 1 to 2
 
-**Tests run and results:**
-- ESLint: ✅ No errors on the new file
-- TypeScript: ✅ Compiles without errors
-- Existing parser tests: ✅ All 152 tests passing
+3. Updated `Transaction.ts`:
+   - Added `categoryId` optional field
+   - Added `category` relation to Category model
+   - Updated associations to include categories
+
+4. Updated `database.ts`:
+   - Registered Category model in modelClasses
+
+5. Updated `models/index.ts`:
+   - Added Category export and CategoryIcon type export
+
+**Tests run:**
+- TypeScript check: Passed (pre-existing SMS test errors only)
+- ESLint on database folder: Passed
+- Database tests: No tests yet (passWithNoTests)
 
 **Files modified:**
-- `src/core/parser/MerchantExtractor.ts` (created)
-- `src/core/parser/index.ts` (updated exports)
+- `src/infrastructure/database/models/Category.ts` (created)
+- `src/infrastructure/database/schema.ts` (modified)
+- `src/infrastructure/database/models/Transaction.ts` (modified)
+- `src/infrastructure/database/models/index.ts` (modified)
+- `src/infrastructure/database/database.ts` (modified)
 
-**Commit hash:** `19513ad630b2b5b0417911e0b303e8b12bed3a65`
-
-**No blockers.**
+**Commit hash:** `35d50e7d45e046efc8afd0603486c15f2e43912f`
 
 TASK COMPLETE
