@@ -4,7 +4,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { PaperProvider, QueryProvider } from '@/shared/providers';
+import { PaperProvider, QueryProvider, SmsSyncProvider } from '@/shared/providers';
 import { useAppTheme } from '@/shared/theme';
 
 function RootLayoutContent(): React.ReactElement {
@@ -27,7 +27,9 @@ export default function RootLayout(): React.ReactElement {
     <SafeAreaProvider>
       <QueryProvider>
         <PaperProvider>
-          <RootLayoutContent />
+          <SmsSyncProvider>
+            <RootLayoutContent />
+          </SmsSyncProvider>
         </PaperProvider>
       </QueryProvider>
     </SafeAreaProvider>
