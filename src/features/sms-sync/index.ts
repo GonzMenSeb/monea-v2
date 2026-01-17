@@ -3,3 +3,6 @@ export type { SyncResult, SyncError, ProcessResult, SmsSyncServiceInterface } fr
 
 export { useSmsSync } from './hooks';
 export type { SmsSyncState, SmsSyncActions, UseSmsSyncResult } from './hooks';
+
+export { SyncStatus } from './components';
+export type { SyncStatusProps, SyncStatusVariant } from './components';

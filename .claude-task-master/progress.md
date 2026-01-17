@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 60
-**Current Task:** 60 of 101
+**Session:** 61
+**Current Task:** 61 of 101
 
 ## Task List
 
@@ -64,8 +64,8 @@
 ✓ [x] **Task 57:** `[coding]` Create `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
 ✓ [x] **Task 58:** `[coding]` Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
 ✓ [x] **Task 59:** `[general]` Write tests for dashboard components in `src/features/dashboard/__tests__/`
-→ [ ] **Task 60:** `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
-  [ ] **Task 61:** `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
+✓ [x] **Task 60:** `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
+→ [ ] **Task 61:** `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
   [ ] **Task 62:** `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
   [ ] **Task 63:** `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
   [ ] **Task 64:** `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
@@ -108,43 +108,35 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 60:** `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
+**Task 61:** `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
 
 ### Summary
 ## Summary
 
-**Task Completed:** Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
+**TASK COMPLETE**
 
-### What was completed:
-1. Created `SmsSyncService` class that:
-   - Reads SMS messages via the existing `smsReader` infrastructure
-   - Parses SMS using the `TransactionParser` from the core parser module
-   - Stores SMS messages in the database
-   - Creates transactions from parsed bank SMS
-   - Auto-creates accounts when a new bank/account number combination is detected
-   - Updates account balance after transactions
-   - Detects and skips duplicate messages
-   - Provides real-time sync via `startRealtimeSync()`/`stopRealtimeSync()`
-   - Implements event listeners for message processing and errors
-   - Includes `reprocessFailedMessages()` for retry functionality
+### What was completed
+Created `src/features/sms-sync/hooks/useSmsSync.ts` - A React hook to trigger and monitor SMS sync operations.
 
-2. Created feature module structure:
-   - `src/features/sms-sync/services/SmsSyncService.ts` - Main service
-   - `src/features/sms-sync/services/index.ts` - Service exports
-   - `src/features/sms-sync/index.ts` - Feature exports
-   - `src/features/sms-sync/services/__tests__/SmsSyncService.test.ts` - Test suite
+**Features of the hook:**
+- **Permission Management**: Check permissions, request permissions with retry, open app settings
+- **Sync Control**: Start/stop SMS listening, reprocess failed messages
+- **State Tracking**: Track syncing status, listening status, permission state, unprocessed count
+- **Event Handling**: Subscribe to message and error events from SmsSyncService
+- **Query Invalidation**: Automatically invalidate React Query cache when transactions are created
+- **Periodic Refresh**: Refresh unprocessed count every 30 seconds
 
-### Tests run and results:
-- **30 tests passed** across 2 projects (native and web)
-- Tests cover: message processing, account creation/reuse, duplicate detection, balance updates, real-time sync control, listeners, unprocessed count, and reprocessing
+### Tests run and results
+- 19 tests all passing
+- Tests cover: initialization, permission handling, listening control, reprocessing, event listeners, unprocessed count tracking
 
-### Files modified:
-- `src/features/sms-sync/index.ts` (new)
-- `src/features/sms-sync/services/SmsSyncService.ts` (new)
-- `src/features/sms-sync/services/__tests__/SmsSyncService.test.ts` (new)
-- `src/features/sms-sync/services/index.ts` (new)
+### Files modified
+1. `src/features/sms-sync/hooks/useSmsSync.ts` - Main hook implementation (new)
+2. `src/features/sms-sync/hooks/index.ts` - Exports (new)
+3. `src/features/sms-sync/hooks/__tests__/useSmsSync.test.ts` - Test suite (new)
+4. `src/features/sms-sync/index.ts` - Updated to export hook and types
 
-### Commit hash:
-`79d87fa`
+### Commit hash
+`331f490`
 
 TASK COMPLETE

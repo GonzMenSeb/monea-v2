@@ -168,7 +168,7 @@ src/
 *Background SMS processing*
 
 - [x] `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
-- [ ] `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
+- [x] `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
 - [ ] `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
 - [ ] `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
 - [ ] `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
