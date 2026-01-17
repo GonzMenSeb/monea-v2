@@ -1,4 +1,17 @@
 import { device, element, by, expect, waitFor } from 'detox';
+import { execSync } from 'child_process';
+
+const APP_PACKAGE = 'com.monea.app';
+
+const grantSmsPermissions = (): void => {
+  execSync(`adb shell pm grant ${APP_PACKAGE} android.permission.READ_SMS`);
+  execSync(`adb shell pm grant ${APP_PACKAGE} android.permission.RECEIVE_SMS`);
+};
+
+const revokeSmsPermissions = (): void => {
+  execSync(`adb shell pm revoke ${APP_PACKAGE} android.permission.READ_SMS`);
+  execSync(`adb shell pm revoke ${APP_PACKAGE} android.permission.RECEIVE_SMS`);
+};
 
 describe('Onboarding Flow', () => {
   beforeAll(async () => {
@@ -43,7 +56,8 @@ describe('Onboarding Flow', () => {
 
   describe('Permission Request Flow', () => {
     beforeEach(async () => {
-      await device.launchApp({ newInstance: true, permissions: { sms: 'unset' } });
+      revokeSmsPermissions();
+      await device.launchApp({ newInstance: true });
     });
 
     it('should request SMS permissions when Grant Permissions is pressed', async () => {
@@ -61,7 +75,8 @@ describe('Onboarding Flow', () => {
 
   describe('Permission Denied State', () => {
     beforeEach(async () => {
-      await device.launchApp({ newInstance: true, permissions: { sms: 'denied' } });
+      revokeSmsPermissions();
+      await device.launchApp({ newInstance: true });
     });
 
     it('should show denied state message when permission is denied', async () => {
@@ -77,7 +92,8 @@ describe('Onboarding Flow', () => {
 
   describe('Permission Granted State', () => {
     beforeEach(async () => {
-      await device.launchApp({ newInstance: true, permissions: { sms: 'granted' } });
+      grantSmsPermissions();
+      await device.launchApp({ newInstance: true });
     });
 
     it('should navigate to dashboard when permissions are granted', async () => {

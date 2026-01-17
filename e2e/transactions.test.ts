@@ -1,11 +1,17 @@
 import { device, element, by, expect, waitFor } from 'detox';
+import { execSync } from 'child_process';
+
+const APP_PACKAGE = 'com.monea.app';
+
+const grantSmsPermissions = (): void => {
+  execSync(`adb shell pm grant ${APP_PACKAGE} android.permission.READ_SMS`);
+  execSync(`adb shell pm grant ${APP_PACKAGE} android.permission.RECEIVE_SMS`);
+};
 
 describe('Transactions Flow', () => {
   beforeAll(async () => {
-    await device.launchApp({
-      newInstance: true,
-      permissions: { sms: 'granted' },
-    });
+    grantSmsPermissions();
+    await device.launchApp({ newInstance: true });
 
     await waitFor(element(by.text('Skip for Now')))
       .toBeVisible()
@@ -142,7 +148,7 @@ describe('Transactions Flow', () => {
       const transactionList = element(by.id('transaction-list'));
 
       try {
-        await transactionList.scroll(200, 'down', NaN, NaN, 0.85);
+        await transactionList.scroll(200, 'down');
       } catch {
         // Pull to refresh may not be visible without transactions
       }
