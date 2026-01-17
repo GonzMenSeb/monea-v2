@@ -3,6 +3,9 @@ import { field, date, readonly, children } from '@nozbe/watermelondb/decorators'
 
 import type Transaction from './Transaction';
 
+export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'daviplata';
+export type AccountType = 'savings' | 'checking' | 'credit' | 'digital_wallet';
+
 export default class Account extends Model {
   static table = 'accounts';
 
@@ -11,10 +14,10 @@ export default class Account extends Model {
     { type: 'has_many', foreignKey: 'account_id' },
   ]);
 
-  @field('bank_code') bankCode!: string;
+  @field('bank_code') bankCode!: BankCode;
   @field('bank_name') bankName!: string;
   @field('account_number') accountNumber!: string;
-  @field('account_type') accountType!: string;
+  @field('account_type') accountType!: AccountType;
   @field('balance') balance!: number;
   @field('last_synced_at') lastSyncedAt?: number;
   @field('is_active') isActive!: boolean;
