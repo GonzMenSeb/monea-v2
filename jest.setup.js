@@ -18,3 +18,6 @@ jest.mock('expo/src/winter/runtime.native', () => ({
 jest.mock('expo', () => ({
   __esModule: true,
 }));
+jest.mock('@expo/vector-icons', () => ({
+  MaterialCommunityIcons: 'MaterialCommunityIcons',
+}));
