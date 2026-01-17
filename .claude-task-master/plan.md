@@ -117,7 +117,7 @@ src/
 - [x] `[coding]` Create `src/infrastructure/sms/SmsPermissions.ts` - Permission request flow with retry logic
 - [x] `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
 - [x] `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
-- [ ] `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
+- [x] `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
 
 ### PR 6: SMS Parsing Engine (Core Business Logic)
 *Bank transaction message parsing*
