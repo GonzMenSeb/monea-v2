@@ -2692,3 +2692,44 @@ Goal: I want to create a React Native application specifically for android mobil
 Current Task (#57): Create `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
 
 Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task Completed:** Created `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
+
+**What was done:**
+1. Created the `hooks` directory under `src/features/dashboard/`
+2. Implemented `useDashboardData.ts` hook that aggregates:
+   - Total balance from all active accounts
+   - List of active accounts for AccountsOverview
+   - Recent transactions (configurable limit)
+   - Transaction summaries for current and previous periods
+   - Spending data points for charts (weekly/monthly breakdown)
+   - Percentage change and trend direction calculations
+3. Created query keys (`DASHBOARD_QUERY_KEYS`) for React Query cache management
+4. Updated `src/infrastructure/database/index.ts` to export `AccountRepository` and related types
+5. Created index file for hooks exports
+6. Wrote comprehensive test suite with 14 passing tests
+
+**Files modified:**
+- `src/features/dashboard/hooks/useDashboardData.ts` (new)
+- `src/features/dashboard/hooks/index.ts` (new)
+- `src/features/dashboard/__tests__/useDashboardData.test.tsx` (new)
+- `src/infrastructure/database/index.ts` (modified to export AccountRepository)
+
+**Tests run:**
+- 14 tests passed in `useDashboardData.test.tsx`
+- All linting passed
+- TypeScript compilation verified
+
+**Commit hash:** `421d381`
+
+TASK COMPLETE
+=== END | completed | 511.5s ===
+=== SESSION 58 | WORKING | 07:55:11 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#58): Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
+
+Please complete this task.
