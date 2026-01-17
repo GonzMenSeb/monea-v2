@@ -1,11 +1,13 @@
 import { Database } from '@nozbe/watermelondb';
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
 
+import { migrations } from './migrations';
 import { Account, Category, Transaction, SmsMessage } from './models';
 import { schema } from './schema';
 
 const adapter = new SQLiteAdapter({
   schema,
+  migrations,
   jsi: true,
   onSetUpError: (error) => {
     console.error('Database setup error:', error);

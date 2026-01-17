@@ -137,8 +137,8 @@ src/
 - [x] `[coding]` Create `src/infrastructure/database/models/Transaction.ts` - Transaction model with relations
 - [x] `[coding]` Create `src/infrastructure/database/models/Account.ts` - Bank account model
 - [x] `[coding]` Create `src/infrastructure/database/models/Category.ts` - Transaction category model
-- [ ] `[coding]` Create `src/infrastructure/database/repositories/TransactionRepository.ts` - CRUD + queries
-- [ ] `[coding]` Create `src/infrastructure/database/repositories/AccountRepository.ts` - Account operations
+- [x] `[coding]` Create `src/infrastructure/database/repositories/TransactionRepository.ts` - CRUD + queries
+- [x] `[coding]` Create `src/infrastructure/database/repositories/AccountRepository.ts` - Account operations
 - [ ] `[coding]` Create `src/infrastructure/database/migrations/` - Initial migration setup
 - [ ] `[general]` Write repository tests in `src/infrastructure/database/__tests__/`
 
