@@ -1,28 +1,10 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 
 export default function HomeScreen(): React.ReactElement {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Monea</Text>
-      <Text style={styles.subtitle}>Your digital wallet</Text>
+    <View className="flex-1 items-center justify-center bg-background-primary">
+      <Text className="text-4xl font-bold text-primary-600 mb-2">Monea</Text>
+      <Text className="text-base text-text-secondary">Your digital wallet</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
-});

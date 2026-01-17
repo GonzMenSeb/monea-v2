@@ -83,10 +83,10 @@ src/
 
 - [x] `[coding]` Initialize Expo project with TypeScript template using `npx create-expo-app@latest monea --template expo-template-blank-typescript`
 - [x] `[coding]` Configure `tsconfig.json` with strict mode and path aliases (`@/features/*`, `@/shared/*`, `@/core/*`)
-- [ ] `[coding]` Configure `app.json` for Android-only build with proper permissions (READ_SMS, RECEIVE_SMS)
-- [ ] `[quick]` Create `.gitignore` with React Native + Expo + Android specific ignores
-- [ ] `[coding]` Set up ESLint + Prettier configuration in `.eslintrc.js` and `.prettierrc` following Airbnb style guide adapted for RN
-- [ ] `[quick]` Create `babel.config.js` with NativeWind and module resolver plugins
+- [x] `[coding]` Configure `app.json` for Android-only build with proper permissions (READ_SMS, RECEIVE_SMS)
+- [x] `[quick]` Create `.gitignore` with React Native + Expo + Android specific ignores
+- [x] `[coding]` Set up ESLint + Prettier configuration in `.eslintrc.js` and `.prettierrc` following Airbnb style guide adapted for RN
+- [x] `[quick]` Create `babel.config.js` with NativeWind and module resolver plugins
 
 ### PR 3: Core Dependencies & UI Framework Setup
 *Install and configure all core dependencies*
