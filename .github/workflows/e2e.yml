@@ -46,8 +46,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            ~/.gradle/configuration-cache
-          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', '**/gradle-wrapper.properties', 'android/gradle.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('package-lock.json', 'app.json') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -66,6 +65,9 @@ jobs:
       - name: Generate Android native project
         run: npx expo prebuild --platform android --clean
 
+      - name: Debug - Show generated MainApplication.kt
+        run: cat android/app/src/main/java/com/monea/app/MainApplication.kt
+
       - name: Build Android app for Detox
         env:
           ORG_GRADLE_PROJECT_reactNativeArchitectures: x86_64
@@ -73,8 +75,8 @@ jobs:
           cd android && ./gradlew assembleDebug assembleAndroidTest \
             -DtestBuildType=debug \
             --build-cache \
-            --configuration-cache \
             --no-daemon \
+            --info \
             -Dorg.gradle.parallel=true \
             -Dorg.gradle.caching=true
 
