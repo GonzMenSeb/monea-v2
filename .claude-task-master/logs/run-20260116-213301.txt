@@ -1767,3 +1767,94 @@ Goal: I want to create a React Native application specifically for android mobil
 Current Task (#35): Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
 
 Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task Completed:** Created `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
+
+### What was completed:
+1. **Created `DateExtractor.ts`** with comprehensive date/time parsing capabilities:
+   - Colombian standard `DD/MM/YYYY` format
+   - ISO `YYYY-MM-DD` format
+   - Dash (`DD-MM-YYYY`) and dot (`DD.MM.YYYY`) separated formats
+   - Spanish month names (`ene`, `feb`, `mar`, `abr`, `may`, `jun`, `jul`, `ago`, `sep`, `oct`, `nov`, `dic`)
+   - 24-hour time formats (`HH:MM`, `HH:MM:SS`)
+   - 12-hour time formats with AM/PM (`H:MM am/pm`, `H:MM:SS a.m./p.m.`)
+   - Two-digit year normalization (years 70-99 → 1900s, years 00-69 → 2000s)
+
+2. **Exported functions:**
+   - `extractDate()` - Full extraction with result object
+   - `parseDate()` - Simple Date object return (fallback to current date)
+   - `parseTimeOnly()` - Time-only parsing
+   - `isValidDateString()` / `isValidTimeString()` - Validation helpers
+   - `formatCODate()` / `formatCODateTime()` - Colombian format output
+
+3. **Updated integration:**
+   - Modified `BankPatterns.ts` to import `parseDate` from `DateExtractor` instead of inline function
+   - Updated `index.ts` to export all DateExtractor functions
+
+4. **Created comprehensive test suite** (`DateExtractor.test.ts`) with 65 test cases covering all formats and edge cases
+
+### Tests run and results:
+- All 152 parser tests pass (65 new DateExtractor tests + 87 existing tests)
+
+### Files modified:
+- `src/core/parser/DateExtractor.ts` (new)
+- `src/core/parser/__tests__/DateExtractor.test.ts` (new)
+- `src/core/parser/BankPatterns.ts` (modified - removed inline parseDate, imports from DateExtractor)
+- `src/core/parser/index.ts` (modified - exports DateExtractor functions)
+- `src/core/parser/__tests__/TransactionParser.test.ts` (auto-fixed by prettier)
+
+### Commit hash: `1dc1b6c`
+
+TASK COMPLETE
+=== END | completed | 219.3s ===
+=== SESSION 36 | WORKING | 23:13:06 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#36): Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
+
+Please complete this task.
+[RESPONSE]
+## Summary
+
+**Task Complete:** Created `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
+
+**What was completed:**
+1. Created `MerchantExtractor.ts` with the following functionality:
+   - `MerchantExtractionResult` interface for structured extraction results
+   - `MerchantCategory` type for categorizing merchants (supermarket, restaurant, transport, utilities, entertainment, health, education, shopping, transfer, atm, other)
+   - Category patterns for Colombian merchants (Exito, Carulla, Rappi, Uber, Netflix, etc.)
+   - Noise removal patterns for business suffixes (S.A.S, LTDA, NIT, etc.)
+   - `extractMerchant()` - Main extraction and normalization function
+   - `normalizeMerchant()` - Simple normalization helper
+   - `categorizeMerchant()` - Category detection helper
+   - `isKnownMerchant()` - Check if merchant matches known patterns
+   - `extractDescription()` - Extract description/concept from SMS
+   - `extractReference()` - Extract reference numbers from SMS
+
+2. Updated `src/core/parser/index.ts` to export the new functions and types
+
+**Tests run and results:**
+- ESLint: ✅ No errors on the new file
+- TypeScript: ✅ Compiles without errors
+- Existing parser tests: ✅ All 152 tests passing
+
+**Files modified:**
+- `src/core/parser/MerchantExtractor.ts` (created)
+- `src/core/parser/index.ts` (updated exports)
+
+**Commit hash:** `19513ad630b2b5b0417911e0b303e8b12bed3a65`
+
+**No blockers.**
+
+TASK COMPLETE
+=== END | completed | 154.7s ===
+=== SESSION 37 | WORKING | 23:15:41 ===
+[PROMPT]
+Goal: I want to create a React Native application specifically for android mobile devices. This application is thought to be a centrallized digital wallet. It will initially work by reading your sm...
+
+Current Task (#37): Write comprehensive unit tests in `src/core/parser/__tests__/` with real SMS samples from Colombian banks
+
+Please complete this task.

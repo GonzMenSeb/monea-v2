@@ -126,8 +126,8 @@ src/
 - [x] `[coding]` Create `src/core/parser/BankPatterns.ts` - Regex patterns for Colombian banks (Bancolombia, Davivienda, BBVA, Nequi, Daviplata)
 - [x] `[coding]` Create `src/core/parser/TransactionParser.ts` - Main parsing engine with strategy pattern for different banks
 - [x] `[coding]` Create `src/core/parser/AmountExtractor.ts` - Currency amount parsing (COP format with dots/commas)
-- [ ] `[coding]` Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
-- [ ] `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
+- [x] `[coding]` Create `src/core/parser/DateExtractor.ts` - Date/time extraction from various formats
+- [x] `[coding]` Create `src/core/parser/MerchantExtractor.ts` - Merchant/description extraction logic
 - [ ] `[coding]` Write comprehensive unit tests in `src/core/parser/__tests__/` with real SMS samples from Colombian banks
 
 ### PR 7: Database Models & Repositories
