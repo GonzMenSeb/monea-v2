@@ -100,7 +100,7 @@ module.exports = {
     'react-native/no-inline-styles': 'warn',
     'react-native/no-color-literals': 'off',
     'react-native/no-raw-text': ['error', {
-      skip: ['Text', 'TextInput'],
+      skip: ['Text', 'TextInput', 'Heading', 'Body', 'Caption', 'Amount'],
     }],
     'react-native/no-single-element-style-arrays': 'error',
     'react-native/sort-styles': 'off',
