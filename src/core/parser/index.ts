@@ -17,6 +17,16 @@ export {
   parseTimeOnly,
   type DateExtractionResult,
 } from './DateExtractor';
+export {
+  categorizeMerchant,
+  extractDescription,
+  extractMerchant,
+  extractReference,
+  isKnownMerchant,
+  normalizeMerchant,
+  type MerchantCategory,
+  type MerchantExtractionResult,
+} from './MerchantExtractor';
 export type {
   BankCode,
   BankInfo,
