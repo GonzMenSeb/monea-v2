@@ -101,10 +101,10 @@ src/
 ### PR 4: Shared Components & Design System
 *Build reusable UI component library*
 
-- [ ] `[coding]` Create `src/shared/components/ui/Button.tsx` - Primary, Secondary, Outline variants with NativeWind
-- [ ] `[coding]` Create `src/shared/components/ui/Card.tsx` - Transaction card, Account card variants
-- [ ] `[coding]` Create `src/shared/components/ui/Typography.tsx` - Heading, Body, Caption, Amount (currency formatting)
-- [ ] `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
+- [x] `[coding]` Create `src/shared/components/ui/Button.tsx` - Primary, Secondary, Outline variants with NativeWind
+- [x] `[coding]` Create `src/shared/components/ui/Card.tsx` - Transaction card, Account card variants
+- [x] `[coding]` Create `src/shared/components/ui/Typography.tsx` - Heading, Body, Caption, Amount (currency formatting)
+- [x] `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
 - [ ] `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
 - [ ] `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
 - [ ] `[general]` Write unit tests for all shared components in `src/shared/components/__tests__/`
