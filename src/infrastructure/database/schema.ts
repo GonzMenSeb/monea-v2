@@ -1,6 +1,6 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const schema = appSchema({
   version: SCHEMA_VERSION,
@@ -23,6 +23,7 @@ export const schema = appSchema({
       name: 'transactions',
       columns: [
         { name: 'account_id', type: 'string', isIndexed: true },
+        { name: 'category_id', type: 'string', isOptional: true, isIndexed: true },
         { name: 'type', type: 'string' },
         { name: 'amount', type: 'number' },
         { name: 'balance_after', type: 'number', isOptional: true },
@@ -32,6 +33,18 @@ export const schema = appSchema({
         { name: 'sms_id', type: 'string', isOptional: true },
         { name: 'transaction_date', type: 'number' },
         { name: 'raw_sms', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
+      ],
+    }),
+    tableSchema({
+      name: 'categories',
+      columns: [
+        { name: 'name', type: 'string' },
+        { name: 'icon', type: 'string' },
+        { name: 'color', type: 'string' },
+        { name: 'is_system', type: 'boolean' },
+        { name: 'is_income', type: 'boolean' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
       ],
