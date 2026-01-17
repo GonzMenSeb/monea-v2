@@ -169,9 +169,9 @@ src/
 
 - [x] `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
 - [x] `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
-- [ ] `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
-- [ ] `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
-- [ ] `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
+- [x] `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
+- [x] `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
+- [x] `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
 - [ ] `[general]` Write integration tests for SMS sync in `src/features/sms-sync/__tests__/`
 
 ### PR 11: Settings & Account Management

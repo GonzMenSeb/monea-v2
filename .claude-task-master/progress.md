@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 61
-**Current Task:** 61 of 101
+**Session:** 64
+**Current Task:** 64 of 101
 
 ## Task List
 
@@ -65,10 +65,10 @@
 ✓ [x] **Task 58:** `[coding]` Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
 ✓ [x] **Task 59:** `[general]` Write tests for dashboard components in `src/features/dashboard/__tests__/`
 ✓ [x] **Task 60:** `[coding]` Create `src/features/sms-sync/services/SmsSyncService.ts` - Service to read, parse, and store SMS transactions
-→ [ ] **Task 61:** `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
-  [ ] **Task 62:** `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
-  [ ] **Task 63:** `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
-  [ ] **Task 64:** `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
+✓ [x] **Task 61:** `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
+✓ [x] **Task 62:** `[coding]` Create `src/features/sms-sync/components/SyncStatus.tsx` - Sync progress indicator
+✓ [x] **Task 63:** `[coding]` Create `src/features/sms-sync/components/SyncButton.tsx` - Manual sync trigger
+→ [ ] **Task 64:** `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
   [ ] **Task 65:** `[general]` Write integration tests for SMS sync in `src/features/sms-sync/__tests__/`
   [ ] **Task 66:** `[coding]` Create `src/features/settings/screens/SettingsScreen.tsx` - Main settings list
   [ ] **Task 67:** `[coding]` Create `src/features/settings/screens/AccountsManagement.tsx` - Add/edit/delete bank accounts
@@ -108,35 +108,36 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 61:** `[coding]` Create `src/features/sms-sync/hooks/useSmsSync.ts` - Hook to trigger and monitor sync
+**Task 64:** `[coding]` Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
 
 ### Summary
 ## Summary
 
-**TASK COMPLETE**
+**Task Completed:** Integrate SMS sync into app startup flow in `src/app/_layout.tsx`
 
-### What was completed
-Created `src/features/sms-sync/hooks/useSmsSync.ts` - A React hook to trigger and monitor SMS sync operations.
+**What was completed:**
+1. Created `SmsSyncProvider` component (`src/shared/providers/SmsSyncProvider.tsx`) that:
+   - Auto-starts SMS sync when the app launches (if permissions are granted)
+   - Checks permissions before starting real-time sync
+   - Stops sync cleanly on unmount
+   - Provides `useSmsSyncService` hook for accessing the SMS sync service from any component
 
-**Features of the hook:**
-- **Permission Management**: Check permissions, request permissions with retry, open app settings
-- **Sync Control**: Start/stop SMS listening, reprocess failed messages
-- **State Tracking**: Track syncing status, listening status, permission state, unprocessed count
-- **Event Handling**: Subscribe to message and error events from SmsSyncService
-- **Query Invalidation**: Automatically invalidate React Query cache when transactions are created
-- **Periodic Refresh**: Refresh unprocessed count every 30 seconds
+2. Updated `src/shared/providers/index.ts` to export the new provider and hook
 
-### Tests run and results
-- 19 tests all passing
-- Tests cover: initialization, permission handling, listening control, reprocessing, event listeners, unprocessed count tracking
+3. Updated `src/app/_layout.tsx` to include `SmsSyncProvider` in the provider hierarchy
 
-### Files modified
-1. `src/features/sms-sync/hooks/useSmsSync.ts` - Main hook implementation (new)
-2. `src/features/sms-sync/hooks/index.ts` - Exports (new)
-3. `src/features/sms-sync/hooks/__tests__/useSmsSync.test.ts` - Test suite (new)
-4. `src/features/sms-sync/index.ts` - Updated to export hook and types
+4. Created comprehensive test suite (`src/shared/providers/__tests__/SmsSyncProvider.test.tsx`) with 7 passing tests
 
-### Commit hash
-`331f490`
+**Tests run and results:**
+- All 7 tests passing for SmsSyncProvider
+- ESLint passes on all modified files
+
+**Files modified:**
+- `src/shared/providers/SmsSyncProvider.tsx` (new file)
+- `src/shared/providers/__tests__/SmsSyncProvider.test.tsx` (new file)
+- `src/shared/providers/index.ts` (modified)
+- `src/app/_layout.tsx` (modified)
+
+**Commit hash:** `82a45cb1aaf78d7355f76f65d9cece8ab04f6f80`
 
 TASK COMPLETE
