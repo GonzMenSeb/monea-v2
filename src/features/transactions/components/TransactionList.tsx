@@ -6,7 +6,8 @@ import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
-import { TransactionCard } from '@/shared/components/ui/Card';
+
+import { TransactionItem } from './TransactionItem';
 
 import type Transaction from '@/infrastructure/database/models/Transaction';
 
@@ -50,14 +51,6 @@ function formatDateForSection(date: Date): string {
     day: 'numeric',
     month: 'long',
     year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
-  });
-}
-
-function formatTransactionTime(date: Date): string {
-  return date.toLocaleTimeString('es-CO', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
   });
 }
 
@@ -109,41 +102,6 @@ const SectionHeader = memo(function SectionHeader({
 
 const ItemSeparator = memo(function ItemSeparator(): React.ReactElement {
   return <View className={ITEM_SEPARATOR_STYLES} />;
-});
-
-interface TransactionItemProps {
-  transaction: Transaction;
-  formatCurrency: (amount: number) => string;
-  onPress?: (transactionId: string) => void;
-}
-
-const TransactionItem = memo(function TransactionItem({
-  transaction,
-  formatCurrency,
-  onPress,
-}: TransactionItemProps): React.ReactElement {
-  const handlePress = useCallback(() => {
-    onPress?.(transaction.id);
-  }, [transaction.id, onPress]);
-
-  return (
-    <View className="px-4">
-      <TransactionCard
-        transaction={{
-          id: transaction.id,
-          type: transaction.type,
-          amount: transaction.amount,
-          merchant: transaction.merchant,
-          description: transaction.description,
-          transactionDate: transaction.transactionDate,
-          bankName: undefined,
-        }}
-        formatCurrency={formatCurrency}
-        formatDate={formatTransactionTime}
-        onPress={onPress ? handlePress : undefined}
-      />
-    </View>
-  );
 });
 
 export function TransactionList({
