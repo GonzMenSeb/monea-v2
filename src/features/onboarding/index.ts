@@ -1,0 +1,1 @@
+export { PermissionsScreen } from './screens';

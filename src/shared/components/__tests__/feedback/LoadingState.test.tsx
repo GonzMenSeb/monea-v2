@@ -105,9 +105,7 @@ describe('LoadingState', () => {
     });
 
     it('renders with all custom props', () => {
-      render(
-        <LoadingState size="sm" variant="inline" message="Please wait" color="#0000FF" />
-      );
+      render(<LoadingState size="sm" variant="inline" message="Please wait" color="#0000FF" />);
       expect(screen.getByTestId('activity-indicator')).toBeTruthy();
       expect(screen.getByText('Please wait')).toBeTruthy();
     });

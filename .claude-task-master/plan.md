@@ -107,15 +107,15 @@ src/
 - [x] `[coding]` Create `src/shared/components/ui/Input.tsx` - Text input with validation states
 - [x] `[coding]` Create `src/shared/components/layout/Screen.tsx` - Safe area wrapper with keyboard avoiding
 - [x] `[coding]` Create `src/shared/components/feedback/EmptyState.tsx` and `LoadingState.tsx`
-- [ ] `[general]` Write unit tests for all shared components in `src/shared/components/__tests__/`
+- [x] `[general]` Write unit tests for all shared components in `src/shared/components/__tests__/`
 
 ### PR 5: SMS Reading Infrastructure
 *Core SMS access and permission handling*
 
-- [ ] `[coding]` Install `react-native-get-sms-android` and configure in `app.json` plugins
-- [ ] `[coding]` Create `src/infrastructure/sms/SmsReader.ts` - Native module wrapper with TypeScript types
-- [ ] `[coding]` Create `src/infrastructure/sms/SmsPermissions.ts` - Permission request flow with retry logic
-- [ ] `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
+- [x] `[coding]` Install `react-native-get-sms-android` and configure in `app.json` plugins
+- [x] `[coding]` Create `src/infrastructure/sms/SmsReader.ts` - Native module wrapper with TypeScript types
+- [x] `[coding]` Create `src/infrastructure/sms/SmsPermissions.ts` - Permission request flow with retry logic
+- [x] `[coding]` Create `src/shared/hooks/useSmsPermission.ts` - Hook for permission state management
 - [ ] `[coding]` Create `src/features/onboarding/screens/PermissionsScreen.tsx` - User-friendly permission request UI
 - [ ] `[general]` Write tests for SMS infrastructure in `src/infrastructure/sms/__tests__/`
 

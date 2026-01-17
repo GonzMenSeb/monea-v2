@@ -260,7 +260,11 @@ describe('Card', () => {
     it('renders bank name', () => {
       const onSelect = jest.fn();
       render(
-        <AccountCard account={mockAccount} formatCurrency={mockFormatCurrency} onSelect={onSelect} />
+        <AccountCard
+          account={mockAccount}
+          formatCurrency={mockFormatCurrency}
+          onSelect={onSelect}
+        />
       );
       expect(screen.getByText('Bancolombia')).toBeTruthy();
     });
@@ -268,7 +272,11 @@ describe('Card', () => {
     it('renders masked account number', () => {
       const onSelect = jest.fn();
       render(
-        <AccountCard account={mockAccount} formatCurrency={mockFormatCurrency} onSelect={onSelect} />
+        <AccountCard
+          account={mockAccount}
+          formatCurrency={mockFormatCurrency}
+          onSelect={onSelect}
+        />
       );
       expect(screen.getByText(/\*\*\*\*1234/)).toBeTruthy();
     });
@@ -276,7 +284,11 @@ describe('Card', () => {
     it('renders account type', () => {
       const onSelect = jest.fn();
       render(
-        <AccountCard account={mockAccount} formatCurrency={mockFormatCurrency} onSelect={onSelect} />
+        <AccountCard
+          account={mockAccount}
+          formatCurrency={mockFormatCurrency}
+          onSelect={onSelect}
+        />
       );
       expect(screen.getByText(/Savings/)).toBeTruthy();
     });
@@ -284,7 +296,11 @@ describe('Card', () => {
     it('renders formatted balance', () => {
       const onSelect = jest.fn();
       render(
-        <AccountCard account={mockAccount} formatCurrency={mockFormatCurrency} onSelect={onSelect} />
+        <AccountCard
+          account={mockAccount}
+          formatCurrency={mockFormatCurrency}
+          onSelect={onSelect}
+        />
       );
       expect(screen.getByText('$1,500,000')).toBeTruthy();
     });
@@ -292,7 +308,11 @@ describe('Card', () => {
     it('calls onSelect with account id when pressed', () => {
       const onSelect = jest.fn();
       render(
-        <AccountCard account={mockAccount} formatCurrency={mockFormatCurrency} onSelect={onSelect} />
+        <AccountCard
+          account={mockAccount}
+          formatCurrency={mockFormatCurrency}
+          onSelect={onSelect}
+        />
       );
       fireEvent.press(screen.getByRole('button'));
       expect(onSelect).toHaveBeenCalledWith('acc-1');
@@ -346,7 +366,11 @@ describe('Card', () => {
     it('has proper accessibility label', () => {
       const onSelect = jest.fn();
       render(
-        <AccountCard account={mockAccount} formatCurrency={mockFormatCurrency} onSelect={onSelect} />
+        <AccountCard
+          account={mockAccount}
+          formatCurrency={mockFormatCurrency}
+          onSelect={onSelect}
+        />
       );
       const button = screen.getByRole('button');
       expect(button.props.accessibilityLabel).toBe('Bancolombia account ending in 1234');

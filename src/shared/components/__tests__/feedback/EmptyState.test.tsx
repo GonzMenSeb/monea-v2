@@ -61,13 +61,7 @@ describe('EmptyState', () => {
     });
 
     it('custom description overrides variant default', () => {
-      render(
-        <EmptyState
-          title="Empty"
-          description="Custom description"
-          variant="transactions"
-        />
-      );
+      render(<EmptyState title="Empty" description="Custom description" variant="transactions" />);
       expect(screen.getByText('Custom description')).toBeTruthy();
     });
   });
@@ -125,7 +119,9 @@ describe('EmptyState', () => {
         />
       );
       expect(screen.getByText('No accounts linked')).toBeTruthy();
-      expect(screen.getByText('Link your bank accounts to start tracking your transactions.')).toBeTruthy();
+      expect(
+        screen.getByText('Link your bank accounts to start tracking your transactions.')
+      ).toBeTruthy();
       expect(screen.getByText('Link Account')).toBeTruthy();
     });
 
