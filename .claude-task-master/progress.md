@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 14
-**Current Task:** 14 of 101
+**Session:** 15
+**Current Task:** 15 of 101
 
 ## Task List
 
@@ -18,8 +18,8 @@
 ✓ [x] **Task 11:** `[quick]` Create `babel.config.js` with NativeWind and module resolver plugins
 ✓ [x] **Task 12:** `[coding]` Install and configure NativeWind (TailwindCSS) with `tailwind.config.js` and custom theme (Colombian bank colors, typography)
 ✓ [x] **Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
-→ [ ] **Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
-  [ ] **Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
+✓ [x] **Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
+→ [ ] **Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
   [ ] **Task 16:** `[coding]` Install and configure WatermelonDB with initial schema in `src/infrastructure/database/`
   [ ] **Task 17:** `[coding]` Create `src/app/_layout.tsx` root layout with all providers (Theme, Query, Paper)
   [ ] **Task 18:** `[coding]` Create `src/shared/components/ui/Button.tsx` - Primary, Secondary, Outline variants with NativeWind
@@ -108,33 +108,29 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
+**Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
 
 ### Summary
-## Task Completed
+## Task Complete
 
 **What was completed:**
-- Installed Zustand and `@react-native-async-storage/async-storage` for state management with persistence
-- Created `src/shared/store/` directory with:
-  - `createPersistedStore.ts` - Utility function for creating AsyncStorage-backed Zustand stores
-  - `appStore.ts` - Global app store with theme mode, onboarding status, and last sync timestamp
-  - `types.ts` - Common store types (BaseStoreActions, SetState, GetState)
-  - `index.ts` - Central exports
+- Installed `@tanstack/react-query` package
+- Created `QueryProvider.tsx` in `src/shared/providers/` with sensible defaults for mobile:
+  - 5 minute stale time
+  - 30 minute garbage collection time
+  - 2 retries for queries, 1 for mutations
+  - `refetchOnWindowFocus` disabled (not needed for mobile apps)
+- Exported QueryProvider from providers index
 
 **Tests run and results:**
-- `npm run typecheck` - ✅ Passed
-- `npm run lint` - ✅ Passed (after auto-fix)
-- `npm run format:check` - ✅ Passed
-- `npm run validate` - ✅ All checks passed
+- `npm run typecheck` - Passed ✓
+- `npm run lint` - Passed ✓
 
 **Files modified:**
-- `package.json` - Added zustand and @react-native-async-storage/async-storage dependencies
-- `package-lock.json` - Updated lockfile
-- `src/shared/store/appStore.ts` - New file
-- `src/shared/store/createPersistedStore.ts` - New file
-- `src/shared/store/index.ts` - New file
-- `src/shared/store/types.ts` - New file
+- `package.json` - Added @tanstack/react-query dependency
+- `src/shared/providers/QueryProvider.tsx` - Created new file
+- `src/shared/providers/index.ts` - Added export
 
-**Commit hash:** `04a97e2`
+**Commit hash:** `4434e89`
 
 TASK COMPLETE

@@ -7,6 +7,7 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
+    "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
       "@/features/*": ["src/features/*"],
