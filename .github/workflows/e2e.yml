@@ -76,9 +76,10 @@ jobs:
             -DtestBuildType=debug \
             --build-cache \
             --no-daemon \
-            --info \
+            --stacktrace \
             -Dorg.gradle.parallel=true \
-            -Dorg.gradle.caching=true
+            -Dkotlin.compiler.execution.strategy=in-process \
+            2>&1 | tee build.log || (grep -A 50 "e:" build.log; exit 1)
 
       - name: Create AVD (if not cached)
         if: steps.avd-cache.outputs.cache-hit != 'true'
