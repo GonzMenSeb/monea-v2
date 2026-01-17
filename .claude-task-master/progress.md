@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 15
-**Current Task:** 15 of 101
+**Session:** 17
+**Current Task:** 17 of 101
 
 ## Task List
 
@@ -19,9 +19,9 @@
 ✓ [x] **Task 12:** `[coding]` Install and configure NativeWind (TailwindCSS) with `tailwind.config.js` and custom theme (Colombian bank colors, typography)
 ✓ [x] **Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
 ✓ [x] **Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
-→ [ ] **Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
-  [ ] **Task 16:** `[coding]` Install and configure WatermelonDB with initial schema in `src/infrastructure/database/`
-  [ ] **Task 17:** `[coding]` Create `src/app/_layout.tsx` root layout with all providers (Theme, Query, Paper)
+✓ [x] **Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
+✓ [x] **Task 16:** `[coding]` Install and configure WatermelonDB with initial schema in `src/infrastructure/database/`
+→ [ ] **Task 17:** `[coding]` Create `src/app/_layout.tsx` root layout with all providers (Theme, Query, Paper)
   [ ] **Task 18:** `[coding]` Create `src/shared/components/ui/Button.tsx` - Primary, Secondary, Outline variants with NativeWind
   [ ] **Task 19:** `[coding]` Create `src/shared/components/ui/Card.tsx` - Transaction card, Account card variants
   [ ] **Task 20:** `[coding]` Create `src/shared/components/ui/Typography.tsx` - Heading, Body, Caption, Amount (currency formatting)
@@ -108,29 +108,28 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
+**Task 17:** `[coding]` Create `src/app/_layout.tsx` root layout with all providers (Theme, Query, Paper)
 
 ### Summary
-## Task Complete
+## Task Complete Summary
 
 **What was completed:**
-- Installed `@tanstack/react-query` package
-- Created `QueryProvider.tsx` in `src/shared/providers/` with sensible defaults for mobile:
-  - 5 minute stale time
-  - 30 minute garbage collection time
-  - 2 retries for queries, 1 for mutations
-  - `refetchOnWindowFocus` disabled (not needed for mobile apps)
-- Exported QueryProvider from providers index
+- Updated `src/app/_layout.tsx` to include all required providers in proper nesting order:
+  1. `SafeAreaProvider` (outermost) - handles safe area insets
+  2. `QueryProvider` - React Query for async state management
+  3. `PaperProvider` - React Native Paper theming (includes ThemeProvider internally)
+- Added `RootLayoutContent` component that uses `useAppTheme` hook to access theme context and dynamically set StatusBar style based on dark/light mode
 
 **Tests run and results:**
-- `npm run typecheck` - Passed ✓
-- `npm run lint` - Passed ✓
+- `npm run typecheck` - ✅ Passed
+- `npm run lint` - ✅ Passed  
+- `npm run format:check` - ✅ Passed
 
 **Files modified:**
-- `package.json` - Added @tanstack/react-query dependency
-- `src/shared/providers/QueryProvider.tsx` - Created new file
-- `src/shared/providers/index.ts` - Added export
+- `src/app/_layout.tsx`
 
-**Commit hash:** `4434e89`
+**Commit hash:** `3d6c9069e844ee577d4b9e57718dd4e4af582ffe`
+
+**Blockers:** None
 
 TASK COMPLETE
