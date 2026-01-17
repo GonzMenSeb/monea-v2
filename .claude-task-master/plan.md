@@ -140,7 +140,7 @@ src/
 - [x] `[coding]` Create `src/infrastructure/database/repositories/TransactionRepository.ts` - CRUD + queries
 - [x] `[coding]` Create `src/infrastructure/database/repositories/AccountRepository.ts` - Account operations
 - [x] `[coding]` Create `src/infrastructure/database/migrations/` - Initial migration setup
-- [ ] `[general]` Write repository tests in `src/infrastructure/database/__tests__/`
+- [x] `[general]` Write repository tests in `src/infrastructure/database/__tests__/`
 
 ### PR 8: Transaction Feature Implementation
 *Main transaction list and detail views*
