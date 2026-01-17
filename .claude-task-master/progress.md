@@ -1,7 +1,7 @@
 # Progress Tracker
 
-**Session:** 11
-**Current Task:** 11 of 101
+**Session:** 13
+**Current Task:** 13 of 101
 
 ## Task List
 
@@ -15,9 +15,9 @@
 ✓ [x] **Task 8:** `[coding]` Configure `app.json` for Android-only build with proper permissions (READ_SMS, RECEIVE_SMS)
 ✓ [x] **Task 9:** `[quick]` Create `.gitignore` with React Native + Expo + Android specific ignores
 ✓ [x] **Task 10:** `[coding]` Set up ESLint + Prettier configuration in `.eslintrc.js` and `.prettierrc` following Airbnb style guide adapted for RN
-→ [ ] **Task 11:** `[quick]` Create `babel.config.js` with NativeWind and module resolver plugins
-  [ ] **Task 12:** `[coding]` Install and configure NativeWind (TailwindCSS) with `tailwind.config.js` and custom theme (Colombian bank colors, typography)
-  [ ] **Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
+✓ [x] **Task 11:** `[quick]` Create `babel.config.js` with NativeWind and module resolver plugins
+✓ [x] **Task 12:** `[coding]` Install and configure NativeWind (TailwindCSS) with `tailwind.config.js` and custom theme (Colombian bank colors, typography)
+→ [ ] **Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
   [ ] **Task 14:** `[coding]` Install and configure Zustand in `src/shared/store/` with TypeScript and persist middleware
   [ ] **Task 15:** `[coding]` Install and configure React Query in `src/shared/providers/QueryProvider.tsx`
   [ ] **Task 16:** `[coding]` Install and configure WatermelonDB with initial schema in `src/infrastructure/database/`
@@ -108,55 +108,40 @@
   [ ] **Task 101:** `[general]` Final code review and cleanup pass
 
 ## Latest Completed
-**Task 11:** `[quick]` Create `babel.config.js` with NativeWind and module resolver plugins
+**Task 13:** `[coding]` Install and configure React Native Paper with custom Material Design 3 theme in `src/shared/theme/`
 
 ### Summary
-Perfect! Everything is complete. Let me create a final summary:
-
 ## Task Completion Summary
 
-✅ **TASK 11 COMPLETE**
+**What was completed:**
+1. Installed `react-native-paper` v5.14.5 (with `react-native-vector-icons`)
+2. Created `src/shared/theme/paperTheme.ts` with:
+   - Custom MD3 light theme integrated with existing color palette
+   - Custom MD3 dark theme for dark mode support
+   - Font configuration using the existing typography settings
+   - Theme colors mapped to Colombian bank colors and semantic tokens
+3. Created `src/shared/theme/ThemeContext.tsx` with:
+   - React Context for theme state management
+   - Support for light, dark, and system (auto) theme modes
+   - `useAppTheme` hook for consuming theme
+   - `ThemeProvider` component
+4. Created `src/shared/providers/PaperProvider.tsx` combining React Native Paper with custom theme
+5. Created `src/shared/providers/index.ts` exporter
+6. Updated `src/shared/theme/index.ts` to export new theme utilities
 
-### What Was Completed
+**Tests run and results:**
+- `npm run typecheck` - ✅ Passed
+- `npm run lint` - ✅ Passed (after auto-fix)
 
-Created a comprehensive Babel configuration (`babel.config.js`) with NativeWind and module resolver support for the Monea React Native project.
+**Files modified:**
+- `package.json` - Added react-native-paper dependency
+- `package-lock.json` - Lockfile updated
+- `src/shared/theme/index.ts` - Added exports for Paper theme
+- `src/shared/theme/paperTheme.ts` - NEW: Material Design 3 theme config
+- `src/shared/theme/ThemeContext.tsx` - NEW: Theme context and hook
+- `src/shared/providers/PaperProvider.tsx` - NEW: Paper provider wrapper
+- `src/shared/providers/index.ts` - NEW: Providers exporter
 
-### Files Modified/Created
-
-1. **babel.config.js** (new)
-   - Configured `babel-preset-expo` with `jsxImportSource: 'nativewind'` for proper JSX transformation
-   - Added `nativewind/babel` preset for TailwindCSS class compilation
-   - Configured `babel-plugin-module-resolver` with 5 path aliases for clean imports
-
-2. **package.json** (updated)
-   - Added `babel-plugin-module-resolver` (^5.0.2)
-
-3. **package-lock.json** (updated)
-   - Lockfile updated with new dependency
-
-### Key Configuration Details
-
-The babel.config.js provides:
-- **Expo Support**: Uses `babel-preset-expo` as primary preset
-- **NativeWind Integration**: Configured with `jsxImportSource: 'nativewind'` for automatic JSX transformation and `nativewind/babel` for style compilation
-- **Path Aliases**:
-  - `@/app` → `./src/app`
-  - `@/features` → `./src/features`
-  - `@/shared` → `./src/shared`
-  - `@/core` → `./src/core`
-  - `@/infrastructure` → `./src/infrastructure`
-
-### Verification Completed
-
-✓ Babel syntax validation passed  
-✓ Dependencies correctly installed  
-✓ Configuration formatted with Prettier  
-✓ Ready for Task 12 (NativeWind installation and configuration)
-
-### Commit Hash
-
-`6b4c377` - feat: Create babel.config.js with NativeWind and module resolver plugins
-
----
+**Commit hash:** `4e5288f`
 
 TASK COMPLETE
