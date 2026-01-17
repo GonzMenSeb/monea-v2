@@ -2,11 +2,15 @@ export { database, getDatabase } from './database';
 export { schema, SCHEMA_VERSION } from './schema';
 export { Account, Transaction, SmsMessage } from './models';
 export { WatermelonDBProvider } from './DatabaseProvider';
-export { TransactionRepository } from './repositories';
+export { AccountRepository, TransactionRepository } from './repositories';
 export type { TransactionType } from './models';
 export type {
+  AccountFilters,
+  AccountSummary,
+  CreateAccountData,
   CreateTransactionData,
-  UpdateTransactionData,
   TransactionFilters,
   TransactionSummary,
+  UpdateAccountData,
+  UpdateTransactionData,
 } from './repositories';

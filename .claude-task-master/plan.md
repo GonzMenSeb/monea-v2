@@ -156,10 +156,10 @@ src/
 ### PR 9: Dashboard & Home Screen
 *Main dashboard with financial overview*
 
-- [ ] `[coding]` Create `src/features/dashboard/components/BalanceCard.tsx` - Total balance display with currency formatting
-- [ ] `[coding]` Create `src/features/dashboard/components/RecentTransactions.tsx` - Last 5 transactions preview
-- [ ] `[coding]` Create `src/features/dashboard/components/SpendingChart.tsx` - Weekly/monthly spending visualization (Victory Native)
-- [ ] `[coding]` Create `src/features/dashboard/components/AccountsOverview.tsx` - Bank accounts summary cards
+- [x] `[coding]` Create `src/features/dashboard/components/BalanceCard.tsx` - Total balance display with currency formatting
+- [x] `[coding]` Create `src/features/dashboard/components/RecentTransactions.tsx` - Last 5 transactions preview
+- [x] `[coding]` Create `src/features/dashboard/components/SpendingChart.tsx` - Weekly/monthly spending visualization (Victory Native)
+- [x] `[coding]` Create `src/features/dashboard/components/AccountsOverview.tsx` - Bank accounts summary cards
 - [ ] `[coding]` Create `src/features/dashboard/hooks/useDashboardData.ts` - Aggregated dashboard data hook
 - [ ] `[coding]` Create `src/app/(tabs)/index.tsx` - Home/Dashboard screen
 - [ ] `[general]` Write tests for dashboard components in `src/features/dashboard/__tests__/`
