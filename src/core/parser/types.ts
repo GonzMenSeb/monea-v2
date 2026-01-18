@@ -1,4 +1,6 @@
-export type TransactionType = 'income' | 'expense' | 'transfer_in' | 'transfer_out';
+import type { TransactionType } from '@/infrastructure/database';
+
+export type { TransactionType };
 
 export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'daviplata';
 

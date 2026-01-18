@@ -4,6 +4,7 @@ import { View, Text, Pressable } from 'react-native';
 
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
 import { TransactionCard } from '@/shared/components/ui/Card';
+import { formatTime } from '@/shared/utils';
 
 import type Transaction from '@/infrastructure/database/models/Transaction';
 
@@ -27,14 +28,6 @@ const ITEM_GAP_STYLES = 'mb-3';
 const EMPTY_CONTAINER_STYLES = 'py-8 items-center';
 const EMPTY_TEXT_STYLES = 'text-sm text-text-muted';
 const ERROR_TEXT_STYLES = 'text-sm text-semantic-error';
-
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString('es-CO', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
-}
 
 const TransactionRow = memo(function TransactionRow({
   transaction,

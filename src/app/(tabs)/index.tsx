@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { ScrollView, View, Text, RefreshControl } from 'react-native';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 
 import {
@@ -12,10 +13,11 @@ import {
   type TimeRange,
   type SpendingDataPoint,
 } from '@/features/dashboard/components';
-import { useDashboardData } from '@/features/dashboard/hooks';
+import { useDashboardData, DASHBOARD_QUERY_KEYS } from '@/features/dashboard/hooks';
 import { useTransactionStore } from '@/features/transactions/store/transactionStore';
 import { Screen } from '@/shared/components/layout';
 import { colors } from '@/shared/theme';
+import { formatCurrency, getGreeting } from '@/shared/utils';
 
 const HEADER_CONTAINER_STYLES = 'px-4 pt-4 pb-2';
 const HEADER_TITLE_STYLES = 'text-2xl font-bold text-text-primary';
@@ -23,35 +25,15 @@ const HEADER_SUBTITLE_STYLES = 'text-sm text-text-secondary mt-1';
 const BALANCE_CONTAINER_STYLES = 'px-4 mt-4';
 const CONTENT_CONTAINER_STYLES = 'pb-8';
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) {
-    return 'Good morning';
-  }
-  if (hour < 18) {
-    return 'Good afternoon';
-  }
-  return 'Good evening';
-}
-
 export default function DashboardScreen(): React.ReactElement {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [timeRange, setTimeRange] = useState<TimeRange>('weekly');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const setSelectedTransaction = useTransactionStore((state) => state.setSelected);
 
   const {
     data,
-    refetch,
     accounts,
     accountsLoading,
     accountsError,
@@ -62,11 +44,14 @@ export default function DashboardScreen(): React.ReactElement {
     spendingLoading,
   } = useDashboardData({ timeRange, recentTransactionsLimit: 5 });
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    refetch();
-    setIsRefreshing(false);
-  }, [refetch]);
+    try {
+      await queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEYS.all });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [queryClient]);
 
   const handleTransactionPress = useCallback(
     (transactionId: string) => {

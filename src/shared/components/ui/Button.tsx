@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { ActivityIndicator, Pressable, Text, View, type PressableProps } from 'react-native';
 
 import { useHaptics } from '@/shared/hooks/useHaptics';
+import { colors } from '@/shared/theme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -104,7 +105,7 @@ export function Button({
     return baseStyles.join(' ');
   };
 
-  const loaderColor = variant === 'primary' ? '#FFFFFF' : '#40A652';
+  const loaderColor = variant === 'primary' ? colors.text.inverse : colors.primary.DEFAULT;
 
   return (
     <Pressable

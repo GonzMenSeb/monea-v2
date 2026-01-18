@@ -1,6 +1,7 @@
 import { View, Text } from 'react-native';
 
 import { Card } from '@/shared/components/ui';
+import { formatCurrency } from '@/shared/utils';
 
 type TrendDirection = 'up' | 'down' | 'neutral';
 
@@ -19,15 +20,6 @@ const TREND_CONFIG: Record<TrendDirection, { color: string; icon: string }> = {
   neutral: { color: 'text-text-secondary', icon: '→' },
 };
 
-function formatCurrency(amount: number, currency: string, locale: string): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 export function BalanceCard({
   totalBalance,
   percentageChange,
@@ -36,7 +28,7 @@ export function BalanceCard({
   locale = 'es-CO',
   label = 'Total Balance',
 }: BalanceCardProps): React.ReactElement {
-  const formattedBalance = formatCurrency(totalBalance, currency, locale);
+  const formattedBalance = formatCurrency(totalBalance, { currency, locale });
   const trendConfig = TREND_CONFIG[trendDirection];
   const showTrend = percentageChange !== undefined;
 

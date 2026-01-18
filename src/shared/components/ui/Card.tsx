@@ -2,8 +2,9 @@ import { useCallback } from 'react';
 
 import { Pressable, Text, View, type PressableProps } from 'react-native';
 
+import type { TransactionType } from '@/infrastructure/database';
+
 type CardVariant = 'transaction' | 'account' | 'elevated';
-type TransactionType = 'income' | 'expense' | 'transfer_in' | 'transfer_out';
 
 interface BaseCardProps extends Omit<PressableProps, 'children'> {
   children: React.ReactNode;

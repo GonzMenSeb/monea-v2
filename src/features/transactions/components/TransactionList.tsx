@@ -7,6 +7,7 @@ import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
 import { colors } from '@/shared/theme';
+import { formatDateRelative } from '@/shared/utils';
 
 import { TransactionItem } from './TransactionItem';
 
@@ -34,27 +35,6 @@ const SECTION_HEADER_TEXT_STYLES =
 const LIST_CONTAINER_STYLES = 'flex-1';
 const ITEM_SEPARATOR_STYLES = 'h-3';
 
-function formatDateForSection(date: Date): string {
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  const dateStr = date.toDateString();
-  if (dateStr === today.toDateString()) {
-    return 'Today';
-  }
-  if (dateStr === yesterday.toDateString()) {
-    return 'Yesterday';
-  }
-
-  return date.toLocaleDateString('es-CO', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
-  });
-}
-
 function groupTransactionsByDate(transactions: Transaction[]): TransactionListItem[] {
   if (transactions.length === 0) {
     return [];
@@ -73,7 +53,7 @@ function groupTransactionsByDate(transactions: Transaction[]): TransactionListIt
       currentDateStr = dateStr;
       items.push({
         type: 'section_header',
-        title: formatDateForSection(transaction.transactionDate),
+        title: formatDateRelative(transaction.transactionDate),
         key: `header-${dateStr}`,
       });
     }

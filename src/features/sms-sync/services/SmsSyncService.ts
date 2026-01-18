@@ -12,7 +12,6 @@ import type { BankCode, ParsedTransaction } from '@/core/parser';
 import type Account from '@/infrastructure/database/models/Account';
 import type { AccountType } from '@/infrastructure/database/models/Account';
 import type SmsMessage from '@/infrastructure/database/models/SmsMessage';
-import type { TransactionType } from '@/infrastructure/database/models/Transaction';
 import type { ParsedSmsMessage } from '@/infrastructure/sms/types';
 import type { Database } from '@nozbe/watermelondb';
 
@@ -293,7 +292,7 @@ export class SmsSyncService implements SmsSyncServiceInterface {
   ): CreateTransactionData {
     return {
       accountId,
-      type: parsed.type as TransactionType,
+      type: parsed.type,
       amount: parsed.amount,
       transactionDate: parsed.transactionDate,
       balanceAfter: parsed.balanceAfter,
