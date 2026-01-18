@@ -18,6 +18,59 @@ env:
   AVD_NAME: e2e_avd
 
 jobs:
+  build-device:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-arm64-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', 'package-lock.json') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - run: npm ci --legacy-peer-deps
+
+      - run: npx expo prebuild --platform android --clean
+
+      - name: Build Device APK (arm64-v8a)
+        env:
+          ORG_GRADLE_PROJECT_reactNativeArchitectures: arm64-v8a
+          GRADLE_OPTS: >-
+            -Dorg.gradle.daemon=false
+            -Dorg.gradle.parallel=true
+            -Dorg.gradle.caching=true
+            -Dorg.gradle.configureondemand=true
+            -Dorg.gradle.jvmargs=-Xmx4g -XX:+HeapDumpOnOutOfMemoryError
+        run: |
+          cd android && ./gradlew assembleRelease \
+            --build-cache \
+            --configuration-cache \
+            --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: device-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 14
+          if-no-files-found: error
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
