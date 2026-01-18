@@ -7,32 +7,98 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+  JAVA_VERSION: '17'
+  NODE_VERSION: '20'
+  API_LEVEL: 30
+  AVD_NAME: e2e_avd
 
 jobs:
-  android-e2e:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: ${{ env.JAVA_VERSION }}
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v3
+
+      - name: Generate cache key
+        id: cache-key
+        run: echo "key=${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'app.json', 'babel.config.js') }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', 'package-lock.json') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - run: npm ci --legacy-peer-deps
+
+      - run: npx expo prebuild --platform android --clean
+
+      - name: Build APKs
+        env:
+          ORG_GRADLE_PROJECT_reactNativeArchitectures: x86_64
+          GRADLE_OPTS: >-
+            -Dorg.gradle.daemon=false
+            -Dorg.gradle.parallel=true
+            -Dorg.gradle.caching=true
+            -Dorg.gradle.configureondemand=true
+            -Dorg.gradle.jvmargs=-Xmx4g -XX:+HeapDumpOnOutOfMemoryError
+        run: |
+          cd android && ./gradlew assembleDebug assembleAndroidTest \
+            -DtestBuildType=debug \
+            --build-cache \
+            --configuration-cache \
+            --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apks
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          retention-days: 7
+          if-no-files-found: error
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: android-actions/setup-android@v3
 
       - name: Enable KVM
         run: |
@@ -40,80 +106,61 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('package-lock.json', 'app.json') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Cache AVD
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         id: avd-cache
         with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-api30-x86_64-v2
+          key: avd-api${{ env.API_LEVEL }}-x86_64-v3
 
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+      - run: npm ci --legacy-peer-deps
 
-      - name: Generate Android native project
-        run: npx expo prebuild --platform android --clean
+      - run: npx expo prebuild --platform android --clean
 
-      - name: Build Android app for Detox
-        env:
-          ORG_GRADLE_PROJECT_reactNativeArchitectures: x86_64
-        run: |
-          cd android && ./gradlew assembleDebug assembleAndroidTest \
-            -DtestBuildType=debug \
-            --build-cache \
-            --no-daemon \
-            -Dorg.gradle.parallel=true
-
-      - name: Upload APK
-        if: success()
-        uses: actions/upload-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: app-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+          name: apks
+          path: android/app/build/outputs/apk
 
-      - name: Create AVD (if not cached)
+      - name: Organize APKs
+        run: |
+          mkdir -p android/app/build/outputs/apk/debug android/app/build/outputs/apk/androidTest/debug
+          mv android/app/build/outputs/apk/app-debug.apk android/app/build/outputs/apk/debug/ 2>/dev/null || true
+          mv android/app/build/outputs/apk/app-debug-androidTest.apk android/app/build/outputs/apk/androidTest/debug/ 2>/dev/null || true
+
+      - name: Create AVD
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: ${{ env.API_LEVEL }}
           arch: x86_64
           target: google_apis
-          avd-name: Pixel_4_API_30
+          avd-name: ${{ env.AVD_NAME }}
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
           disable-animations: true
-          script: echo "AVD created and cached"
+          script: echo "AVD ready"
 
       - name: Run E2E tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: ${{ env.API_LEVEL }}
           arch: x86_64
           target: google_apis
-          avd-name: Pixel_4_API_30
+          avd-name: ${{ env.AVD_NAME }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
           disable-animations: true
-          script: npm run e2e:test:android -- --headless
+          emulator-boot-timeout: 300
+          script: npm run e2e:test:android -- --headless --retries 2
 
-      - name: Upload test artifacts
+      - uses: actions/upload-artifact@v4
         if: failure()
-        uses: actions/upload-artifact@v4
         with:
           name: detox-artifacts
           path: |
             artifacts/
             e2e/screenshots/
-          retention-days: 7
+          retention-days: 3
+          if-no-files-found: ignore
