@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
+
+import { styled, ScrollView, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { Button, Input } from '@/shared/components/ui';
 import { colors } from '@/shared/theme';
@@ -58,15 +60,89 @@ const ACCOUNT_TYPE_OPTIONS: AccountTypeOption[] = [
   { type: 'digital_wallet', label: 'Digital Wallet' },
 ];
 
-const SECTION_STYLES = 'mb-4';
-const SECTION_LABEL_STYLES = 'text-sm font-medium text-text-primary mb-2';
-const OPTION_ROW_STYLES = 'flex-row flex-wrap gap-2';
-const OPTION_CHIP_BASE_STYLES = 'px-4 py-2 rounded-xl border-2';
-const OPTION_CHIP_SELECTED_STYLES = 'border-primary-500 bg-primary-50';
-const OPTION_CHIP_UNSELECTED_STYLES = 'border-gray-200 bg-white';
-const BANK_INDICATOR_STYLES = 'w-3 h-3 rounded-full mr-2';
-const ACTIONS_STYLES = 'flex-row gap-3 mt-6';
-const DELETE_SECTION_STYLES = 'mt-6 pt-4 border-t border-gray-100';
+const Section = styled(YStack, {
+  name: 'Section',
+  marginBottom: '$4',
+});
+
+const SectionLabel = styled(Text, {
+  name: 'SectionLabel',
+  fontSize: '$2',
+  fontWeight: '500',
+  color: '$textPrimary',
+  marginBottom: '$2',
+});
+
+const OptionRow = styled(XStack, {
+  name: 'OptionRow',
+  flexWrap: 'wrap',
+  gap: '$2',
+});
+
+const OptionChip = styled(Stack, {
+  name: 'OptionChip',
+  paddingHorizontal: '$4',
+  paddingVertical: '$2',
+  borderRadius: '$4',
+  borderWidth: 2,
+  flexDirection: 'row',
+  alignItems: 'center',
+  variants: {
+    selected: {
+      true: {
+        borderColor: '$accentPrimary',
+        backgroundColor: '$primaryMuted',
+      },
+      false: {
+        borderColor: '$borderMuted',
+        backgroundColor: '$backgroundSurface',
+      },
+    },
+  } as const,
+  defaultVariants: {
+    selected: false,
+  },
+});
+
+const BankIndicator = styled(Stack, {
+  name: 'BankIndicator',
+  width: 12,
+  height: 12,
+  borderRadius: '$full',
+  marginRight: '$2',
+});
+
+const OptionText = styled(Text, {
+  name: 'OptionText',
+  variants: {
+    selected: {
+      true: {
+        color: '$accentPrimary',
+        fontWeight: '500',
+      },
+      false: {
+        color: '$textSecondary',
+      },
+    },
+  } as const,
+  defaultVariants: {
+    selected: false,
+  },
+});
+
+const ActionsRow = styled(XStack, {
+  name: 'ActionsRow',
+  gap: '$3',
+  marginTop: '$6',
+});
+
+const DeleteSection = styled(YStack, {
+  name: 'DeleteSection',
+  marginTop: '$6',
+  paddingTop: '$4',
+  borderTopWidth: 1,
+  borderTopColor: '$borderMuted',
+});
 
 const MIN_ACCOUNT_NUMBER_LENGTH = 4;
 const MAX_ACCOUNT_NUMBER_LENGTH = 20;
@@ -108,9 +184,9 @@ interface BankSelectorProps {
 
 function BankSelector({ selected, onSelect }: BankSelectorProps): React.ReactElement {
   return (
-    <View className={SECTION_STYLES}>
-      <Text className={SECTION_LABEL_STYLES}>Bank</Text>
-      <View className={OPTION_ROW_STYLES}>
+    <Section>
+      <SectionLabel>Bank</SectionLabel>
+      <OptionRow>
         {BANK_OPTIONS.map((bank) => (
           <Pressable
             key={bank.code}
@@ -118,22 +194,14 @@ function BankSelector({ selected, onSelect }: BankSelectorProps): React.ReactEle
             accessibilityRole="radio"
             accessibilityState={{ selected: selected === bank.code }}
           >
-            <View
-              className={`${OPTION_CHIP_BASE_STYLES} flex-row items-center ${selected === bank.code ? OPTION_CHIP_SELECTED_STYLES : OPTION_CHIP_UNSELECTED_STYLES}`}
-            >
-              <View className={BANK_INDICATOR_STYLES} style={{ backgroundColor: bank.color }} />
-              <Text
-                className={
-                  selected === bank.code ? 'text-primary-600 font-medium' : 'text-text-secondary'
-                }
-              >
-                {bank.name}
-              </Text>
-            </View>
+            <OptionChip selected={selected === bank.code}>
+              <BankIndicator backgroundColor={bank.color} />
+              <OptionText selected={selected === bank.code}>{bank.name}</OptionText>
+            </OptionChip>
           </Pressable>
         ))}
-      </View>
-    </View>
+      </OptionRow>
+    </Section>
   );
 }
 
@@ -144,9 +212,9 @@ interface AccountTypeSelectorProps {
 
 function AccountTypeSelector({ selected, onSelect }: AccountTypeSelectorProps): React.ReactElement {
   return (
-    <View className={SECTION_STYLES}>
-      <Text className={SECTION_LABEL_STYLES}>Account Type</Text>
-      <View className={OPTION_ROW_STYLES}>
+    <Section>
+      <SectionLabel>Account Type</SectionLabel>
+      <OptionRow>
         {ACCOUNT_TYPE_OPTIONS.map((option) => (
           <Pressable
             key={option.type}
@@ -154,21 +222,13 @@ function AccountTypeSelector({ selected, onSelect }: AccountTypeSelectorProps): 
             accessibilityRole="radio"
             accessibilityState={{ selected: selected === option.type }}
           >
-            <View
-              className={`${OPTION_CHIP_BASE_STYLES} ${selected === option.type ? OPTION_CHIP_SELECTED_STYLES : OPTION_CHIP_UNSELECTED_STYLES}`}
-            >
-              <Text
-                className={
-                  selected === option.type ? 'text-primary-600 font-medium' : 'text-text-secondary'
-                }
-              >
-                {option.label}
-              </Text>
-            </View>
+            <OptionChip selected={selected === option.type}>
+              <OptionText selected={selected === option.type}>{option.label}</OptionText>
+            </OptionChip>
           </Pressable>
         ))}
-      </View>
-    </View>
+      </OptionRow>
+    </Section>
   );
 }
 
@@ -254,7 +314,7 @@ export function AccountForm({
 
       <AccountTypeSelector selected={formData.accountType} onSelect={handleAccountTypeSelect} />
 
-      <View className={SECTION_STYLES}>
+      <Section>
         <Input
           label="Account Number"
           placeholder="Enter last 4+ digits"
@@ -266,9 +326,9 @@ export function AccountForm({
           errorMessage={displayedErrors.accountNumber}
           disabled={isDisabled}
         />
-      </View>
+      </Section>
 
-      <View className={SECTION_STYLES}>
+      <Section>
         <Input
           label="Initial Balance (optional)"
           placeholder="0"
@@ -280,15 +340,15 @@ export function AccountForm({
           hint="Current balance in Colombian Pesos"
           disabled={isDisabled}
         />
-      </View>
+      </Section>
 
-      <View className={ACTIONS_STYLES}>
-        <View className="flex-1">
+      <ActionsRow>
+        <Stack flex={1}>
           <Button variant="secondary" onPress={onCancel} fullWidth disabled={isDisabled}>
             Cancel
           </Button>
-        </View>
-        <View className="flex-1">
+        </Stack>
+        <Stack flex={1}>
           <Button
             variant="primary"
             onPress={onSubmit}
@@ -298,11 +358,11 @@ export function AccountForm({
           >
             {submitLabel}
           </Button>
-        </View>
-      </View>
+        </Stack>
+      </ActionsRow>
 
       {onDelete && (
-        <View className={DELETE_SECTION_STYLES}>
+        <DeleteSection>
           <Button
             variant="outline"
             onPress={onDelete}
@@ -312,7 +372,7 @@ export function AccountForm({
           >
             Delete Account
           </Button>
-        </View>
+        </DeleteSection>
       )}
     </ScrollView>
   );

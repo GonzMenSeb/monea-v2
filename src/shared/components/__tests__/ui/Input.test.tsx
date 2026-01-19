@@ -246,12 +246,6 @@ describe('Input', () => {
       expect(input.props.autoCapitalize).toBe('none');
       expect(input.props.keyboardType).toBe('email-address');
     });
-
-    it('accepts custom className', () => {
-      render(<Input className="custom-class" />);
-      const input = screen.getByRole('none');
-      expect(input).toBeTruthy();
-    });
   });
 
   describe('Secure Text Entry', () => {
