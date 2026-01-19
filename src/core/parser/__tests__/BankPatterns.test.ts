@@ -15,6 +15,7 @@ describe('BankPatterns', () => {
       expect(BANK_INFO).toHaveProperty('bbva');
       expect(BANK_INFO).toHaveProperty('nequi');
       expect(BANK_INFO).toHaveProperty('daviplata');
+      expect(BANK_INFO).toHaveProperty('bancoomeva');
     });
 
     it('each bank has required properties', () => {
@@ -36,13 +37,21 @@ describe('BankPatterns', () => {
       });
     });
 
-    it('each bank has expense, income, and transfer patterns', () => {
-      Object.values(BANK_PATTERNS).forEach((patterns) => {
+    it('established banks have expense, income, and transfer patterns', () => {
+      const establishedBanks = ['bancolombia', 'davivienda', 'bbva', 'nequi', 'daviplata'] as const;
+      establishedBanks.forEach((bankCode) => {
+        const patterns = BANK_PATTERNS[bankCode];
         const types = patterns.map((p) => p.type);
         expect(types).toContain('expense');
         expect(types).toContain('income');
         expect(types).toContain('transfer_out');
       });
+    });
+
+    it('bancoomeva has at least expense patterns', () => {
+      const patterns = BANK_PATTERNS.bancoomeva;
+      const types = patterns.map((p) => p.type);
+      expect(types).toContain('expense');
     });
   });
 
@@ -104,7 +113,8 @@ describe('BankPatterns', () => {
       expect(matchesSender('Bancolombia', bank)).toBe(true);
       expect(matchesSender('BANCOLOMBIA', bank)).toBe(true);
       expect(matchesSender('891333', bank)).toBe(true);
-      expect(matchesSender('85954', bank)).toBe(true);
+      expect(matchesSender('85540', bank)).toBe(true);
+      expect(matchesSender('85784', bank)).toBe(true);
     });
 
     it('matches Nequi sender patterns', () => {
@@ -112,6 +122,13 @@ describe('BankPatterns', () => {
       expect(matchesSender('Nequi', bank)).toBe(true);
       expect(matchesSender('NEQUI', bank)).toBe(true);
       expect(matchesSender('85432', bank)).toBe(true);
+      expect(matchesSender('85954', bank)).toBe(true);
+    });
+
+    it('matches Bancoomeva sender patterns', () => {
+      const bank = BANK_INFO.bancoomeva;
+      expect(matchesSender('Bancoomeva', bank)).toBe(true);
+      expect(matchesSender('BANCOOMEVA', bank)).toBe(true);
     });
 
     it('does not match unrelated senders', () => {
@@ -125,10 +142,14 @@ describe('BankPatterns', () => {
     it('returns correct bank for known senders', () => {
       expect(getBankBySender('Bancolombia')?.code).toBe('bancolombia');
       expect(getBankBySender('891333')?.code).toBe('bancolombia');
+      expect(getBankBySender('85540')?.code).toBe('bancolombia');
+      expect(getBankBySender('85784')?.code).toBe('bancolombia');
       expect(getBankBySender('Davivienda')?.code).toBe('davivienda');
       expect(getBankBySender('BBVA')?.code).toBe('bbva');
       expect(getBankBySender('Nequi')?.code).toBe('nequi');
+      expect(getBankBySender('85954')?.code).toBe('nequi');
       expect(getBankBySender('DaviPlata')?.code).toBe('daviplata');
+      expect(getBankBySender('Bancoomeva')?.code).toBe('bancoomeva');
     });
 
     it('returns null for unknown senders', () => {

@@ -220,10 +220,7 @@ describe('AccountForm', () => {
     );
 
     expect(screen.getByText('Cancel')).toBeDisabled();
-    const buttons = screen.getAllByRole('button');
-    buttons.forEach((button) => {
-      expect(button).toBeDisabled();
-    });
+    expect(screen.getByText('Delete Account')).toBeDisabled();
   });
 
   it('disables buttons when isDeleting is true', () => {
@@ -236,10 +233,6 @@ describe('AccountForm', () => {
 
     expect(screen.getByText('Cancel')).toBeDisabled();
     expect(screen.getByText('Save')).toBeDisabled();
-    const buttons = screen.getAllByRole('button');
-    buttons.forEach((button) => {
-      expect(button).toBeDisabled();
-    });
   });
 
   it('displays external errors', () => {

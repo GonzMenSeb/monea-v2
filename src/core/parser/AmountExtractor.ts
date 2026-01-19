@@ -5,8 +5,6 @@ export interface AmountExtractionResult {
 }
 
 const CURRENCY_SYMBOL_PATTERN = /^\s*\$?\s*/;
-const THOUSANDS_SEPARATOR_PATTERN = /\./g;
-const DECIMAL_SEPARATOR_PATTERN = /,/g;
 const WHITESPACE_PATTERN = /\s+/g;
 const COP_DECIMALS = 0;
 
@@ -14,27 +12,42 @@ function normalizeAmountString(input: string): string {
   return input.replace(WHITESPACE_PATTERN, '').replace(CURRENCY_SYMBOL_PATTERN, '');
 }
 
-function hasDecimalPart(normalized: string): boolean {
-  const commaIndex = normalized.lastIndexOf(',');
-  if (commaIndex === -1) {
-    return false;
+function detectFormat(normalized: string): 'us' | 'european' | 'plain' {
+  const lastDotIndex = normalized.lastIndexOf('.');
+  const lastCommaIndex = normalized.lastIndexOf(',');
+
+  if (lastDotIndex !== -1) {
+    const afterDot = normalized.slice(lastDotIndex + 1);
+    if (afterDot.length === 2 && /^\d{2}$/.test(afterDot)) {
+      return 'us';
+    }
   }
 
-  const afterComma = normalized.slice(commaIndex + 1);
-  return afterComma.length <= 2 && /^\d+$/.test(afterComma);
+  if (lastCommaIndex !== -1) {
+    const afterComma = normalized.slice(lastCommaIndex + 1);
+    if (afterComma.length === 2 && /^\d{2}$/.test(afterComma)) {
+      return 'european';
+    }
+  }
+
+  return 'plain';
 }
 
-function parseColombianFormat(normalized: string): number {
-  if (hasDecimalPart(normalized)) {
-    const withoutThousands = normalized.replace(THOUSANDS_SEPARATOR_PATTERN, '');
-    const standardized = withoutThousands.replace(DECIMAL_SEPARATOR_PATTERN, '.');
+function parseAmountByFormat(normalized: string): number {
+  const format = detectFormat(normalized);
+
+  if (format === 'us') {
+    const withoutCommas = normalized.replace(/,/g, '');
+    return parseFloat(withoutCommas);
+  }
+
+  if (format === 'european') {
+    const withoutDots = normalized.replace(/\./g, '');
+    const standardized = withoutDots.replace(/,/g, '.');
     return parseFloat(standardized);
   }
 
-  const withoutSeparators = normalized
-    .replace(THOUSANDS_SEPARATOR_PATTERN, '')
-    .replace(DECIMAL_SEPARATOR_PATTERN, '');
-
+  const withoutSeparators = normalized.replace(/[.,]/g, '');
   return parseInt(withoutSeparators, 10);
 }
 
@@ -49,7 +62,7 @@ export function extractAmount(input: string): AmountExtractionResult | null {
     return null;
   }
 
-  const value = parseColombianFormat(normalized);
+  const value = parseAmountByFormat(normalized);
 
   if (isNaN(value) || !isFinite(value)) {
     return null;

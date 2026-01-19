@@ -122,8 +122,7 @@ describe('AccountsOverview', () => {
           onAccountPress={onAccountPress}
         />
       );
-      const buttons = screen.getAllByRole('button');
-      fireEvent.press(buttons[0]);
+      fireEvent.press(screen.getByText('Bancolombia'));
       expect(onAccountPress).toHaveBeenCalledWith('acc-1');
     });
 
@@ -258,9 +257,13 @@ describe('AccountsOverview', () => {
       expect(screen.getByText('Inactive')).toBeTruthy();
     });
 
-    it('does not trigger onAccountPress for inactive accounts', () => {
+    it('marks inactive accounts as disabled', () => {
       const onAccountPress = jest.fn();
-      const inactiveAccount = createMockAccount({ id: 'acc-inactive', isActive: false });
+      const inactiveAccount = createMockAccount({
+        id: 'acc-inactive',
+        isActive: false,
+        bankName: 'Test Bank',
+      });
       render(
         <AccountsOverview
           accounts={[inactiveAccount]}
@@ -268,8 +271,8 @@ describe('AccountsOverview', () => {
           onAccountPress={onAccountPress}
         />
       );
-      fireEvent.press(screen.getByRole('button'));
-      expect(onAccountPress).not.toHaveBeenCalled();
+      const card = screen.getByLabelText('Test Bank account ending in 1234');
+      expect(card.props.accessibilityState.disabled).toBe(true);
     });
   });
 });

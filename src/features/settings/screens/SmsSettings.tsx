@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ScrollView, Switch } from 'react-native';
-import { styled, Stack, XStack, YStack, Text } from 'tamagui';
 
 import { useRouter } from 'expo-router';
+import { styled, Stack, XStack, YStack, Text } from 'tamagui';
 
 import { useSmsSync } from '@/features/sms-sync/hooks';
 import { Screen } from '@/shared/components/layout';
@@ -183,7 +183,9 @@ function PermissionStatus({
   return (
     <StatusCard backgroundColor={STATUS_COLORS[state]}>
       <XStack alignItems="center" marginBottom="$3">
-        <BodyText size="lg" marginRight="$2">{config.icon}</BodyText>
+        <BodyText size="lg" marginRight="$2">
+          {config.icon}
+        </BodyText>
         <BodyText fontWeight="600">{config.title}</BodyText>
       </XStack>
 
@@ -392,11 +394,15 @@ export function SmsSettings(): React.ReactElement {
           <YStack marginBottom="$4">
             {permissionState === 'denied' ? (
               <ActionButton onPress={handleRequestPermissions} accessibilityRole="button">
-                <BodyText color="$textInverse" fontWeight="600">Grant Permissions</BodyText>
+                <BodyText color="$textInverse" fontWeight="600">
+                  Grant Permissions
+                </BodyText>
               </ActionButton>
             ) : (
               <SecondaryButton onPress={handleOpenSettings} accessibilityRole="button">
-                <BodyText color={colors.accent.primary} fontWeight="600">Open App Settings</BodyText>
+                <BodyText color={colors.accent.primary} fontWeight="600">
+                  Open App Settings
+                </BodyText>
               </SecondaryButton>
             )}
           </YStack>

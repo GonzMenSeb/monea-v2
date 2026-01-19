@@ -3,7 +3,7 @@ import { field, date, readonly, children } from '@nozbe/watermelondb/decorators'
 
 import type Transaction from './Transaction';
 
-export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'daviplata';
+export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'daviplata' | 'bancoomeva';
 export type AccountType = 'savings' | 'checking' | 'credit' | 'digital_wallet';
 
 export default class Account extends Model {

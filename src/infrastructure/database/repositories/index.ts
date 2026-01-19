@@ -6,6 +6,9 @@ export type {
   AccountSummary,
 } from './AccountRepository';
 
+export { CategoryRepository } from './CategoryRepository';
+export type { CreateCategoryData, UpdateCategoryData, CategoryFilters } from './CategoryRepository';
+
 export { TransactionRepository } from './TransactionRepository';
 export type {
   CreateTransactionData,

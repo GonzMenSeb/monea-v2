@@ -1,7 +1,5 @@
 import { styled, Text, type GetProps } from 'tamagui';
 
-import { colors } from '@/shared/theme';
-
 type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4';
 type BodySize = 'sm' | 'md' | 'lg';
 type CaptionSize = 'sm' | 'md';
@@ -186,11 +184,7 @@ function formatCurrency(value: number, currency: string, locale: string): string
   }).format(value);
 }
 
-export function Heading({
-  level = 'h2',
-  children,
-  ...props
-}: HeadingProps): React.ReactElement {
+export function Heading({ level = 'h2', children, ...props }: HeadingProps): React.ReactElement {
   return (
     <HeadingText level={level} accessibilityRole="header" {...props}>
       {children}

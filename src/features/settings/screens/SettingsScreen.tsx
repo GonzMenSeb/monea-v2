@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { Linking, Pressable, ScrollView } from 'react-native';
-import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { useRouter } from 'expo-router';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { smsPermissions } from '@/infrastructure/sms';
 import { Screen } from '@/shared/components/layout';
@@ -120,16 +120,12 @@ function SettingItemRow({ item, isLast }: SettingItemRowProps): React.ReactEleme
       <Pressable onPress={item.onPress} accessibilityRole="button" accessibilityLabel={item.title}>
         {({ pressed }) => (
           <ItemRow opacity={pressed ? 0.7 : 1}>
-            <IconContainer
-              backgroundColor={isDestructive ? '$dangerMuted' : '$primaryMuted'}
-            >
+            <IconContainer backgroundColor={isDestructive ? '$dangerMuted' : '$primaryMuted'}>
               <Body size="lg">{item.icon}</Body>
             </IconContainer>
             <ContentContainer>
               <Body color={isDestructive ? '$danger' : '$textPrimary'}>{item.title}</Body>
-              {item.description && (
-                <Caption color="$textSecondary">{item.description}</Caption>
-              )}
+              {item.description && <Caption color="$textSecondary">{item.description}</Caption>}
             </ContentContainer>
             {item.rightElement}
             {item.showChevron !== false && <Chevron>{'›'}</Chevron>}
@@ -169,11 +165,31 @@ function PermissionStatusBadge({ state }: PermissionStatusBadgeProps): React.Rea
     PermissionState,
     { label: string; bgColor: string; textColor: string }
   > = {
-    granted: { label: 'Enabled', bgColor: colors.accent.primary + '20', textColor: colors.accent.primary },
-    denied: { label: 'Denied', bgColor: colors.accent.danger + '20', textColor: colors.accent.danger },
-    blocked: { label: 'Blocked', bgColor: colors.accent.danger + '20', textColor: colors.accent.danger },
-    unknown: { label: 'Unknown', bgColor: colors.background.surface, textColor: colors.text.secondary },
-    checking: { label: 'Checking...', bgColor: colors.background.surface, textColor: colors.text.secondary },
+    granted: {
+      label: 'Enabled',
+      bgColor: colors.accent.primary + '20',
+      textColor: colors.accent.primary,
+    },
+    denied: {
+      label: 'Denied',
+      bgColor: colors.accent.danger + '20',
+      textColor: colors.accent.danger,
+    },
+    blocked: {
+      label: 'Blocked',
+      bgColor: colors.accent.danger + '20',
+      textColor: colors.accent.danger,
+    },
+    unknown: {
+      label: 'Unknown',
+      bgColor: colors.background.surface,
+      textColor: colors.text.secondary,
+    },
+    checking: {
+      label: 'Checking...',
+      bgColor: colors.background.surface,
+      textColor: colors.text.secondary,
+    },
   };
 
   const config = statusConfig[state];
@@ -204,8 +220,16 @@ export function SettingsScreen(): React.ReactElement {
     router.push('/settings/sms');
   }, [router]);
 
+  const handleImportSmsPress = useCallback(() => {
+    router.push('/sync/import');
+  }, [router]);
+
   const handleAccountsPress = useCallback(() => {
     router.push('/settings/accounts');
+  }, [router]);
+
+  const handleCategoriesPress = useCallback(() => {
+    router.push('/settings/categories');
   }, [router]);
 
   const handleNotificationsPress = useCallback(() => {
@@ -232,6 +256,10 @@ export function SettingsScreen(): React.ReactElement {
     router.push('/settings/clear-data');
   }, [router]);
 
+  const handleBackupPress = useCallback(() => {
+    router.push('/settings/backup');
+  }, [router]);
+
   const sections: SettingSection[] = [
     {
       title: 'Bank & SMS',
@@ -245,11 +273,25 @@ export function SettingsScreen(): React.ReactElement {
           rightElement: <PermissionStatusBadge state={permissionState} />,
         },
         {
+          id: 'import-sms',
+          icon: '📥',
+          title: 'Import Historical SMS',
+          description: 'Import transactions from past SMS messages',
+          onPress: handleImportSmsPress,
+        },
+        {
           id: 'accounts',
           icon: '🏦',
           title: 'Bank Accounts',
           description: 'Manage your linked accounts',
           onPress: handleAccountsPress,
+        },
+        {
+          id: 'categories',
+          icon: '📂',
+          title: 'Categories',
+          description: 'Manage transaction categories',
+          onPress: handleCategoriesPress,
         },
       ],
     },
@@ -304,6 +346,13 @@ export function SettingsScreen(): React.ReactElement {
     {
       title: 'Data',
       items: [
+        {
+          id: 'backup',
+          icon: '💾',
+          title: 'Backup & Restore',
+          description: 'Export or import your data',
+          onPress: handleBackupPress,
+        },
         {
           id: 'clear-data',
           icon: '🗑️',

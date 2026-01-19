@@ -151,18 +151,18 @@ describe('Screen', () => {
   });
 
   describe('Content Container', () => {
-    it('accepts contentContainerClassName for scroll variant', () => {
+    it('renders content in scroll variant', () => {
       render(
-        <Screen variant="scroll" contentContainerClassName="px-4">
+        <Screen variant="scroll">
           <Text>With Padding</Text>
         </Screen>
       );
       expect(screen.getByText('With Padding')).toBeTruthy();
     });
 
-    it('accepts contentContainerClassName for fixed variant', () => {
+    it('renders content in fixed variant', () => {
       render(
-        <Screen variant="fixed" contentContainerClassName="p-4">
+        <Screen variant="fixed">
           <Text>Fixed with Padding</Text>
         </Screen>
       );

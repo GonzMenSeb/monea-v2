@@ -97,7 +97,14 @@ class ParserRegistry {
 
 function createDefaultRegistry(): ParserRegistry {
   const registry = new ParserRegistry();
-  const bankCodes: BankCode[] = ['bancolombia', 'davivienda', 'bbva', 'nequi', 'daviplata'];
+  const bankCodes: BankCode[] = [
+    'bancolombia',
+    'davivienda',
+    'bbva',
+    'nequi',
+    'daviplata',
+    'bancoomeva',
+  ];
 
   for (const code of bankCodes) {
     registry.register(createBankParser(code));

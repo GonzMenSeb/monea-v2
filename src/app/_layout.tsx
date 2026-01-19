@@ -1,9 +1,14 @@
+import { useEffect } from 'react';
+
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { TamaguiProvider, QueryProvider, SmsSyncProvider } from '@/shared/providers';
 import { ThemeProvider } from '@/shared/theme';
+
+void SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent(): React.ReactElement {
   return (
@@ -21,6 +26,10 @@ function RootLayoutContent(): React.ReactElement {
 }
 
 export default function RootLayout(): React.ReactElement {
+  useEffect(() => {
+    void SplashScreen.hideAsync();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <TamaguiProvider>

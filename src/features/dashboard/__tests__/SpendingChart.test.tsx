@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react-native';
 import { SpendingChart, type SpendingDataPoint } from '../components/SpendingChart';
 
 jest.mock('victory-native', () => ({
-  CartesianChart: ({ children }: { children: () => React.ReactNode }) => {
+  CartesianChart: ({ children }: { children: (args: unknown) => React.ReactNode }) => {
     return children({ points: { income: [], expense: [] }, chartBounds: {} });
   },
   Bar: () => null,
@@ -73,8 +73,8 @@ describe('SpendingChart', () => {
       <SpendingChart data={weeklyData} timeRange="weekly" formatCurrency={mockFormatCurrency} />
     );
 
-    expect(screen.getByText('Income')).toBeTruthy();
-    expect(screen.getByText('Expenses')).toBeTruthy();
+    expect(screen.getAllByText('Income').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Expense/).length).toBeGreaterThan(0);
     expect(screen.getByText('Net')).toBeTruthy();
 
     expect(screen.getByText(/\+.*350[.,]000/)).toBeTruthy();

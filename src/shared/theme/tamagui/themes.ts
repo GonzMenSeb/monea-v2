@@ -1,6 +1,6 @@
-import type { Variable } from 'tamagui';
-
 import { tokens } from './tokens';
+
+import type { Variable } from 'tamagui';
 
 type TokenColor = keyof typeof tokens.color;
 type ColorValue = (typeof tokens.color)[TokenColor];

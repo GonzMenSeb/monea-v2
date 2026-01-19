@@ -1,9 +1,9 @@
 import { memo, useCallback } from 'react';
 
 import { Pressable, ActivityIndicator, type PressableProps } from 'react-native';
-import { styled, Stack, Text, XStack } from 'tamagui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { styled, Stack, Text, XStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
 

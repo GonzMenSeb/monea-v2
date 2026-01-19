@@ -54,7 +54,8 @@ function createPermissionResult(state: 'granted' | 'denied' | 'blocked'): Permis
 
 function createWrapper(autoStart = true) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(SmsSyncProvider, { autoStart }, children);
+    // eslint-disable-next-line react/no-children-prop
+    return createElement(SmsSyncProvider, { autoStart, children });
   };
 }
 
@@ -70,7 +71,11 @@ describe('SmsSyncProvider', () => {
       mockCheckPermissionState.mockResolvedValue(createPermissionResult('granted'));
 
       render(
-        createElement(SmsSyncProvider, { autoStart: true }, createElement(Text, null, 'Test'))
+        // eslint-disable-next-line react/no-children-prop
+        createElement(SmsSyncProvider, {
+          autoStart: true,
+          children: createElement(Text, null, 'Test'),
+        })
       );
 
       await waitFor(() => {
@@ -82,7 +87,11 @@ describe('SmsSyncProvider', () => {
       mockCheckPermissionState.mockResolvedValue(createPermissionResult('denied'));
 
       render(
-        createElement(SmsSyncProvider, { autoStart: true }, createElement(Text, null, 'Test'))
+        // eslint-disable-next-line react/no-children-prop
+        createElement(SmsSyncProvider, {
+          autoStart: true,
+          children: createElement(Text, null, 'Test'),
+        })
       );
 
       await waitFor(() => {
@@ -96,7 +105,11 @@ describe('SmsSyncProvider', () => {
       mockCheckPermissionState.mockResolvedValue(createPermissionResult('granted'));
 
       render(
-        createElement(SmsSyncProvider, { autoStart: false }, createElement(Text, null, 'Test'))
+        // eslint-disable-next-line react/no-children-prop
+        createElement(SmsSyncProvider, {
+          autoStart: false,
+          children: createElement(Text, null, 'Test'),
+        })
       );
 
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -110,7 +123,11 @@ describe('SmsSyncProvider', () => {
       mockIsRunning.mockReturnValue(true);
 
       render(
-        createElement(SmsSyncProvider, { autoStart: true }, createElement(Text, null, 'Test'))
+        // eslint-disable-next-line react/no-children-prop
+        createElement(SmsSyncProvider, {
+          autoStart: true,
+          children: createElement(Text, null, 'Test'),
+        })
       );
 
       await waitFor(() => {
@@ -124,7 +141,11 @@ describe('SmsSyncProvider', () => {
       mockCheckPermissionState.mockResolvedValue(createPermissionResult('granted'));
 
       const { unmount } = render(
-        createElement(SmsSyncProvider, { autoStart: true }, createElement(Text, null, 'Test'))
+        // eslint-disable-next-line react/no-children-prop
+        createElement(SmsSyncProvider, {
+          autoStart: true,
+          children: createElement(Text, null, 'Test'),
+        })
       );
 
       await waitFor(() => {

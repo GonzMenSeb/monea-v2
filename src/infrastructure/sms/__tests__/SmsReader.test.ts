@@ -238,7 +238,7 @@ describe('SmsReader', () => {
 
     it('forwards string errors as Error objects', () => {
       const onMessage = jest.fn();
-      const onError = jest.fn<void, [Error]>();
+      const onError = jest.fn<void, [Error | string]>();
 
       smsReader.startListening(onMessage, onError);
 
@@ -255,7 +255,7 @@ describe('SmsReader', () => {
 
     it('forwards Error objects directly', () => {
       const onMessage = jest.fn();
-      const onError = jest.fn<void, [Error]>();
+      const onError = jest.fn<void, [Error | string]>();
       const error = new Error('Native module error');
 
       smsReader.startListening(onMessage, onError);

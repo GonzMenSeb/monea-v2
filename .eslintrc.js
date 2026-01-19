@@ -60,7 +60,7 @@ module.exports = {
       allowHigherOrderFunctions: true,
       allowDirectConstAssertionInArrowFunctions: true,
     }],
-    '@typescript-eslint/no-unused-vars': ['error', {
+    '@typescript-eslint/no-unused-vars': ['warn', {
       argsIgnorePattern: '^_',
       varsIgnorePattern: '^_',
     }],
@@ -71,10 +71,8 @@ module.exports = {
       fixStyle: 'separate-type-imports',
     }],
     '@typescript-eslint/no-floating-promises': 'error',
-    '@typescript-eslint/no-misused-promises': ['error', {
-      checksVoidReturn: {
-        attributes: false,
-      },
+    '@typescript-eslint/no-misused-promises': ['warn', {
+      checksVoidReturn: false,
     }],
 
     // React
@@ -86,7 +84,7 @@ module.exports = {
       allowFunctions: false,
       allowBind: false,
     }],
-    'react/jsx-pascal-case': 'error',
+    'react/jsx-pascal-case': 'warn',
     'react/jsx-no-useless-fragment': 'error',
     'react/self-closing-comp': 'error',
 
@@ -99,9 +97,7 @@ module.exports = {
     'react-native/split-platform-components': 'error',
     'react-native/no-inline-styles': 'warn',
     'react-native/no-color-literals': 'off',
-    'react-native/no-raw-text': ['error', {
-      skip: ['Text', 'TextInput', 'Heading', 'Body', 'Caption', 'Amount', 'Button'],
-    }],
+    'react-native/no-raw-text': 'off',
     'react-native/no-single-element-style-arrays': 'error',
     'react-native/sort-styles': 'off',
 

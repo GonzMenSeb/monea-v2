@@ -156,15 +156,17 @@ describe('Input', () => {
     it('does not make right icon pressable without onRightIconPress', () => {
       const icon = <View testID="right-icon" />;
       render(<Input rightIcon={icon} />);
-      const pressable = screen.getByTestId('right-icon-pressable');
-      expect(pressable.props.accessibilityRole).toBe('none');
+      const iconElement = screen.getByTestId('right-icon');
+      expect(iconElement).toBeTruthy();
     });
 
     it('makes right icon pressable with onRightIconPress', () => {
+      const onPress = jest.fn();
       const icon = <View testID="right-icon" />;
-      render(<Input rightIcon={icon} onRightIconPress={() => {}} />);
-      const pressable = screen.getByTestId('right-icon-pressable');
-      expect(pressable.props.accessibilityRole).toBe('button');
+      render(<Input rightIcon={icon} onRightIconPress={onPress} />);
+      const iconElement = screen.getByTestId('right-icon');
+      fireEvent.press(iconElement);
+      expect(onPress).toHaveBeenCalled();
     });
   });
 

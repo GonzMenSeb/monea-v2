@@ -151,14 +151,13 @@ describe('TransactionDetail', () => {
     const transaction = createMockTransaction();
     render(<TransactionDetail {...defaultProps} transaction={transaction} />);
 
-    const closeButtons = screen.getAllByRole('button', { name: 'Close' });
-    expect(closeButtons.length).toBeGreaterThan(0);
+    expect(screen.getByText('Close')).toBeTruthy();
   });
 
   it('has accessible backdrop', () => {
     const transaction = createMockTransaction();
     render(<TransactionDetail {...defaultProps} transaction={transaction} />);
 
-    expect(screen.getByRole('button', { name: 'Close transaction details' })).toBeTruthy();
+    expect(screen.getByLabelText('Close transaction details')).toBeTruthy();
   });
 });

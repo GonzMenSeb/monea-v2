@@ -54,18 +54,25 @@ export function Component({ value, onChange }: ComponentProps): React.ReactEleme
 - Hooks at top, handlers next, render last
 - Use `React.ReactElement` as return type
 
-### Styling
+### Styling (Tamagui)
 
-- Use NativeWind utility classes
-- Extract complex styles to constants
-- Use theme tokens from `@/shared/theme`
+- Use Tamagui styled components
+- Define variants for component variations
+- Use theme tokens ($backgroundSurface, $textPrimary, etc.)
 
 ```typescript
-const CARD_STYLES = 'bg-white rounded-xl p-4 shadow-sm';
+import { styled, Stack, Text } from 'tamagui';
 
-<View className={CARD_STYLES}>
-  <Text className="text-lg font-semibold">{title}</Text>
-</View>
+const Card = styled(Stack, {
+  name: 'Card',
+  backgroundColor: '$backgroundSurface',
+  borderRadius: '$4',
+  padding: '$4',
+});
+
+<Card>
+  <Text fontSize="$4" fontWeight="600">{title}</Text>
+</Card>
 ```
 
 ### File Naming
@@ -166,12 +173,11 @@ npm run e2e:test:ci        # Run tests in CI environment (e2e_avd)
 
 ## Adding a New Bank Parser
 
-1. Collect real SMS samples from the bank
-2. Create pattern file in `src/core/parser/patterns/[BankName].ts`
-3. Implement parser strategy following existing patterns
-4. Write comprehensive tests with real message samples
-5. Register parser in `src/core/parser/ParserRegistry.ts`
-6. Update `docs/SMS_PATTERNS.md`
+1. Collect real SMS samples from the bank (minimum 3-5 covering different transaction types)
+2. Add bank to `BANK_INFO` in `src/core/parser/BankPatterns.ts`
+3. Add transaction patterns to `BANK_PATTERNS` in the same file
+4. Write comprehensive tests in `src/core/parser/__tests__/`
+5. Update `docs/SMS_PATTERNS.md` with the new bank's message formats
 
 ## Code Review Guidelines
 

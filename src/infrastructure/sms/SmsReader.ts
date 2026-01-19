@@ -3,6 +3,8 @@ import {
   checkIfHasSMSPermission,
   requestReadSMSPermission,
 } from '@maniac-tech/react-native-expo-read-sms';
+// eslint-disable-next-line import/default
+import SmsAndroid from 'react-native-get-sms-android';
 
 import type {
   SmsPermissionStatus,
@@ -10,7 +12,10 @@ import type {
   ParsedSmsCallback,
   SmsErrorCallback,
   SmsReaderInterface,
+  HistoricalSmsOptions,
+  HistoricalSmsMessage,
 } from './types';
+import type { SmsFilter, SmsMessage } from 'react-native-get-sms-android';
 
 function parseRawSmsMessage(rawMessage: string): ParsedSmsMessage {
   const match = rawMessage.match(/^\[([^\],]*),\s*(.+)\]$/s);
@@ -85,6 +90,84 @@ class SmsReader implements SmsReaderInterface {
 
   isListening(): boolean {
     return this.listening;
+  }
+
+  async fetchHistoricalSms(options?: HistoricalSmsOptions): Promise<HistoricalSmsMessage[]> {
+    const hasPermissions = await this.hasAllPermissions();
+    if (!hasPermissions) {
+      throw new Error('SMS permissions not granted');
+    }
+
+    return new Promise((resolve, reject) => {
+      const filter: SmsFilter = {
+        box: 'inbox',
+        maxCount: options?.limit ?? 1000,
+      };
+
+      if (options?.startDate) {
+        filter.minDate = options.startDate.getTime();
+      }
+
+      if (options?.endDate) {
+        filter.maxDate = options.endDate.getTime();
+      }
+
+      SmsAndroid.list(
+        JSON.stringify(filter),
+        (count: number, smsList: string, error: string | null) => {
+          if (error) {
+            reject(new Error(error));
+            return;
+          }
+
+          try {
+            const messages: SmsMessage[] = JSON.parse(smsList);
+            let filteredMessages = messages;
+
+            if (options?.senders && options.senders.length > 0) {
+              const senderSet = new Set(options.senders.map((s) => s.toLowerCase()));
+              filteredMessages = messages.filter((m) => senderSet.has(m.address.toLowerCase()));
+            }
+
+            const historicalMessages: HistoricalSmsMessage[] = filteredMessages.map((m) => ({
+              id: m._id,
+              sender: m.address,
+              body: m.body,
+              date: new Date(parseInt(m.date, 10)),
+            }));
+
+            resolve(historicalMessages);
+          } catch (parseError) {
+            reject(new Error('Failed to parse SMS messages'));
+          }
+        }
+      );
+    });
+  }
+
+  async getInboxCount(): Promise<number> {
+    const hasPermissions = await this.hasAllPermissions();
+    if (!hasPermissions) {
+      return 0;
+    }
+
+    return new Promise((resolve) => {
+      const filter: SmsFilter = {
+        box: 'inbox',
+        maxCount: 1,
+      };
+
+      SmsAndroid.list(
+        JSON.stringify(filter),
+        (count: number, _smsList: string, error: string | null) => {
+          if (error) {
+            resolve(0);
+            return;
+          }
+          resolve(count);
+        }
+      );
+    });
   }
 }
 

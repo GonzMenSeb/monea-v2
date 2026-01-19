@@ -57,13 +57,10 @@ describe('Real SMS Samples - Colombian Banks', () => {
         }
       });
 
-      it('parses from sender code 85954', () => {
+      it('sender code 85954 is now assigned to Nequi', () => {
         const sms = 'Bancolombia le informa compra por $30.000 en TIENDA. Saldo: $170.000';
         const result = parser.parse(sms, '85954');
-        expect(result.success).toBe(true);
-        if (result.success) {
-          expect(result.bank.code).toBe('bancolombia');
-        }
+        expect(result.success).toBe(false);
       });
     });
 
@@ -712,6 +709,269 @@ describe('Real SMS Samples - Colombian Banks', () => {
       if (result.success) {
         expect(result.transaction.accountNumber).toBe('5678');
       }
+    });
+  });
+
+  describe('New Bancolombia Formats (2024-2026)', () => {
+    describe('credit card purchase with COP format', () => {
+      const samples = [
+        {
+          description: 'COP purchase at Didi',
+          sms: 'Bancolombia: Compraste COP5.680,00 en DLO*Didi con tu T.Cred *1194, el 16/01/2026 a las 16:56. Si tienes dudas, encuentranos aqui: 6045109095 o 018000931987. Estamos cerca.',
+          expected: { type: 'expense', amount: 5680, merchant: 'DLO*Didi', accountLast4: '1194' },
+        },
+        {
+          description: 'COP purchase at Skechers',
+          sms: 'Bancolombia: Compraste COP239.940,00 en SKECHERS VIVA ENVIGA con tu T.Cred *1194, el 14/01/2026 a las 19:07. Si tienes dudas, encuentranos aqui: 6045109095 o 018000931987. Estamos cerca.',
+          expected: {
+            type: 'expense',
+            amount: 239940,
+            merchant: 'SKECHERS VIVA ENVIGA',
+            accountLast4: '1194',
+          },
+        },
+        {
+          description: 'COP purchase at DiDi Food',
+          sms: 'Bancolombia: Compraste COP175.700,00 en DiDi CO Food con tu T.Cred *1194, el 15/01/2026 a las 18:13. Si tienes dudas, encuentranos aqui: 6045109095 o 018000931987. Estamos cerca.',
+          expected: {
+            type: 'expense',
+            amount: 175700,
+            merchant: 'DiDi CO Food',
+            accountLast4: '1194',
+          },
+        },
+      ];
+
+      it.each(samples)('$description', ({ sms, expected }) => {
+        const result = parser.parse(sms, '85540');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.transaction.type).toBe(expected.type);
+          expect(result.transaction.amount).toBe(expected.amount);
+          expect(result.transaction.merchant).toBe(expected.merchant);
+          expect(result.transaction.accountNumber).toBe(expected.accountLast4);
+        }
+      });
+    });
+
+    describe('credit card purchase with USD format', () => {
+      it('parses USD purchase (amount rounded to whole number)', () => {
+        const sms =
+          'Bancolombia: Compraste USD7,70 en OVHcloud con tu T.Cred *1194, el 16/01/2026 a las 07:15. Si tienes dudas, encuentranos aqui: 6045109095 o 018000931987. Estamos cerca.';
+        const result = parser.parse(sms, '85540');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.transaction.type).toBe('expense');
+          expect(result.transaction.amount).toBe(8);
+          expect(result.transaction.merchant).toBe('OVHcloud');
+          expect(result.transaction.accountNumber).toBe('1194');
+        }
+      });
+    });
+
+    describe('transfer out (Transferiste format)', () => {
+      const samples = [
+        {
+          description: 'transfer to account with comma thousands',
+          sms: 'Bancolombia: Transferiste $66,000.00 desde tu cuenta 0810 a la cuenta *3052269855 el 14/11/2025 a las 10:09. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+          expected: { type: 'transfer_out', amount: 66000, accountLast4: '0810' },
+        },
+        {
+          description: 'transfer with different amount format',
+          sms: 'Bancolombia: Transferiste $320,000 desde tu cuenta *0810 a la cuenta *00416448132 el 17/11/2025 a las 18:56. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+          expected: { type: 'transfer_out', amount: 320000, accountLast4: '0810' },
+        },
+        {
+          description: 'transfer by QR',
+          sms: 'Bancolombia: Transferiste $30,300.00 por QR desde tu cuenta 0810 a la cuenta ALEMANA 274, el 2025/07/25 19:04. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+          expected: { type: 'transfer_out', amount: 30300, accountLast4: '0810' },
+        },
+        {
+          description: 'large transfer',
+          sms: 'Bancolombia: Transferiste $1,500,000.00 desde tu cuenta *0810 a la cuenta *0000003052269855 el 15/05/2025 a las 11:03. ¿Dudas? Llamanos al 018000931987. Estamos cerca.',
+          expected: { type: 'transfer_out', amount: 1500000, accountLast4: '0810' },
+        },
+      ];
+
+      it.each(samples)('$description', ({ sms, expected }) => {
+        const result = parser.parse(sms, '85540');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.transaction.type).toBe(expected.type);
+          expect(result.transaction.amount).toBe(expected.amount);
+          expect(result.transaction.accountNumber).toBe(expected.accountLast4);
+        }
+      });
+    });
+
+    describe('income received by QR (Recibiste por QR)', () => {
+      it('parses QR received payment', () => {
+        const sms =
+          'Bancolombia: Recibiste $100,000.00 por QR de MARIA ELIZABETH GONZALEZ DIAZ en tu cuenta *0810 el 2025/05/05 a las 17:49. ¿Dudas? Llama al 018000931987. Estamos cerca.';
+        const result = parser.parse(sms, '85784');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.transaction.type).toBe('income');
+          expect(result.transaction.amount).toBe(100000);
+          expect(result.transaction.merchant).toBe('MARIA ELIZABETH GONZALEZ DIAZ');
+          expect(result.transaction.accountNumber).toBe('0810');
+        }
+      });
+    });
+
+    describe('payroll income (Nomina)', () => {
+      it('parses payroll payment', () => {
+        const sms =
+          'Bancolombia: Recibiste un pago de Nomina de QUANTUM OUTSOUR por $1,595,260.00 en tu cuenta de Ahorros el 30/04/2025 a las 10:40. Si tienes dudas, llamanos al 018000931987. A tu lado siempre.';
+        const result = parser.parse(sms, '85784');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.transaction.type).toBe('income');
+          expect(result.transaction.amount).toBe(1595260);
+          expect(result.transaction.merchant).toBe('QUANTUM OUTSOUR');
+        }
+      });
+    });
+
+    describe('sender codes', () => {
+      it('parses from sender code 85540', () => {
+        const sms =
+          'Bancolombia: Compraste COP5.680,00 en TIENDA con tu T.Cred *1194, el 16/01/2026 a las 16:56. Estamos cerca.';
+        const result = parser.parse(sms, '85540');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.bank.code).toBe('bancolombia');
+        }
+      });
+
+      it('parses from sender code 85784', () => {
+        const sms =
+          'Bancolombia: Transferiste $28,000 desde tu cuenta *0810 a la cuenta *00736535882 el 14/05/2025 a las 15:36. ¿Dudas? Llamanos al 018000931987. Estamos cerca.';
+        const result = parser.parse(sms, '85784');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.bank.code).toBe('bancolombia');
+        }
+      });
+    });
+  });
+
+  describe('Nequi Real Samples (2024-2026)', () => {
+    describe('payment without thousand separators', () => {
+      const samples = [
+        {
+          description: 'payment at bookstore',
+          sms: 'Nequi: Pagaste $450300.00 en PANAMERICANA LIBRERIA .',
+          expected: { type: 'expense', amount: 450300, merchant: 'PANAMERICANA LIBRERIA' },
+        },
+        {
+          description: 'payment at restaurant',
+          sms: 'Nequi: Pagaste $171209.00 en PARMESSANO REST DELICA.',
+          expected: { type: 'expense', amount: 171209, merchant: 'PARMESSANO REST DELICA' },
+        },
+        {
+          description: 'payment at Rappi',
+          sms: 'Nequi: Pagaste $23490.00 en DLO Rappi CO PRO .',
+          expected: { type: 'expense', amount: 23490, merchant: 'DLO Rappi CO PRO' },
+        },
+        {
+          description: 'payment at Google Play',
+          sms: 'Nequi: Pagaste $10560.00 en GOOGLE PLAY YOUTUBE D.',
+          expected: { type: 'expense', amount: 10560, merchant: 'GOOGLE PLAY YOUTUBE D' },
+        },
+      ];
+
+      it.each(samples)('$description', ({ sms, expected }) => {
+        const result = parser.parse(sms, '85954');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.transaction.type).toBe(expected.type);
+          expect(result.transaction.amount).toBe(expected.amount);
+          expect(result.transaction.merchant).toBe(expected.merchant);
+        }
+      });
+    });
+
+    describe('failed payments should not be parsed', () => {
+      it('rejects insufficient funds message', () => {
+        const sms = 'Nequi: No te alcanzo para pagar $127000.00 en FLORIDA ETAPA 2 .';
+        const result = parser.parse(sms, '85954');
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects repeated insufficient funds messages', () => {
+        const sms = 'Nequi: No te alcanzo para pagar $10560.00 en GOOGLE PLAY YOUTUBE D.';
+        const result = parser.parse(sms, '85954');
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('sender code 85954', () => {
+      it('parses from sender code 85954', () => {
+        const sms = 'Nequi: Pagaste $50000.00 en TIENDA.';
+        const result = parser.parse(sms, '85954');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.bank.code).toBe('nequi');
+        }
+      });
+    });
+  });
+
+  describe('Bancoomeva', () => {
+    describe('internet purchase', () => {
+      const samples = [
+        {
+          description: 'purchase at Didi',
+          sms: 'Bancoomeva informa compra por Internet en DL*DIDI RIDES CO por $8,995.00 con su tarjeta Credito 2566 el 2026/01/07 13:12:29. +Info al 3009109898 opc * 3.',
+          expected: {
+            type: 'expense',
+            amount: 8995,
+            merchant: 'DL*DIDI RIDES CO',
+            accountLast4: '2566',
+          },
+        },
+        {
+          description: 'purchase at Google YouTube',
+          sms: 'Bancoomeva informa compra por Internet en DLO*GOOGLE YouTube Bogo por $20,900.00 con su tarjeta Credito 2566 el 2026/01/03 12:13:07. +Info al 3009109898 opc * 3.',
+          expected: {
+            type: 'expense',
+            amount: 20900,
+            merchant: 'DLO*GOOGLE YouTube Bogo',
+            accountLast4: '2566',
+          },
+        },
+        {
+          description: 'purchase at Uber',
+          sms: 'Bancoomeva informa compra por Internet en UBER RIDES Bogo por $34,510.00 con su tarjeta Credito 2566 el 2026/01/06 15:21:32. +Info al 3009109898 opc * 3.',
+          expected: {
+            type: 'expense',
+            amount: 34510,
+            merchant: 'UBER RIDES Bogo',
+            accountLast4: '2566',
+          },
+        },
+      ];
+
+      it.each(samples)('$description', ({ sms, expected }) => {
+        const result = parser.parse(sms, 'Bancoomeva');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.transaction.type).toBe(expected.type);
+          expect(result.transaction.amount).toBe(expected.amount);
+          expect(result.transaction.merchant).toBe(expected.merchant);
+          expect(result.transaction.accountNumber).toBe(expected.accountLast4);
+        }
+      });
+    });
+
+    describe('rejected purchases should not be parsed', () => {
+      it('rejects RECHAZO messages', () => {
+        const sms =
+          'Bancoomeva informa RECHAZO de compra por Internet 2026/01/07 20:57:39 por $10,305.00 en DLO*Didi Bogo con T.Credito +Info al 3009109898 opc * 3.';
+        const result = parser.parse(sms, 'Bancoomeva');
+        expect(result.success).toBe(false);
+      });
     });
   });
 });

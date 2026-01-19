@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
 
-import { styled, Stack, Text, XStack, YStack } from 'tamagui';
+import { Pressable } from 'react-native';
 
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { TransactionList } from '@/features/transactions/components';
 import {
@@ -36,6 +38,23 @@ const SummaryLabel = styled(Text, {
   fontSize: '$1',
   color: '$textSecondary',
   marginBottom: '$1',
+});
+
+const FAB = styled(Stack, {
+  name: 'FAB',
+  position: 'absolute',
+  bottom: 24,
+  right: 24,
+  width: 56,
+  height: 56,
+  borderRadius: '$full',
+  backgroundColor: '$accentPrimary',
+  alignItems: 'center',
+  justifyContent: 'center',
+  shadowColor: '$black',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.3,
+  shadowRadius: 8,
 });
 
 interface TransactionSummaryHeaderProps {
@@ -74,6 +93,7 @@ function TransactionSummaryHeader({
 }
 
 export default function TransactionsScreen(): React.ReactElement {
+  const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
   const setSelected = useTransactionStore((state) => state.setSelected);
@@ -95,9 +115,14 @@ export default function TransactionsScreen(): React.ReactElement {
   const handleTransactionPress = useCallback(
     (transactionId: string) => {
       setSelected(transactionId);
+      router.push(`/transactions/${transactionId}/edit`);
     },
-    [setSelected]
+    [setSelected, router]
   );
+
+  const handleAddTransaction = useCallback(() => {
+    router.push('/transactions/new');
+  }, [router]);
 
   const listHeaderComponent = summary ? (
     <TransactionSummaryHeader
@@ -130,6 +155,20 @@ export default function TransactionsScreen(): React.ReactElement {
           ListHeaderComponent={listHeaderComponent}
         />
       </Stack>
+
+      <Pressable
+        onPress={handleAddTransaction}
+        accessibilityRole="button"
+        accessibilityLabel="Add new transaction"
+      >
+        {({ pressed }) => (
+          <FAB opacity={pressed ? 0.8 : 1} scale={pressed ? 0.95 : 1}>
+            <Text color="$textInverse" fontSize="$6" fontWeight="300">
+              +
+            </Text>
+          </FAB>
+        )}
+      </Pressable>
     </Screen>
   );
 }

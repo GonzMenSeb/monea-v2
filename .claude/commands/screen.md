@@ -12,18 +12,16 @@ Parse the arguments to extract screen path and create the screen file.
 ### For Static Screen: `src/app/{screenPath}.tsx`
 
 ```typescript
-import { View } from 'react-native';
-import { Stack } from 'expo-router';
-
-import { Text } from '@/shared/components/ui';
+import { Stack as RouterStack } from 'expo-router';
+import { YStack, Text } from 'tamagui';
 
 export default function {ScreenName}Screen(): React.ReactElement {
   return (
     <>
-      <Stack.Screen options={{ title: '{Screen Title}' }} />
-      <View className="flex-1 bg-gray-50 p-4">
-        <Text className="text-lg">{ScreenName}</Text>
-      </View>
+      <RouterStack.Screen options={{ title: '{Screen Title}' }} />
+      <YStack flex={1} backgroundColor="$background" padding="$4">
+        <Text fontSize="$5">{ScreenName}</Text>
+      </YStack>
     </>
   );
 }
@@ -32,20 +30,18 @@ export default function {ScreenName}Screen(): React.ReactElement {
 ### For Dynamic Screen: `src/app/{screenPath}.tsx`
 
 ```typescript
-import { View } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
-
-import { Text } from '@/shared/components/ui';
+import { Stack as RouterStack, useLocalSearchParams } from 'expo-router';
+import { YStack, Text } from 'tamagui';
 
 export default function {ScreenName}Screen(): React.ReactElement {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   return (
     <>
-      <Stack.Screen options={{ title: '{Screen Title}' }} />
-      <View className="flex-1 bg-gray-50 p-4">
-        <Text className="text-lg">Viewing: {id}</Text>
-      </View>
+      <RouterStack.Screen options={{ title: '{Screen Title}' }} />
+      <YStack flex={1} backgroundColor="$background" padding="$4">
+        <Text fontSize="$5">Viewing: {id}</Text>
+      </YStack>
     </>
   );
 }
@@ -76,8 +72,8 @@ export default function TabLayout(): React.ReactElement {
 
 ## Screen Conventions
 - Default export required for Expo Router
-- Use `Stack.Screen` to configure header
-- Apply consistent background: `bg-gray-50`
+- Use `Stack.Screen` (from expo-router) to configure header
+- Use Tamagui's `$background` token for consistent theming
 - Use semantic route naming
 - Group related screens with route groups `()`
 

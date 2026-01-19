@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import { ActivityIndicator } from 'react-native';
+
 import { styled, Stack, Text, type GetProps } from 'tamagui';
 
 import { useHaptics } from '@/shared/hooks/useHaptics';
@@ -145,18 +146,20 @@ export function Button({
   const { light } = useHaptics();
   const isDisabled = disabled || loading;
 
-  const handlePress = useCallback((event: Parameters<NonNullable<typeof onPress>>[0]) => {
-    if (!isDisabled && onPress) {
-      if (haptic) {
-        light();
+  const handlePress = useCallback(
+    (event: Parameters<NonNullable<typeof onPress>>[0]) => {
+      if (!isDisabled && onPress) {
+        if (haptic) {
+          light();
+        }
+        onPress(event);
       }
-      onPress(event);
-    }
-  }, [isDisabled, onPress, haptic, light]);
+    },
+    [isDisabled, onPress, haptic, light]
+  );
 
-  const loaderColor = variant === 'primary' || variant === 'danger'
-    ? colors.text.inverse
-    : colors.accent.primary;
+  const loaderColor =
+    variant === 'primary' || variant === 'danger' ? colors.text.inverse : colors.accent.primary;
 
   return (
     <ButtonFrame

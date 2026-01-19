@@ -1,4 +1,4 @@
-import type { Database } from '@nozbe/watermelondb';
+import type { Database, Collection } from '@nozbe/watermelondb';
 
 import {
   createTestDatabase,
@@ -23,9 +23,9 @@ import { SmsSyncService, resetSmsSyncService } from '../services/SmsSyncService'
 describe('SMS Sync Error Handling Integration Tests', () => {
   let database: Database;
   let service: SmsSyncService;
-  let accountsCollection: ReturnType<Database['get']>;
-  let transactionsCollection: ReturnType<Database['get']>;
-  let smsCollection: ReturnType<Database['get']>;
+  let accountsCollection: Collection<Account>;
+  let transactionsCollection: Collection<Transaction>;
+  let smsCollection: Collection<SmsMessage>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -33,9 +33,9 @@ describe('SMS Sync Error Handling Integration Tests', () => {
     await resetDatabase(database);
     resetSmsSyncService();
     service = new SmsSyncService(database);
-    accountsCollection = database.get<Account>('accounts');
-    transactionsCollection = database.get<Transaction>('transactions');
-    smsCollection = database.get<SmsMessage>('sms_messages');
+    accountsCollection = database.get('accounts');
+    transactionsCollection = database.get('transactions');
+    smsCollection = database.get('sms_messages');
   });
 
   afterEach(async () => {
@@ -227,8 +227,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const smsMessages = await smsCollection.query().fetch();
       expect(smsMessages).toHaveLength(1);
-      expect(smsMessages[0].isProcessed).toBe(true);
-      expect(smsMessages[0].processingError).toBeNull();
+      expect(smsMessages[0]!.isProcessed).toBe(true);
+      expect(smsMessages[0]!.processingError).toBeNull();
     });
 
     it('stores SMS message even for non-bank messages', async () => {
@@ -255,9 +255,9 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       await service.processMessage(message);
 
       const smsMessages = await smsCollection.query().fetch();
-      expect(smsMessages[0].address).toBe('Bancolombia');
-      expect(smsMessages[0].body).toBe(message.body);
-      expect(smsMessages[0].date).toBeInstanceOf(Date);
+      expect(smsMessages[0]!.address).toBe('Bancolombia');
+      expect(smsMessages[0]!.body).toBe(message.body);
+      expect(smsMessages[0]!.date).toBeInstanceOf(Date);
     });
   });
 
@@ -275,8 +275,8 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       expect(result.success).toBe(true);
 
       const transactions = await transactionsCollection.query().fetch();
-      expect(transactions[0].amount).toBe(999999999);
-      expect(transactions[0].balanceAfter).toBe(1000000000);
+      expect(transactions[0]!.amount).toBe(999999999);
+      expect(transactions[0]!.balanceAfter).toBe(1000000000);
     });
 
     it('handles small transaction amounts', async () => {
@@ -292,7 +292,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       expect(result.success).toBe(true);
 
       const transactions = await transactionsCollection.query().fetch();
-      expect(transactions[0].amount).toBe(100);
+      expect(transactions[0]!.amount).toBe(100);
     });
 
     it('handles messages with special characters in merchant name', async () => {
@@ -308,7 +308,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       expect(result.success).toBe(true);
 
       const transactions = await transactionsCollection.query().fetch();
-      expect(transactions[0].merchant).toBe('EXITO COLOMBIA S A');
+      expect(transactions[0]!.merchant).toBe('EXITO COLOMBIA S A');
     });
 
     it('handles account number variations', async () => {
@@ -331,7 +331,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(2);
-      expect(accounts.map((a) => a.accountNumber).sort()).toEqual(['1234', '5678']);
+      expect(accounts.map((a: Account) => a.accountNumber).sort()).toEqual(['1234', '5678']);
     });
   });
 
@@ -350,7 +350,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].accountNumber).toBe('unknown');
+      expect(accounts[0]!.accountNumber).toBe('unknown');
     });
 
     it('reuses account when both messages have no account number', async () => {
@@ -373,7 +373,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].balance).toBe(550000);
+      expect(accounts[0]!.balance).toBe(550000);
     });
 
     it('sets correct account type for digital wallets', async () => {
@@ -394,7 +394,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(2);
-      expect(accounts.every((a) => a.accountType === 'digital_wallet')).toBe(true);
+      expect(accounts.every((a: Account) => a.accountType === 'digital_wallet')).toBe(true);
     });
 
     it('sets savings account type for traditional banks', async () => {
@@ -409,7 +409,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].accountType).toBe('savings');
+      expect(accounts[0]!.accountType).toBe('savings');
     });
   });
 
@@ -427,7 +427,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
       expect(result.success).toBe(true);
 
       const accounts = await accountsCollection.query().fetch();
-      expect(accounts[0].balance).toBe(0);
+      expect(accounts[0]!.balance).toBe(0);
     });
 
     it('updates account balance when provided', async () => {
@@ -448,7 +448,7 @@ describe('SMS Sync Error Handling Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].balance).toBe(950000);
+      expect(accounts[0]!.balance).toBe(950000);
     });
   });
 

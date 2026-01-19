@@ -146,12 +146,7 @@ export function TransactionCard({
           {formatDate(transaction.transactionDate)}
         </Text>
       </YStack>
-      <Text
-        fontFamily="$mono"
-        fontSize="$3"
-        fontWeight="700"
-        color={typeConfig.color}
-      >
+      <Text fontFamily="$mono" fontSize="$3" fontWeight="700" color={typeConfig.color}>
         {formattedAmount}
       </Text>
     </XStack>
@@ -159,11 +154,7 @@ export function TransactionCard({
 
   if (!onPress) {
     return (
-      <CardFrame
-        variant="surface"
-        borderLeftWidth={4}
-        borderLeftColor={bankAccent}
-      >
+      <CardFrame variant="surface" borderLeftWidth={4} borderLeftColor={bankAccent}>
         {content}
       </CardFrame>
     );
@@ -271,11 +262,7 @@ export function AccountCard({
   );
 }
 
-export function GlassCard({
-  children,
-  onPress,
-  ...props
-}: BaseCardProps): React.ReactElement {
+export function GlassCard({ children, onPress, ...props }: BaseCardProps): React.ReactElement {
   return (
     <Card variant="glass" onPress={onPress} {...props}>
       {children}

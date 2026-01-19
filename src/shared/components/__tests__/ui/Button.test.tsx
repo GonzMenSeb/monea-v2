@@ -12,8 +12,8 @@ describe('Button', () => {
     });
 
     it('renders with primary variant by default', () => {
-      render(<Button>Primary</Button>);
-      const button = screen.getByRole('button');
+      render(<Button testID="primary-btn">Primary</Button>);
+      const button = screen.getByTestId('primary-btn');
       expect(button).toBeTruthy();
     });
 
@@ -71,9 +71,13 @@ describe('Button', () => {
 
   describe('Loading State', () => {
     it('shows loading indicator when loading is true', () => {
-      render(<Button loading>Loading</Button>);
+      render(
+        <Button loading testID="loading-btn">
+          Loading
+        </Button>
+      );
       expect(screen.queryByText('Loading')).toBeNull();
-      const button = screen.getByRole('button');
+      const button = screen.getByTestId('loading-btn');
       expect(button).toBeTruthy();
     });
 
@@ -91,36 +95,44 @@ describe('Button', () => {
     it('does not call onPress when loading', () => {
       const onPress = jest.fn();
       render(
-        <Button loading onPress={onPress}>
+        <Button loading onPress={onPress} testID="loading-btn">
           Loading
         </Button>
       );
-      fireEvent.press(screen.getByRole('button'));
+      fireEvent.press(screen.getByTestId('loading-btn'));
       expect(onPress).not.toHaveBeenCalled();
     });
   });
 
   describe('Disabled State', () => {
     it('renders as disabled when disabled prop is true', () => {
-      render(<Button disabled>Disabled</Button>);
-      const button = screen.getByRole('button');
+      render(
+        <Button disabled testID="disabled-btn">
+          Disabled
+        </Button>
+      );
+      const button = screen.getByTestId('disabled-btn');
       expect(button.props.accessibilityState.disabled).toBe(true);
     });
 
     it('does not call onPress when disabled', () => {
       const onPress = jest.fn();
       render(
-        <Button disabled onPress={onPress}>
+        <Button disabled onPress={onPress} testID="disabled-btn">
           Disabled
         </Button>
       );
-      fireEvent.press(screen.getByRole('button'));
+      fireEvent.press(screen.getByTestId('disabled-btn'));
       expect(onPress).not.toHaveBeenCalled();
     });
 
     it('is disabled when loading', () => {
-      render(<Button loading>Loading</Button>);
-      const button = screen.getByRole('button');
+      render(
+        <Button loading testID="loading-btn">
+          Loading
+        </Button>
+      );
+      const button = screen.getByTestId('loading-btn');
       expect(button.props.accessibilityState?.disabled).toBe(true);
     });
   });
@@ -141,39 +153,48 @@ describe('Button', () => {
     it('calls onPress when pressed', () => {
       const onPress = jest.fn();
       render(<Button onPress={onPress}>Press Me</Button>);
-      fireEvent.press(screen.getByRole('button'));
+      fireEvent.press(screen.getByText('Press Me'));
       expect(onPress).toHaveBeenCalledTimes(1);
     });
 
     it('does not call onPress when not provided', () => {
-      render(<Button>No Handler</Button>);
-      const button = screen.getByRole('button');
+      render(<Button testID="no-handler-btn">No Handler</Button>);
+      const button = screen.getByTestId('no-handler-btn');
       fireEvent.press(button);
     });
 
     it('passes event to onPress handler', () => {
       const onPress = jest.fn();
       render(<Button onPress={onPress}>Event Test</Button>);
-      fireEvent.press(screen.getByRole('button'));
+      fireEvent.press(screen.getByText('Event Test'));
       expect(onPress).toHaveBeenCalled();
     });
   });
 
   describe('Accessibility', () => {
     it('has button role', () => {
-      render(<Button>Accessible</Button>);
-      expect(screen.getByRole('button')).toBeTruthy();
+      render(<Button testID="accessible-btn">Accessible</Button>);
+      const button = screen.getByTestId('accessible-btn');
+      expect(button.props.accessibilityRole).toBe('button');
     });
 
     it('sets disabled state in accessibility', () => {
-      render(<Button disabled>Disabled</Button>);
-      const button = screen.getByRole('button');
+      render(
+        <Button disabled testID="disabled-btn">
+          Disabled
+        </Button>
+      );
+      const button = screen.getByTestId('disabled-btn');
       expect(button.props.accessibilityState.disabled).toBe(true);
     });
 
     it('sets loading state as disabled in accessibility', () => {
-      render(<Button loading>Loading</Button>);
-      const button = screen.getByRole('button');
+      render(
+        <Button loading testID="loading-btn">
+          Loading
+        </Button>
+      );
+      const button = screen.getByTestId('loading-btn');
       expect(button.props.accessibilityState.disabled).toBe(true);
     });
   });

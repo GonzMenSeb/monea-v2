@@ -155,15 +155,35 @@ monea/
 ├── src/
 │   ├── app/                          # Screen routes (Expo Router)
 │   │   ├── _layout.tsx               # Root layout with providers
+│   │   ├── index.tsx                 # Dashboard (home)
 │   │   ├── (tabs)/                   # Tab navigator group
 │   │   │   ├── _layout.tsx           # Tab bar configuration
-│   │   │   ├── index.tsx             # Dashboard (home tab)
-│   │   │   ├── transactions.tsx      # Transactions list tab
-│   │   │   └── settings.tsx          # Settings tab
-│   │   └── settings/                 # Settings stack screens
-│   │       └── accounts.tsx          # Account management
+│   │   │   └── transactions.tsx      # Transactions list tab
+│   │   ├── settings/                 # Settings stack screens
+│   │   │   ├── _layout.tsx           # Settings layout
+│   │   │   ├── about.tsx             # About screen
+│   │   │   ├── accounts.tsx          # Account management
+│   │   │   ├── backup.tsx            # Backup & restore
+│   │   │   ├── categories.tsx        # Category management
+│   │   │   ├── category/             # Category detail routes
+│   │   │   ├── clear-data.tsx        # Clear data screen
+│   │   │   └── sms.tsx               # SMS settings
+│   │   ├── sync/                     # Sync-related screens
+│   │   └── transactions/             # Transaction detail routes
 │   │
 │   ├── features/                     # Domain features (vertical slices)
+│   │   ├── backup/
+│   │   │   ├── components/           # BackupCard, RestoreDialog
+│   │   │   ├── hooks/                # useBackup
+│   │   │   ├── services/             # BackupService
+│   │   │   └── types/                # Backup types
+│   │   │
+│   │   ├── categories/
+│   │   │   ├── components/           # CategoryList, CategoryForm
+│   │   │   ├── hooks/                # useCategories
+│   │   │   ├── services/             # CategoryService
+│   │   │   └── types/                # Category types
+│   │   │
 │   │   ├── dashboard/
 │   │   │   ├── components/           # BalanceCard, SpendingChart, etc.
 │   │   │   ├── hooks/                # useDashboardData
@@ -176,9 +196,9 @@ monea/
 │   │   │   └── types/                # Transaction types
 │   │   │
 │   │   ├── sms-sync/
-│   │   │   ├── components/           # SyncButton, SyncStatus
-│   │   │   ├── hooks/                # useSmsSync
-│   │   │   ├── services/             # SmsSyncService
+│   │   │   ├── components/           # SyncButton, SyncStatus, BulkImportCard
+│   │   │   ├── hooks/                # useSmsSync, useBulkImport
+│   │   │   ├── services/             # SmsSyncService, BulkImportService
 │   │   │   └── types/                # Sync-related types
 │   │   │
 │   │   ├── settings/
@@ -338,10 +358,10 @@ App
 3. TransactionParser iterates messages
          │
          ▼
-4. ParserRegistry finds matching bank parser
+4. BankPatterns.getBankBySender() identifies bank
          │
          ▼
-5. Bank parser extracts transaction data
+5. Bank patterns extract transaction data
          │
          ▼
 6. TransactionRepository saves to WatermelonDB
@@ -465,11 +485,16 @@ App
 
 | Future Feature | Extension Strategy |
 |----------------|-------------------|
-| New bank support | Add parser strategy to `patterns/` |
+| New bank support | Add patterns to `BANK_PATTERNS` in `BankPatterns.ts` |
 | Multi-device sync | Add sync layer to infrastructure |
-| Budget categories | Add feature to `features/budgets/` |
-| Export to CSV | Add service to `features/export/` |
+| Export to CSV | Add service to `features/backup/` (backup feature exists) |
 | Multiple currencies | Extend `AmountExtractor` |
+| Budgets | Add feature to `features/budgets/` |
+
+**Implemented Features:**
+- ✅ Transaction categories - `features/categories/`
+- ✅ Data backup & restore - `features/backup/`
+- ✅ Bulk SMS import - `features/sms-sync/` (BulkImportService)
 
 ---
 

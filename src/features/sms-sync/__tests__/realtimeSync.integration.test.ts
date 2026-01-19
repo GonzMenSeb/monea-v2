@@ -79,8 +79,8 @@ describe('Real-time SMS Sync Integration Tests', () => {
         expect.any(Function)
       );
 
-      const messageCallback = mockSmsReader.startListening.mock.calls[0][0];
-      const errorCallback = mockSmsReader.startListening.mock.calls[0][1];
+      const messageCallback = mockSmsReader.startListening.mock.calls[0]![0];
+      const errorCallback = mockSmsReader.startListening.mock.calls[0]![1];
 
       expect(typeof messageCallback).toBe('function');
       expect(typeof errorCallback).toBe('function');

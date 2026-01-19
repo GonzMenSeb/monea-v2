@@ -16,9 +16,7 @@ Create the following files:
 ### 1. Component File: `src/{location}/components/{ComponentName}.tsx`
 
 ```typescript
-import { View, Text, Pressable } from 'react-native';
-
-import type { {ComponentName}Props } from './types';
+import { Stack, Text } from 'tamagui';
 
 interface {ComponentName}Props {
   // Define props based on component purpose
@@ -26,9 +24,9 @@ interface {ComponentName}Props {
 
 export function {ComponentName}({ ...props }: {ComponentName}Props): React.ReactElement {
   return (
-    <View className="">
-      <Text className="">{ComponentName}</Text>
-    </View>
+    <Stack backgroundColor="$backgroundSurface" padding="$4" borderRadius="$4">
+      <Text fontSize="$4">{ComponentName}</Text>
+    </Stack>
   );
 }
 ```
@@ -56,6 +54,6 @@ Add export: `export { {ComponentName} } from './{ComponentName}';`
 - Use functional components only
 - Props destructured in signature
 - Hooks at top, handlers next, render last
-- Use NativeWind for styling
+- Use Tamagui for styling with theme tokens
 - Follow CLAUDE.md minimal comments policy
 - Explicit return type: `React.ReactElement`

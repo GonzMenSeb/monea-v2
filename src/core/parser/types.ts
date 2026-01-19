@@ -2,7 +2,7 @@ import type { TransactionType } from '@/infrastructure/database';
 
 export type { TransactionType };
 
-export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'daviplata';
+export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'daviplata' | 'bancoomeva';
 
 export interface BankInfo {
   code: BankCode;

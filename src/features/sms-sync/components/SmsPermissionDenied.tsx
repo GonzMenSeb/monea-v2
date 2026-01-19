@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
 
-import { styled, Stack, Text, YStack } from 'tamagui';
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { styled, Stack, Text, YStack } from 'tamagui';
 
 import { smsPermissions } from '@/infrastructure/sms';
 import { Button } from '@/shared/components/ui';

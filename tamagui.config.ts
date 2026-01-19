@@ -1,8 +1,8 @@
-import { createFont, createTamagui } from 'tamagui';
 import { createAnimations } from '@tamagui/animations-react-native';
+import { createFont, createTamagui } from 'tamagui';
 
-import { tokens } from './src/shared/theme/tamagui/tokens';
 import { darkTheme } from './src/shared/theme/tamagui/themes';
+import { tokens } from './src/shared/theme/tamagui/tokens';
 
 const animations = createAnimations({
   fast: {
@@ -204,5 +204,6 @@ export default config;
 export type AppConfig = typeof config;
 
 declare module 'tamagui' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface TamaguiCustomConfig extends AppConfig {}
 }

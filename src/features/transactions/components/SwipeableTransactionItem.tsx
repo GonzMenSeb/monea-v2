@@ -1,6 +1,7 @@
 import { useCallback, useRef, memo } from 'react';
 
 import { StyleSheet, Pressable } from 'react-native';
+
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Stack, Text, XStack } from 'tamagui';

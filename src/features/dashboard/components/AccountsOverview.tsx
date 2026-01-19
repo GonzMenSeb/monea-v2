@@ -1,6 +1,7 @@
 import { useCallback, memo } from 'react';
 
 import { ScrollView } from 'react-native';
+
 import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
@@ -194,9 +195,7 @@ export function AccountsOverview({
           <SectionTitle>Your Accounts</SectionTitle>
         </SectionHeader>
         <EmptyContainer>
-          <EmptyText>
-            No accounts linked yet. Link your bank accounts to start tracking.
-          </EmptyText>
+          <EmptyText>No accounts linked yet. Link your bank accounts to start tracking.</EmptyText>
           {onAddAccountPress && (
             <Stack marginTop="$4">
               <AddAccountButton onPress={onAddAccountPress} />

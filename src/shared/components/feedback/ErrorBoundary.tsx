@@ -1,8 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
-import { styled, Stack, Text, YStack } from 'tamagui';
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { styled, Stack, Text, YStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
 
@@ -123,9 +122,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             persists.
           </Message>
           {__DEV__ && this.state.error && (
-            <ErrorDetails numberOfLines={3}>
-              {this.state.error.message}
-            </ErrorDetails>
+            <ErrorDetails numberOfLines={3}>{this.state.error.message}</ErrorDetails>
           )}
           <ActionContainer>
             <Button variant="primary" size="md" onPress={this.handleReset}>

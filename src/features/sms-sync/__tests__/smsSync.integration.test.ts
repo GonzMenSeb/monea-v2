@@ -1,4 +1,4 @@
-import type { Database } from '@nozbe/watermelondb';
+import type { Database, Collection } from '@nozbe/watermelondb';
 
 import {
   createTestDatabase,
@@ -23,9 +23,9 @@ import { SmsSyncService, resetSmsSyncService } from '../services/SmsSyncService'
 describe('SMS Sync Integration Tests', () => {
   let database: Database;
   let service: SmsSyncService;
-  let accountsCollection: ReturnType<Database['get']>;
-  let transactionsCollection: ReturnType<Database['get']>;
-  let smsCollection: ReturnType<Database['get']>;
+  let accountsCollection: Collection<Account>;
+  let transactionsCollection: Collection<Transaction>;
+  let smsCollection: Collection<SmsMessage>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -33,9 +33,9 @@ describe('SMS Sync Integration Tests', () => {
     await resetDatabase(database);
     resetSmsSyncService();
     service = new SmsSyncService(database);
-    accountsCollection = database.get<Account>('accounts');
-    transactionsCollection = database.get<Transaction>('transactions');
-    smsCollection = database.get<SmsMessage>('sms_messages');
+    accountsCollection = database.get('accounts');
+    transactionsCollection = database.get('transactions');
+    smsCollection = database.get('sms_messages');
   });
 
   afterEach(async () => {
@@ -58,21 +58,21 @@ describe('SMS Sync Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].bankCode).toBe('bancolombia');
-      expect(accounts[0].accountNumber).toBe('5432');
-      expect(accounts[0].balance).toBe(1250000);
+      expect(accounts[0]!.bankCode).toBe('bancolombia');
+      expect(accounts[0]!.accountNumber).toBe('5432');
+      expect(accounts[0]!.balance).toBe(1250000);
 
       const transactions = await transactionsCollection.query().fetch();
       expect(transactions).toHaveLength(1);
-      expect(transactions[0].type).toBe('expense');
-      expect(transactions[0].amount).toBe(75500);
-      expect(transactions[0].merchant).toBe('EXITO CENTRO');
-      expect(transactions[0].balanceAfter).toBe(1250000);
+      expect(transactions[0]!.type).toBe('expense');
+      expect(transactions[0]!.amount).toBe(75500);
+      expect(transactions[0]!.merchant).toBe('EXITO CENTRO');
+      expect(transactions[0]!.balanceAfter).toBe(1250000);
 
       const smsMessages = await smsCollection.query().fetch();
       expect(smsMessages).toHaveLength(1);
-      expect(smsMessages[0].isProcessed).toBe(true);
-      expect(smsMessages[0].processingError).toBeNull();
+      expect(smsMessages[0]!.isProcessed).toBe(true);
+      expect(smsMessages[0]!.processingError).toBeNull();
     });
 
     it('processes Nequi income SMS and creates digital wallet account', async () => {
@@ -88,15 +88,15 @@ describe('SMS Sync Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].bankCode).toBe('nequi');
-      expect(accounts[0].accountType).toBe('digital_wallet');
-      expect(accounts[0].balance).toBe(150000);
+      expect(accounts[0]!.bankCode).toBe('nequi');
+      expect(accounts[0]!.accountType).toBe('digital_wallet');
+      expect(accounts[0]!.balance).toBe(150000);
 
       const transactions = await transactionsCollection.query().fetch();
       expect(transactions).toHaveLength(1);
-      expect(transactions[0].type).toBe('income');
-      expect(transactions[0].amount).toBe(50000);
-      expect(transactions[0].merchant).toBe('Juan Perez');
+      expect(transactions[0]!.type).toBe('income');
+      expect(transactions[0]!.amount).toBe(50000);
+      expect(transactions[0]!.merchant).toBe('Juan Perez');
     });
 
     it('processes Daviplata transfer and creates digital wallet account', async () => {
@@ -112,14 +112,14 @@ describe('SMS Sync Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].bankCode).toBe('daviplata');
-      expect(accounts[0].accountType).toBe('digital_wallet');
-      expect(accounts[0].balance).toBe(120000);
+      expect(accounts[0]!.bankCode).toBe('daviplata');
+      expect(accounts[0]!.accountType).toBe('digital_wallet');
+      expect(accounts[0]!.balance).toBe(120000);
 
       const transactions = await transactionsCollection.query().fetch();
       expect(transactions).toHaveLength(1);
-      expect(transactions[0].type).toBe('transfer_out');
-      expect(transactions[0].amount).toBe(30000);
+      expect(transactions[0]!.type).toBe('transfer_out');
+      expect(transactions[0]!.amount).toBe(30000);
     });
   });
 
@@ -144,8 +144,8 @@ describe('SMS Sync Integration Tests', () => {
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(2);
 
-      const bancolombiaAccount = accounts.find((a) => a.bankCode === 'bancolombia');
-      const daviplataAccount = accounts.find((a) => a.bankCode === 'daviplata');
+      const bancolombiaAccount = accounts.find((a: Account) => a.bankCode === 'bancolombia');
+      const daviplataAccount = accounts.find((a: Account) => a.bankCode === 'daviplata');
 
       expect(bancolombiaAccount).toBeDefined();
       expect(daviplataAccount).toBeDefined();
@@ -174,8 +174,8 @@ describe('SMS Sync Integration Tests', () => {
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(2);
 
-      const account1 = accounts.find((a) => a.accountNumber === '1234');
-      const account2 = accounts.find((a) => a.accountNumber === '5678');
+      const account1 = accounts.find((a: Account) => a.accountNumber === '1234');
+      const account2 = accounts.find((a: Account) => a.accountNumber === '5678');
 
       expect(account1).toBeDefined();
       expect(account2).toBeDefined();
@@ -201,7 +201,7 @@ describe('SMS Sync Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].balance).toBe(950000);
+      expect(accounts[0]!.balance).toBe(950000);
     });
   });
 
@@ -235,8 +235,8 @@ describe('SMS Sync Integration Tests', () => {
       const transactions = await transactionsCollection.query().fetch();
       expect(transactions).toHaveLength(3);
 
-      const income = transactions.find((t) => t.type === 'income');
-      const expenses = transactions.filter((t) => t.type === 'expense');
+      const income = transactions.find((t: Transaction) => t.type === 'income');
+      const expenses = transactions.filter((t: Transaction) => t.type === 'expense');
 
       expect(income).toBeDefined();
       expect(income?.amount).toBe(500000);
@@ -244,7 +244,7 @@ describe('SMS Sync Integration Tests', () => {
 
       const accounts = await accountsCollection.query().fetch();
       expect(accounts).toHaveLength(1);
-      expect(accounts[0].balance).toBe(350000);
+      expect(accounts[0]!.balance).toBe(350000);
     });
   });
 
@@ -450,10 +450,10 @@ describe('SMS Sync Integration Tests', () => {
       expect(transactions).toHaveLength(1);
       expect(smsMessages).toHaveLength(1);
 
-      expect(accounts[0].bankCode).toBe('nequi');
-      expect(transactions[0].accountId).toBe(accounts[0].id);
-      expect(transactions[0].smsId).toBe(smsMessages[0].id);
-      expect(smsMessages[0].isProcessed).toBe(true);
+      expect(accounts[0]!.bankCode).toBe('nequi');
+      expect(transactions[0]!.accountId).toBe(accounts[0]!.id);
+      expect(transactions[0]!.smsId).toBe(smsMessages[0]!.id);
+      expect(smsMessages[0]!.isProcessed).toBe(true);
     });
 
     it('handles full sync flow with mixed bank messages', async () => {
@@ -493,9 +493,9 @@ describe('SMS Sync Integration Tests', () => {
       expect(accounts).toHaveLength(3);
       expect(transactions).toHaveLength(4);
 
-      const bancolombiaAccount = accounts.find((a) => a.bankCode === 'bancolombia');
-      const nequiAccount = accounts.find((a) => a.bankCode === 'nequi');
-      const daviplataAccount = accounts.find((a) => a.bankCode === 'daviplata');
+      const bancolombiaAccount = accounts.find((a: Account) => a.bankCode === 'bancolombia');
+      const nequiAccount = accounts.find((a: Account) => a.bankCode === 'nequi');
+      const daviplataAccount = accounts.find((a: Account) => a.bankCode === 'daviplata');
 
       expect(bancolombiaAccount?.balance).toBe(475000);
       expect(nequiAccount?.balance).toBe(130000);

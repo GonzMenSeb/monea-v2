@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import { Modal, ScrollView } from 'react-native';
+
 import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { Button } from '@/shared/components/ui';
@@ -213,7 +214,10 @@ export function TransactionDetail({
               )}
 
               {transaction.balanceAfter !== undefined && transaction.balanceAfter !== null && (
-                <DetailItem label="Balance After" value={formatCurrency(transaction.balanceAfter)} />
+                <DetailItem
+                  label="Balance After"
+                  value={formatCurrency(transaction.balanceAfter)}
+                />
               )}
 
               {transaction.reference && (
@@ -229,12 +233,7 @@ export function TransactionDetail({
           </ScrollView>
 
           <FooterSection>
-            <Button
-              variant="secondary"
-              size="lg"
-              fullWidth
-              onPress={onClose}
-            >
+            <Button variant="secondary" size="lg" fullWidth onPress={onClose}>
               Close
             </Button>
           </FooterSection>

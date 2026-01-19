@@ -199,6 +199,7 @@ export class AccountRepository {
       bbva: 0,
       nequi: 0,
       daviplata: 0,
+      bancoomeva: 0,
     };
 
     let totalBalance = 0;

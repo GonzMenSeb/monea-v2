@@ -18,7 +18,42 @@ env:
   AVD_NAME: e2e_avd
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Type Check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format Check
+        run: npm run format:check
+
+      - name: Unit Tests
+        run: npm test -- --coverage --ci
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: ignore
+
   build-device:
+    needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -71,6 +106,7 @@ jobs:
           if-no-files-found: error
 
   build:
+    needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 20
     outputs:

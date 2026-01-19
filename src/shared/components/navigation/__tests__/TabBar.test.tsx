@@ -21,12 +21,12 @@ const createMockDescriptors = (
       options: {
         title: route.name,
         tabBarLabel: route.name,
-        tabBarIcon: ({ color: _color, size: _size }) => null,
+        tabBarIcon: ({ color: _color, size: _size }) => null as unknown as React.ReactElement,
       },
       navigation:
         createMockNavigation() as unknown as BottomTabBarProps['descriptors'][string]['navigation'],
       route,
-      render: () => null,
+      render: () => null as unknown as React.ReactElement,
     };
   });
   return descriptors;
@@ -42,7 +42,8 @@ const createMockState = (
   type: 'tab' as const,
   routeNames: routes.map((r) => r.name),
   stale: false,
-  history: [],
+  history: routes.slice(0, activeIndex + 1).map((r) => ({ type: 'route' as const, key: r.key })),
+  preloadedRouteKeys: [],
 });
 
 describe('TabBar', () => {

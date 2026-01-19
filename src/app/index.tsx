@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ActivityIndicator } from 'react-native';
-import { Stack } from 'tamagui';
 
 import { useRouter } from 'expo-router';
+import { Stack } from 'tamagui';
 
 import { PermissionsScreen } from '@/features/onboarding';
 import { useAppStore } from '@/shared/store/appStore';

@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 
 import { ScrollView, RefreshControl } from 'react-native';
-import { Stack, Text, YStack } from 'tamagui';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { Stack, Text } from 'tamagui';
 
 import {
   BalanceCard,

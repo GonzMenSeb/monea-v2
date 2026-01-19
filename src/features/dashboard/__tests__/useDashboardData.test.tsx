@@ -58,6 +58,7 @@ const mockAccountSummary: AccountSummary = {
     davivienda: 0,
     bbva: 0,
     daviplata: 0,
+    bancoomeva: 0,
   },
 };
 

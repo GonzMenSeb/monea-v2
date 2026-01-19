@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { Alert, FlatList, Modal, Pressable, ScrollView } from 'react-native';
-import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { database, AccountRepository } from '@/infrastructure/database';
 import { EmptyState, LoadingState } from '@/shared/components/feedback';
@@ -249,12 +249,7 @@ function AccountItem({ account, onPress }: AccountItemProps): React.ReactElement
           </XStack>
           <YStack marginTop="$3">
             <Caption color="$textMuted">Balance</Caption>
-            <Text
-              fontFamily="$mono"
-              fontSize="$4"
-              fontWeight="700"
-              color="$textPrimary"
-            >
+            <Text fontFamily="$mono" fontSize="$4" fontWeight="700" color="$textPrimary">
               {formatCurrency(account.balance)}
             </Text>
           </YStack>
@@ -397,7 +392,9 @@ function AccountFormModal({
           <ModalHeader>
             <Heading level="h4">{mode === 'create' ? 'Add Account' : 'Edit Account'}</Heading>
             <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
-              <Text fontSize="$6" color="$textSecondary">×</Text>
+              <Text fontSize="$6" color="$textSecondary">
+                ×
+              </Text>
             </Pressable>
           </ModalHeader>
 
@@ -679,7 +676,9 @@ export function AccountsManagement(): React.ReactElement {
       <HeaderContainer>
         <Pressable onPress={handleBack} accessibilityRole="button" accessibilityLabel="Go back">
           <BackButton>
-            <Text fontSize="$6" color="$textPrimary">←</Text>
+            <Text fontSize="$6" color="$textPrimary">
+              ←
+            </Text>
           </BackButton>
         </Pressable>
         <Heading level="h3">Bank Accounts</Heading>
@@ -689,7 +688,9 @@ export function AccountsManagement(): React.ReactElement {
           accessibilityLabel="Add account"
         >
           <AddButton>
-            <Text color="$textInverse" fontWeight="600">+ Add</Text>
+            <Text color="$textInverse" fontWeight="600">
+              + Add
+            </Text>
           </AddButton>
         </Pressable>
       </HeaderContainer>

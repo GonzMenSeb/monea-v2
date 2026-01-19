@@ -437,7 +437,7 @@ describe('useTransactions', () => {
 
       const updateData = {
         id: 'tx-1',
-        data: { amount: 75000 },
+        data: { merchant: 'Updated Merchant' },
       };
 
       result.current.mutate(updateData);
@@ -446,7 +446,7 @@ describe('useTransactions', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(mockUpdate).toHaveBeenCalledWith('tx-1', { amount: 75000 });
+      expect(mockUpdate).toHaveBeenCalledWith('tx-1', { merchant: 'Updated Merchant' });
       expect(result.current.data?.amount).toBe(75000);
     });
 
@@ -459,7 +459,7 @@ describe('useTransactions', () => {
 
       const updateData = {
         id: 'tx-1',
-        data: { amount: 75000 },
+        data: { merchant: 'Updated Merchant' },
       };
 
       result.current.mutate(updateData);
@@ -483,7 +483,7 @@ describe('useTransactions', () => {
 
       const updateData = {
         id: 'non-existent',
-        data: { amount: 75000 },
+        data: { merchant: 'Updated Merchant' },
       };
 
       result.current.mutate(updateData);
@@ -595,7 +595,7 @@ describe('useTransactions', () => {
       mockFindById.mockResolvedValue(anotherTransaction);
 
       useTransactionStore.getState().setSelected('tx-2');
-      rerender();
+      rerender({});
 
       await waitFor(() => {
         expect(mockFindById).toHaveBeenCalledWith('tx-2');
@@ -706,7 +706,7 @@ describe('useTransactions', () => {
       });
 
       const firstResult = result.current;
-      rerender();
+      rerender({});
       const secondResult = result.current;
 
       expect(firstResult).toBe(secondResult);

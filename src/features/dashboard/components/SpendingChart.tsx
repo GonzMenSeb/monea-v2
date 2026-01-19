@@ -188,7 +188,8 @@ function ChartSummaryRow({
   summary: ChartSummary;
   formatCurrency: (amount: number) => string;
 }): React.ReactElement {
-  const netChangeColor = summary.netChange >= 0 ? colors.transaction.income : colors.transaction.expense;
+  const netChangeColor =
+    summary.netChange >= 0 ? colors.transaction.income : colors.transaction.expense;
   const netChangeSign = summary.netChange >= 0 ? '+' : '';
 
   return (
@@ -208,7 +209,8 @@ function ChartSummaryRow({
       <SummaryItem>
         <SummaryLabel>Net</SummaryLabel>
         <SummaryValue color={netChangeColor}>
-          {netChangeSign}{formatCurrency(Math.abs(summary.netChange))}
+          {netChangeSign}
+          {formatCurrency(Math.abs(summary.netChange))}
         </SummaryValue>
       </SummaryItem>
     </SummaryContainer>
@@ -243,7 +245,9 @@ export function SpendingChart({
   }, [data]);
 
   const maxValue = useMemo(() => {
-    if (data.length === 0) return 1000;
+    if (data.length === 0) {
+      return 1000;
+    }
     return Math.max(...data.flatMap((d) => [d.income, d.expense])) * 1.1;
   }, [data]);
 
@@ -306,20 +310,38 @@ export function SpendingChart({
             yAxisLabelWidth={50}
             formatYLabel={(label) => {
               const num = parseFloat(label);
-              if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-              if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
+              if (num >= 1000000) {
+                return `${(num / 1000000).toFixed(1)}M`;
+              }
+              if (num >= 1000) {
+                return `${(num / 1000).toFixed(0)}K`;
+              }
               return label;
             }}
           />
         </Stack>
         <XStack justifyContent="center" gap="$4" marginTop="$2">
           <XStack alignItems="center" gap="$1">
-            <Stack width={12} height={12} borderRadius="$1" backgroundColor={colors.transaction.income} />
-            <Text color="$textSecondary" fontSize="$1">Income</Text>
+            <Stack
+              width={12}
+              height={12}
+              borderRadius="$1"
+              backgroundColor={colors.transaction.income}
+            />
+            <Text color="$textSecondary" fontSize="$1">
+              Income
+            </Text>
           </XStack>
           <XStack alignItems="center" gap="$1">
-            <Stack width={12} height={12} borderRadius="$1" backgroundColor={colors.transaction.expense} />
-            <Text color="$textSecondary" fontSize="$1">Expense</Text>
+            <Stack
+              width={12}
+              height={12}
+              borderRadius="$1"
+              backgroundColor={colors.transaction.expense}
+            />
+            <Text color="$textSecondary" fontSize="$1">
+              Expense
+            </Text>
           </XStack>
         </XStack>
         <ChartSummaryRow summary={summary} formatCurrency={formatCurrency} />

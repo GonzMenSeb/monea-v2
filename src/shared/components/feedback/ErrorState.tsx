@@ -1,6 +1,5 @@
-import { styled, Stack, Text, YStack } from 'tamagui';
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { styled, Stack, Text, YStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
 

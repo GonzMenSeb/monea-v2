@@ -7,5 +7,7 @@ export type {
   SmsErrorCallback,
   ParsedSmsCallback,
   SmsReaderInterface,
+  HistoricalSmsOptions,
+  HistoricalSmsMessage,
 } from './types';
 export type { PermissionState, PermissionResult, SmsPermissionsInterface } from './SmsPermissions';

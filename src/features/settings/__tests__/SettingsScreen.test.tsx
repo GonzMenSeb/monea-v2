@@ -20,7 +20,7 @@ describe('SettingsScreen', () => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     jest.spyOn(Linking, 'openSettings').mockResolvedValue();
-    jest.spyOn(Linking, 'openURL').mockResolvedValue();
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
   });
 
   describe('permission state display', () => {

@@ -9,7 +9,7 @@ export const BANK_INFO: Record<BankCode, BankInfo> = {
   bancolombia: {
     code: 'bancolombia',
     name: 'Bancolombia',
-    senderPatterns: [/^bancolombia$/i, /^891333$/, /^85954$/],
+    senderPatterns: [/^bancolombia$/i, /^891333$/, /^85540$/, /^85784$/],
   },
   davivienda: {
     code: 'davivienda',
@@ -24,12 +24,17 @@ export const BANK_INFO: Record<BankCode, BankInfo> = {
   nequi: {
     code: 'nequi',
     name: 'Nequi',
-    senderPatterns: [/^nequi$/i, /^85432$/],
+    senderPatterns: [/^nequi$/i, /^85432$/, /^85954$/],
   },
   daviplata: {
     code: 'daviplata',
     name: 'Daviplata',
     senderPatterns: [/^daviplata$/i, /^85255$/],
+  },
+  bancoomeva: {
+    code: 'bancoomeva',
+    name: 'Bancoomeva',
+    senderPatterns: [/^bancoomeva$/i],
   },
 };
 
@@ -54,6 +59,10 @@ const DATE_PATTERN = '(\\d{2}/\\d{2}/\\d{4})';
 const TIME_PATTERN = '(\\d{2}:\\d{2})';
 const MERCHANT_PATTERN = '([A-Za-z0-9][A-Za-z0-9\\s]*[A-Za-z0-9]|[A-Za-z0-9])';
 const _REFERENCE_PATTERN = '(?:Ref\\.?|Referencia:?)\\s*([A-Za-z0-9]+)';
+
+const CURRENCY_AMOUNT_PATTERN = '(?:COP|USD)?\\s*([\\d.,]+)';
+const FLEXIBLE_DATE_PATTERN = '(\\d{2}/\\d{2}/\\d{4}|\\d{4}/\\d{2}/\\d{2})';
+const DEST_ACCOUNT_PATTERN = '([A-Za-z0-9\\s]+?)';
 
 export const BANCOLOMBIA_PATTERNS: TransactionPattern[] = [
   {
@@ -87,6 +96,38 @@ export const BANCOLOMBIA_PATTERNS: TransactionPattern[] = [
       'i'
     ),
     groups: { amount: 1, merchant: 2, date: 3, time: 4, accountLast4: 5, balance: 6 },
+  },
+  {
+    type: 'expense',
+    pattern: new RegExp(
+      `Bancolombia:\\s*Compraste\\s+${CURRENCY_AMOUNT_PATTERN}\\s+en\\s+(.+?)\\s+con\\s+tu\\s+T\\.Cred\\s*\\*(\\d{4}),?\\s*el\\s+${FLEXIBLE_DATE_PATTERN}\\s+a\\s+las\\s+${TIME_PATTERN}`,
+      'i'
+    ),
+    groups: { amount: 1, merchant: 2, accountLast4: 3, date: 4, time: 5 },
+  },
+  {
+    type: 'transfer_out',
+    pattern: new RegExp(
+      `Bancolombia:\\s*Transferiste\\s+${AMOUNT_PATTERN}(?:\\s+por\\s+QR)?\\s+desde\\s+tu\\s+cuenta\\s*\\*?(\\d{4})\\s+a\\s+la\\s+cuenta\\s*\\*?${DEST_ACCOUNT_PATTERN}\\s*,?\\s*el\\s+${FLEXIBLE_DATE_PATTERN}(?:\\s+a\\s+las)?\\s+${TIME_PATTERN}`,
+      'i'
+    ),
+    groups: { amount: 1, accountLast4: 2, merchant: 3, date: 4, time: 5 },
+  },
+  {
+    type: 'income',
+    pattern: new RegExp(
+      `Bancolombia:\\s*Recibiste\\s+${AMOUNT_PATTERN}\\s+por\\s+QR\\s+de\\s+(.+?)\\s+en\\s+tu\\s+cuenta\\s*\\*(\\d{4})\\s+el\\s+${FLEXIBLE_DATE_PATTERN}\\s+a\\s+las\\s+${TIME_PATTERN}`,
+      'i'
+    ),
+    groups: { amount: 1, merchant: 2, accountLast4: 3, date: 4, time: 5 },
+  },
+  {
+    type: 'income',
+    pattern: new RegExp(
+      `Bancolombia:\\s*Recibiste\\s+un\\s+pago\\s+de\\s+Nomina\\s+de\\s+(.+?)\\s+por\\s+${AMOUNT_PATTERN}\\s+en\\s+tu\\s+cuenta\\s+de\\s+Ahorros\\s+el\\s+${FLEXIBLE_DATE_PATTERN}\\s+a\\s+las\\s+${TIME_PATTERN}`,
+      'i'
+    ),
+    groups: { merchant: 1, amount: 2, date: 3, time: 4 },
   },
 ];
 
@@ -230,12 +271,24 @@ export const DAVIPLATA_PATTERNS: TransactionPattern[] = [
   },
 ];
 
+export const BANCOOMEVA_PATTERNS: TransactionPattern[] = [
+  {
+    type: 'expense',
+    pattern: new RegExp(
+      `Bancoomeva\\s+informa\\s+compra\\s+por\\s+Internet\\s+en\\s+(.+?)\\s+por\\s+${AMOUNT_PATTERN}\\s+con\\s+su\\s+tarjeta\\s+Credito\\s+(\\d{4})\\s+el\\s+${FLEXIBLE_DATE_PATTERN}\\s*:?${TIME_PATTERN}?`,
+      'i'
+    ),
+    groups: { merchant: 1, amount: 2, accountLast4: 3, date: 4, time: 5 },
+  },
+];
+
 export const BANK_PATTERNS: Record<BankCode, TransactionPattern[]> = {
   bancolombia: BANCOLOMBIA_PATTERNS,
   davivienda: DAVIVIENDA_PATTERNS,
   bbva: BBVA_PATTERNS,
   nequi: NEQUI_PATTERNS,
   daviplata: DAVIPLATA_PATTERNS,
+  bancoomeva: BANCOOMEVA_PATTERNS,
 };
 
 export function matchesSender(sender: string, bank: BankInfo): boolean {

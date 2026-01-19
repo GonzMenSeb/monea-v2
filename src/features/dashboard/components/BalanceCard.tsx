@@ -2,8 +2,8 @@ import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 import { LinearGradient } from 'tamagui/linear-gradient';
 
 import { Card } from '@/shared/components/ui';
-import { formatCurrency } from '@/shared/utils';
 import { colors } from '@/shared/theme';
+import { formatCurrency } from '@/shared/utils';
 
 type TrendDirection = 'up' | 'down' | 'neutral';
 

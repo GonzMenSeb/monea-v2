@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { ScrollView } from 'react-native';
+
 import { styled, Stack, Text, YStack, XStack } from 'tamagui';
 
 import { smsPermissions } from '@/infrastructure/sms';
@@ -170,9 +171,7 @@ export function PermissionsScreen({
       <Container>
         <YStack alignItems="center" marginBottom="$8">
           <IconContainer>
-            <Text fontSize={48}>
-              {permissionState === 'granted' ? '✅' : '📩'}
-            </Text>
+            <Text fontSize={48}>{permissionState === 'granted' ? '✅' : '📩'}</Text>
           </IconContainer>
 
           <Heading level="h2" textAlign="center" marginBottom="$3">
@@ -192,10 +191,10 @@ export function PermissionsScreen({
                   <Body>{feature.icon}</Body>
                 </FeatureIconContainer>
                 <YStack flex={1}>
-                  <Body fontWeight="600" marginBottom="$1">{feature.title}</Body>
-                  <Caption color="$textSecondary">
-                    {feature.description}
-                  </Caption>
+                  <Body fontWeight="600" marginBottom="$1">
+                    {feature.title}
+                  </Body>
+                  <Caption color="$textSecondary">{feature.description}</Caption>
                 </YStack>
               </FeatureRow>
               {index < PERMISSION_FEATURES.length - 1 && <FeatureSeparator />}

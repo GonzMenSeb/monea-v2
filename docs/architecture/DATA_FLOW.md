@@ -62,9 +62,9 @@ This document describes how data flows through the Monea application.
 ┌──────────────────────────────────────────────────────────┐
 │                   TransactionParser                       │
 │  ┌───────────────┐  ┌───────────────┐  ┌──────────────┐ │
-│  │getBankBySender│─▶│ matchPatterns │─▶│   Extract:   │ │
-│  │(BankPatterns) │  │(BANK_PATTERNS)│  │ Amount, Date │ │
-│  │               │  │               │  │   Merchant   │ │
+│  │getBankBySender│─▶│ BANK_PATTERNS │─▶│   Extract:   │ │
+│  │ (identifies   │  │ (matches SMS  │  │ Amount, Date │ │
+│  │  bank)        │  │   patterns)   │  │   Merchant   │ │
 │  └───────────────┘  └───────────────┘  └──────────────┘ │
 └──────────────────────────────────────────────────────────┘
        │

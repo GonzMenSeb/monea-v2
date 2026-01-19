@@ -1,6 +1,7 @@
 import { memo, useCallback } from 'react';
 
 import { Pressable, ActivityIndicator } from 'react-native';
+
 import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
@@ -175,7 +176,9 @@ function DetailedContent({
           </Text>
         </XStack>
         {lastSyncResult && statusType !== 'error' && (
-          <Text fontSize="$1" color="$textMuted">{lastSyncResult.created} new</Text>
+          <Text fontSize="$1" color="$textMuted">
+            {lastSyncResult.created} new
+          </Text>
         )}
       </XStack>
       {(description || error) && (
@@ -278,9 +281,7 @@ export const SyncStatus = memo(function SyncStatus({
         accessibilityRole="button"
         accessibilityLabel={getStatusLabel(statusType, isListening)}
       >
-        <Stack {...containerStyle}>
-          {renderContent()}
-        </Stack>
+        <Stack {...containerStyle}>{renderContent()}</Stack>
       </Pressable>
     );
   }

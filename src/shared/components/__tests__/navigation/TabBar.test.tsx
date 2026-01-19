@@ -42,6 +42,7 @@ const createMockState = (
   key: 'tab-state',
   routeNames: routes.map((r) => r.name),
   history: [{ type: 'route' as const, key: routes[index]?.key ?? '' }],
+  preloadedRouteKeys: [],
 });
 
 describe('TabBar', () => {

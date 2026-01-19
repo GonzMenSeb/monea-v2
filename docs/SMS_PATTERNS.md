@@ -6,11 +6,12 @@ This document describes the SMS message patterns used to parse bank transaction 
 
 | Bank | Code | Short Codes |
 |------|------|-------------|
-| Bancolombia | `bancolombia` | `891333`, `85954` |
+| Bancolombia | `bancolombia` | `891333`, `85540`, `85784` |
 | Davivienda | `davivienda` | `85327` |
 | BBVA Colombia | `bbva` | `87703` |
-| Nequi | `nequi` | `85432` |
+| Nequi | `nequi` | `85432`, `85954` |
 | Daviplata | `daviplata` | `85255` |
+| Bancoomeva | `bancoomeva` | (name-based only) |
 
 ## Transaction Types
 
@@ -186,6 +187,17 @@ DaviPlata: Te enviaron $[AMOUNT] de [SENDER]. Saldo: $[BALANCE]
 #### Sent Transfer (transfer_out)
 ```
 DaviPlata: Enviaste $[AMOUNT] a [RECIPIENT]. Saldo: $[BALANCE]
+```
+
+### Bancoomeva
+
+#### Online Purchase (expense)
+```
+Bancoomeva informa compra por Internet en [MERCHANT] por $[AMOUNT] con su tarjeta Credito [LAST4] el [DATE]:[TIME]
+```
+Example:
+```
+Bancoomeva informa compra por Internet en SPOTIFY por $16.900 con su tarjeta Credito 1234 el 17/01/2026:14:30
 ```
 
 ## Amount Formats

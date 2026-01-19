@@ -2,11 +2,11 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
@@ -16,7 +16,8 @@
       "@/infrastructure/*": ["src/infrastructure/*"],
       "@/app/*": ["src/app/*"]
     },
-    "types": ["react-native", "@types/react"]
+    "types": ["react-native", "@types/react", "jest", "detox"]
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "e2e/**/*.ts"],
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
 }

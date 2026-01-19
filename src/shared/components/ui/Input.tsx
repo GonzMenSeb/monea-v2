@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 
 import { TextInput, type TextInputProps } from 'react-native';
+
 import { styled, Stack, Text, XStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
@@ -184,24 +185,20 @@ export function Input({
   const feedbackMessage = errorMessage || successMessage || hint;
   const feedbackState: InputState = errorMessage ? 'error' : successMessage ? 'success' : 'default';
 
-  const borderColor = isFocused && validationState === 'default'
-    ? colors.accent.primary
-    : validationState === 'error'
-      ? colors.accent.danger
-      : validationState === 'success'
-        ? colors.accent.primary
-        : colors.border.default;
+  const borderColor =
+    isFocused && validationState === 'default'
+      ? colors.accent.primary
+      : validationState === 'error'
+        ? colors.accent.danger
+        : validationState === 'success'
+          ? colors.accent.primary
+          : colors.border.default;
 
   return (
     <InputContainer>
       {label && <Label size={size}>{label}</Label>}
 
-      <InputWrapper
-        size={size}
-        state={validationState}
-        disabled={disabled}
-        style={{ borderColor }}
-      >
+      <InputWrapper size={size} state={validationState} disabled={disabled} style={{ borderColor }}>
         {leftIcon && <Stack paddingLeft="$3">{leftIcon}</Stack>}
 
         <TextInput
