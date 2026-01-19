@@ -14,7 +14,7 @@ concurrency:
 env:
   JAVA_VERSION: '17'
   NODE_VERSION: '20'
-  API_LEVEL: 30
+  API_LEVEL: 34
   AVD_NAME: e2e_avd
 
 jobs:
@@ -61,7 +61,6 @@ jobs:
         run: |
           cd android && ./gradlew assembleRelease \
             --build-cache \
-            --configuration-cache \
             --no-daemon
 
       - uses: actions/upload-artifact@v4
@@ -121,7 +120,6 @@ jobs:
           cd android && ./gradlew assembleDebug assembleAndroidTest \
             -DtestBuildType=debug \
             --build-cache \
-            --configuration-cache \
             --no-daemon
 
       - uses: actions/upload-artifact@v4
@@ -136,7 +134,7 @@ jobs:
   test:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -165,11 +163,9 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-api${{ env.API_LEVEL }}-x86_64-v3
+          key: avd-api${{ env.API_LEVEL }}-x86_64-v1
 
       - run: npm ci --legacy-peer-deps
-
-      - run: npx expo prebuild --platform android --clean
 
       - uses: actions/download-artifact@v4
         with:
@@ -197,6 +193,8 @@ jobs:
 
       - name: Run E2E tests
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          AVD_NAME: ${{ env.AVD_NAME }}
         with:
           api-level: ${{ env.API_LEVEL }}
           arch: x86_64
@@ -206,7 +204,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
           disable-animations: true
           emulator-boot-timeout: 300
-          script: npm run e2e:test:android -- --headless --retries 2
+          script: npm run e2e:test:ci -- --headless --retries 2
 
       - uses: actions/upload-artifact@v4
         if: failure()
