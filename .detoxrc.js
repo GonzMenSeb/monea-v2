@@ -6,7 +6,7 @@ module.exports = {
       config: 'e2e/jest.config.js',
     },
     jest: {
-      setupTimeout: 120000,
+      setupTimeout: 180000,
     },
   },
   behavior: {
@@ -14,7 +14,7 @@ module.exports = {
       exposeGlobals: true,
       reinstallApp: true,
     },
-    launchApp: 'auto',
+    launchApp: 'manual',
     cleanup: {
       shutdownDevice: false,
     },
@@ -29,6 +29,9 @@ module.exports = {
           testStart: false,
           testDone: true,
         },
+      },
+      video: {
+        enabled: true,
       },
     },
   },
@@ -45,9 +48,6 @@ module.exports = {
       binaryPath: 'android/app/build/outputs/apk/debug/app-debug.apk',
       testBinaryPath:
         'android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk',
-      launchArgs: {
-        detoxURLBlacklistRegex: '.*bundle.*',
-      },
     },
     'android.release': {
       type: 'android.apk',

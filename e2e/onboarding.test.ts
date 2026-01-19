@@ -14,15 +14,15 @@ const revokeSmsPermissions = (): void => {
 };
 
 describe('Onboarding Flow', () => {
-  beforeAll(async () => {
-    await device.launchApp({ newInstance: true });
-  });
-
-  beforeEach(async () => {
-    await device.reloadReactNative();
-  });
-
   describe('Permissions Screen', () => {
+    beforeAll(async () => {
+      await device.launchApp({ newInstance: true });
+    });
+
+    beforeEach(async () => {
+      await device.reloadReactNative();
+    });
+
     it('should display the permissions request screen on first launch', async () => {
       await waitFor(element(by.text('SMS Access Required')))
         .toBeVisible()

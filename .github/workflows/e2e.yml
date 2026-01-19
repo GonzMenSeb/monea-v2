@@ -243,11 +243,14 @@ jobs:
           name: apks
           path: android/app/build/outputs/apk
 
-      - name: Organize APKs
+      - name: Verify APKs
         run: |
-          mkdir -p android/app/build/outputs/apk/debug android/app/build/outputs/apk/androidTest/debug
-          mv android/app/build/outputs/apk/app-debug.apk android/app/build/outputs/apk/debug/ 2>/dev/null || true
-          mv android/app/build/outputs/apk/app-debug-androidTest.apk android/app/build/outputs/apk/androidTest/debug/ 2>/dev/null || true
+          echo "Listing downloaded APK files..."
+          find android/app/build/outputs/apk -name "*.apk" -type f
+          echo ""
+          echo "Checking required APK locations..."
+          ls -la android/app/build/outputs/apk/debug/app-debug.apk
+          ls -la android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
       - name: Run E2E tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -267,8 +270,15 @@ jobs:
             adb shell settings put global window_animation_scale 0
             adb shell settings put global transition_animation_scale 0
             adb shell settings put global animator_duration_scale 0
-            sleep 5
-            npm run e2e:test:ci -- --headless --retries 2
+            sleep 10
+            adb logcat -c
+            npm run e2e:test:ci -- --headless --retries 2 || (adb logcat -d > artifacts/logcat.txt && exit 1)
+
+      - name: Capture logcat on failure
+        if: failure()
+        run: |
+          mkdir -p artifacts
+          adb logcat -d > artifacts/logcat-failure.txt 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         if: failure()
