@@ -1,21 +1,19 @@
-import '../../global.css';
-
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { PaperProvider, QueryProvider, SmsSyncProvider } from '@/shared/providers';
-import { useAppTheme } from '@/shared/theme';
+import { TamaguiProvider, QueryProvider, SmsSyncProvider } from '@/shared/providers';
+import { ThemeProvider } from '@/shared/theme';
 
 function RootLayoutContent(): React.ReactElement {
-  const { isDark } = useAppTheme();
-
   return (
     <>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerShown: false,
+          contentStyle: { backgroundColor: '#0A0B0E' },
+          animation: 'fade',
         }}
       />
     </>
@@ -25,13 +23,15 @@ function RootLayoutContent(): React.ReactElement {
 export default function RootLayout(): React.ReactElement {
   return (
     <SafeAreaProvider>
-      <QueryProvider>
-        <PaperProvider>
-          <SmsSyncProvider>
-            <RootLayoutContent />
-          </SmsSyncProvider>
-        </PaperProvider>
-      </QueryProvider>
+      <TamaguiProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            <SmsSyncProvider>
+              <RootLayoutContent />
+            </SmsSyncProvider>
+          </QueryProvider>
+        </ThemeProvider>
+      </TamaguiProvider>
     </SafeAreaProvider>
   );
 }

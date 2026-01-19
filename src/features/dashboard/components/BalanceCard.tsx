@@ -1,7 +1,9 @@
-import { View, Text } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
+import { LinearGradient } from 'tamagui/linear-gradient';
 
 import { Card } from '@/shared/components/ui';
 import { formatCurrency } from '@/shared/utils';
+import { colors } from '@/shared/theme';
 
 type TrendDirection = 'up' | 'down' | 'neutral';
 
@@ -15,10 +17,50 @@ interface BalanceCardProps {
 }
 
 const TREND_CONFIG: Record<TrendDirection, { color: string; icon: string }> = {
-  up: { color: 'text-transaction-income', icon: '↑' },
-  down: { color: 'text-transaction-expense', icon: '↓' },
-  neutral: { color: 'text-text-secondary', icon: '→' },
+  up: { color: colors.transaction.income, icon: '↑' },
+  down: { color: colors.transaction.expense, icon: '↓' },
+  neutral: { color: colors.text.secondary, icon: '→' },
 };
+
+const BalanceLabel = styled(Text, {
+  name: 'BalanceLabel',
+  color: '$textSecondary',
+  fontSize: '$2',
+  fontWeight: '500',
+  marginBottom: '$2',
+});
+
+const BalanceAmount = styled(Text, {
+  name: 'BalanceAmount',
+  color: '$textPrimary',
+  fontFamily: '$mono',
+  fontSize: 40,
+  fontWeight: '700',
+  letterSpacing: -1,
+});
+
+const TrendBadge = styled(XStack, {
+  name: 'TrendBadge',
+  alignItems: 'center',
+  marginTop: '$3',
+  paddingHorizontal: '$3',
+  paddingVertical: '$1.5',
+  borderRadius: '$full',
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+});
+
+const TrendText = styled(Text, {
+  name: 'TrendText',
+  fontSize: '$2',
+  fontWeight: '600',
+});
+
+const TrendLabel = styled(Text, {
+  name: 'TrendLabel',
+  color: '$textMuted',
+  fontSize: '$2',
+  marginLeft: '$1',
+});
 
 export function BalanceCard({
   totalBalance,
@@ -34,23 +76,20 @@ export function BalanceCard({
 
   return (
     <Card variant="elevated">
-      <View className="items-center py-4">
-        <Text className="text-sm font-medium text-text-secondary mb-2">{label}</Text>
-        <Text
-          className="text-4xl font-bold text-text-primary"
-          accessibilityLabel={`${label}: ${formattedBalance}`}
-        >
+      <YStack alignItems="center" paddingVertical="$4">
+        <BalanceLabel>{label}</BalanceLabel>
+        <BalanceAmount accessibilityLabel={`${label}: ${formattedBalance}`}>
           {formattedBalance}
-        </Text>
+        </BalanceAmount>
         {showTrend && (
-          <View className="flex-row items-center mt-3">
-            <Text className={`text-sm font-semibold ${trendConfig.color}`}>
+          <TrendBadge>
+            <TrendText color={trendConfig.color}>
               {trendConfig.icon} {Math.abs(percentageChange).toFixed(1)}%
-            </Text>
-            <Text className="text-sm text-text-muted ml-1">vs last month</Text>
-          </View>
+            </TrendText>
+            <TrendLabel>vs last month</TrendLabel>
+          </TrendBadge>
         )}
-      </View>
+      </YStack>
     </Card>
   );
 }

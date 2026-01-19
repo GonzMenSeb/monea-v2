@@ -1,0 +1,111 @@
+import { createTokens } from 'tamagui';
+
+export const tokens = createTokens({
+  color: {
+    backgroundBase: '#0A0B0E',
+    backgroundSurface: '#12141A',
+    backgroundElevated: '#1A1D26',
+    backgroundOverlay: 'rgba(0,0,0,0.8)',
+
+    accentPrimary: '#00D4AA',
+    accentSecondary: '#7B61FF',
+    accentWarning: '#FFB800',
+    accentDanger: '#FF4757',
+    accentInfo: '#3B82F6',
+
+    textPrimary: '#FFFFFF',
+    textSecondary: '#8B8D97',
+    textMuted: '#5C5E66',
+    textInverse: '#0A0B0E',
+
+    transactionIncome: '#00D4AA',
+    transactionExpense: '#FF4757',
+    transactionTransfer: '#7B61FF',
+
+    bankBancolombia: '#FDDA24',
+    bankDavivienda: '#E30613',
+    bankBbva: '#004481',
+    bankNequi: '#E6007E',
+    bankDaviplata: '#F7941D',
+
+    border: '#2A2D36',
+    borderMuted: '#1F2128',
+
+    white: '#FFFFFF',
+    black: '#000000',
+    transparent: 'transparent',
+  },
+
+  space: {
+    0: 0,
+    0.5: 2,
+    1: 4,
+    1.5: 6,
+    2: 8,
+    2.5: 10,
+    3: 12,
+    3.5: 14,
+    4: 16,
+    5: 20,
+    6: 24,
+    7: 28,
+    8: 32,
+    9: 36,
+    10: 40,
+    11: 44,
+    12: 48,
+    14: 56,
+    16: 64,
+    20: 80,
+    24: 96,
+    true: 16,
+  },
+
+  size: {
+    0: 0,
+    0.5: 2,
+    1: 4,
+    1.5: 6,
+    2: 8,
+    2.5: 10,
+    3: 12,
+    3.5: 14,
+    4: 16,
+    5: 20,
+    6: 24,
+    7: 28,
+    8: 32,
+    9: 36,
+    10: 40,
+    11: 44,
+    12: 48,
+    14: 56,
+    16: 64,
+    20: 80,
+    24: 96,
+    true: 44,
+  },
+
+  radius: {
+    0: 0,
+    1: 4,
+    2: 8,
+    3: 12,
+    4: 16,
+    5: 20,
+    6: 24,
+    full: 9999,
+    true: 12,
+  },
+
+  zIndex: {
+    0: 0,
+    1: 100,
+    2: 200,
+    3: 300,
+    4: 400,
+    5: 500,
+  },
+});
+
+export type Tokens = typeof tokens;

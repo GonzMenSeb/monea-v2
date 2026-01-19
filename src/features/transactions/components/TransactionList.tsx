@@ -1,8 +1,8 @@
 import { useCallback, useMemo, memo } from 'react';
 
-import { Text, View, RefreshControl } from 'react-native';
-
-import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
+import { RefreshControl } from 'react-native';
+import { FlashList as FlashListBase, type ListRenderItemInfo } from '@shopify/flash-list';
+import { styled, Stack, Text } from 'tamagui';
 
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
@@ -12,6 +12,8 @@ import { formatDateRelative } from '@/shared/utils';
 import { TransactionItem } from './TransactionItem';
 
 import type Transaction from '@/infrastructure/database/models/Transaction';
+
+const FlashList = FlashListBase as React.ComponentType<any>;
 
 type TransactionListItem = Transaction | { type: 'section_header'; title: string; key: string };
 
@@ -29,11 +31,27 @@ interface TransactionListProps {
   ListHeaderComponent?: React.ReactElement;
 }
 
-const SECTION_HEADER_STYLES = 'px-4 py-2 bg-background-secondary';
-const SECTION_HEADER_TEXT_STYLES =
-  'text-sm font-semibold text-text-secondary uppercase tracking-wide';
-const LIST_CONTAINER_STYLES = 'flex-1';
-const ITEM_SEPARATOR_STYLES = 'h-3';
+const SectionHeaderContainer = styled(Stack, {
+  name: 'SectionHeader',
+  paddingHorizontal: '$4',
+  paddingVertical: '$2',
+  backgroundColor: '$backgroundBase',
+});
+
+const SectionHeaderText = styled(Text, {
+  name: 'SectionHeaderText',
+  color: '$textSecondary',
+  fontSize: '$2',
+  fontWeight: '600',
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+});
+
+const ListContainer = styled(Stack, {
+  name: 'ListContainer',
+  flex: 1,
+  backgroundColor: '$backgroundBase',
+});
 
 function groupTransactionsByDate(transactions: Transaction[]): TransactionListItem[] {
   if (transactions.length === 0) {
@@ -75,14 +93,14 @@ const SectionHeader = memo(function SectionHeader({
   title: string;
 }): React.ReactElement {
   return (
-    <View className={SECTION_HEADER_STYLES}>
-      <Text className={SECTION_HEADER_TEXT_STYLES}>{title}</Text>
-    </View>
+    <SectionHeaderContainer>
+      <SectionHeaderText>{title}</SectionHeaderText>
+    </SectionHeaderContainer>
   );
 });
 
 const ItemSeparator = memo(function ItemSeparator(): React.ReactElement {
-  return <View className={ITEM_SEPARATOR_STYLES} />;
+  return <Stack height="$3" />;
 });
 
 export function TransactionList({
@@ -100,15 +118,11 @@ export function TransactionList({
 }: TransactionListProps): React.ReactElement {
   const items = useMemo(() => groupTransactionsByDate(transactions), [transactions]);
 
-  const keyExtractor = useCallback((item: TransactionListItem): string => {
+  const keyExtractor = useCallback((item: TransactionListItem, index: number): string => {
     if (isSectionHeader(item)) {
       return item.key;
     }
     return item.id;
-  }, []);
-
-  const getItemType = useCallback((item: TransactionListItem): string => {
-    return isSectionHeader(item) ? 'section_header' : 'transaction';
   }, []);
 
   const renderItem = useCallback(
@@ -126,16 +140,6 @@ export function TransactionList({
     },
     [formatCurrency, onTransactionPress]
   );
-
-  const stickyHeaderIndices = useMemo(() => {
-    const indices: number[] = [];
-    items.forEach((item, index) => {
-      if (isSectionHeader(item)) {
-        indices.push(index);
-      }
-    });
-    return indices;
-  }, [items]);
 
   if (isLoading && transactions.length === 0) {
     return <LoadingState message="Loading transactions..." />;
@@ -157,25 +161,24 @@ export function TransactionList({
     <RefreshControl
       refreshing={isRefreshing}
       onRefresh={onRefresh}
-      colors={[colors.primary.DEFAULT]}
-      tintColor={colors.primary.DEFAULT}
-      progressBackgroundColor={colors.background.primary}
+      colors={[colors.accent.primary]}
+      tintColor={colors.accent.primary}
+      progressBackgroundColor={colors.background.base}
     />
   ) : undefined;
 
   return (
-    <View className={LIST_CONTAINER_STYLES}>
+    <ListContainer>
       <FlashList
         data={items}
         keyExtractor={keyExtractor}
-        getItemType={getItemType}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        stickyHeaderIndices={stickyHeaderIndices}
         refreshControl={refreshControl}
         ListHeaderComponent={ListHeaderComponent}
         showsVerticalScrollIndicator={false}
+        estimatedItemSize={80}
       />
-    </View>
+    </ListContainer>
   );
 }

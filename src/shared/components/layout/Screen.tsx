@@ -1,58 +1,44 @@
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  View,
-  type ViewProps,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StatusBar } from 'react-native';
 
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
+import { styled, Stack, type GetProps } from 'tamagui';
+
+import { colors } from '@/shared/theme';
 
 import type { PropsWithChildren } from 'react';
 
 type ScreenVariant = 'fixed' | 'scroll';
 
-interface ScreenProps extends Omit<ViewProps, 'children'> {
+const ScreenContainer = styled(Stack, {
+  name: 'ScreenContainer',
+  flex: 1,
+  backgroundColor: '$backgroundBase',
+});
+
+interface ScreenProps extends GetProps<typeof ScreenContainer> {
   variant?: ScreenVariant;
   edges?: Edge[];
-  backgroundColor?: string;
   statusBarStyle?: 'light-content' | 'dark-content';
   keyboardAvoiding?: boolean;
   scrollEnabled?: boolean;
-  contentContainerClassName?: string;
 }
 
 const DEFAULT_EDGES: Edge[] = ['top', 'bottom', 'left', 'right'];
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
-});
 
 export function Screen({
   children,
   variant = 'fixed',
   edges = DEFAULT_EDGES,
-  backgroundColor = '#FFFFFF',
-  statusBarStyle = 'dark-content',
+  statusBarStyle = 'light-content',
   keyboardAvoiding = true,
   scrollEnabled = true,
-  contentContainerClassName,
-  className,
-  ...viewProps
+  ...props
 }: PropsWithChildren<ScreenProps>): React.ReactElement {
   const content =
     variant === 'scroll' ? (
       <ScrollView
-        className="flex-1"
-        contentContainerStyle={styles.scrollContent}
-        contentContainerClassName={contentContainerClassName}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         scrollEnabled={scrollEnabled}
@@ -60,14 +46,12 @@ export function Screen({
         {children}
       </ScrollView>
     ) : (
-      <View className={`flex-1 ${contentContainerClassName ?? ''}`} {...viewProps}>
-        {children}
-      </View>
+      <ScreenContainer {...props}>{children}</ScreenContainer>
     );
 
   const wrappedContent = keyboardAvoiding ? (
     <KeyboardAvoidingView
-      className="flex-1"
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
@@ -78,12 +62,12 @@ export function Screen({
   );
 
   return (
-    <SafeAreaView
-      className={`flex-1 ${className ?? ''}`}
-      edges={edges}
-      style={[styles.safeArea, { backgroundColor }]}
-    >
-      <StatusBar barStyle={statusBarStyle} backgroundColor={backgroundColor} translucent={false} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.base }} edges={edges}>
+      <StatusBar
+        barStyle={statusBarStyle}
+        backgroundColor={colors.background.base}
+        translucent={false}
+      />
       {wrappedContent}
     </SafeAreaView>
   );

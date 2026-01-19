@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { styled, Stack, Text, YStack } from 'tamagui';
 
 import { Button } from '../ui/Button';
 
@@ -32,12 +32,42 @@ const VARIANT_DEFAULTS: Record<EmptyStateVariant, { title: string; description: 
   },
 };
 
-const CONTAINER_STYLES = 'flex-1 items-center justify-center px-8 py-12';
-const ICON_CONTAINER_STYLES =
-  'w-16 h-16 rounded-full bg-background-tertiary items-center justify-center mb-4';
-const TITLE_STYLES = 'text-lg font-semibold text-text-primary text-center';
-const DESCRIPTION_STYLES = 'text-sm text-text-secondary text-center mt-2 max-w-xs';
-const ACTION_CONTAINER_STYLES = 'mt-6';
+const EmptyContainer = styled(YStack, {
+  name: 'EmptyContainer',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: '$8',
+  paddingVertical: '$12',
+});
+
+const IconContainer = styled(Stack, {
+  name: 'EmptyIconContainer',
+  width: 64,
+  height: 64,
+  borderRadius: '$full',
+  backgroundColor: '$backgroundElevated',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: '$4',
+});
+
+const EmptyTitle = styled(Text, {
+  name: 'EmptyTitle',
+  color: '$textPrimary',
+  fontSize: '$4',
+  fontWeight: '600',
+  textAlign: 'center',
+});
+
+const EmptyDescription = styled(Text, {
+  name: 'EmptyDescription',
+  color: '$textSecondary',
+  fontSize: '$2',
+  textAlign: 'center',
+  marginTop: '$2',
+  maxWidth: 280,
+});
 
 export function EmptyState({
   variant = 'default',
@@ -52,17 +82,17 @@ export function EmptyState({
   const displayDescription = description ?? defaults.description;
 
   return (
-    <View className={CONTAINER_STYLES}>
-      {icon && <View className={ICON_CONTAINER_STYLES}>{icon}</View>}
-      <Text className={TITLE_STYLES}>{displayTitle}</Text>
-      {displayDescription && <Text className={DESCRIPTION_STYLES}>{displayDescription}</Text>}
+    <EmptyContainer>
+      {icon && <IconContainer>{icon}</IconContainer>}
+      <EmptyTitle>{displayTitle}</EmptyTitle>
+      {displayDescription && <EmptyDescription>{displayDescription}</EmptyDescription>}
       {actionLabel && onAction && (
-        <View className={ACTION_CONTAINER_STYLES}>
+        <Stack marginTop="$6">
           <Button variant="primary" size="md" onPress={onAction}>
             {actionLabel}
           </Button>
-        </View>
+        </Stack>
       )}
-    </View>
+    </EmptyContainer>
   );
 }

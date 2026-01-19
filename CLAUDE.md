@@ -32,7 +32,7 @@ Monea is a React Native Android application serving as a centralized digital wal
 |-------|------------|
 | Framework | React Native + Expo (dev-client) |
 | Language | TypeScript (strict) |
-| UI | NativeWind (TailwindCSS) + React Native Paper |
+| UI | Tamagui (dark theme) |
 | State | Zustand + React Query |
 | Database | WatermelonDB |
 | Navigation | Expo Router |
@@ -134,19 +134,31 @@ export function AccountCard({ account, onSelect }: AccountCardProps): React.Reac
 }
 ```
 
-### Styling (NativeWind)
+### Styling (Tamagui)
 ```typescript
-// Prefer NativeWind utility classes
-// Extract complex styles to constants
-// Use design tokens from theme
+// Use Tamagui styled components
+// Define variants for component variations
+// Use theme tokens ($backgroundSurface, $textPrimary, etc.)
 
-const CARD_STYLES = 'bg-white rounded-xl p-4 shadow-sm';
+import { styled, Stack, Text } from 'tamagui';
 
-<View className={CARD_STYLES}>
-  <Text className="text-lg font-semibold text-gray-900">
-    {title}
-  </Text>
-</View>
+const Card = styled(Stack, {
+  name: 'Card',
+  backgroundColor: '$backgroundSurface',
+  borderRadius: '$4',
+  padding: '$4',
+});
+
+const Title = styled(Text, {
+  name: 'Title',
+  fontSize: '$4',
+  fontWeight: '600',
+  color: '$textPrimary',
+});
+
+<Card>
+  <Title>{title}</Title>
+</Card>
 ```
 
 ### State Management
@@ -383,7 +395,7 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`
 | File | Purpose |
 |------|---------|
 | `app.json` | Expo configuration |
-| `tailwind.config.js` | NativeWind theme |
+| `tamagui.config.ts` | Tamagui theme configuration |
 | `tsconfig.json` | TypeScript configuration |
 | `src/app/_layout.tsx` | Root layout with providers |
 | `src/infrastructure/database/schema.ts` | Database schema |

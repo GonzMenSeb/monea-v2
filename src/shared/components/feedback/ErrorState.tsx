@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { styled, Stack, Text, YStack } from 'tamagui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -52,12 +52,50 @@ const VARIANT_CONFIG: Record<ErrorStateVariant, VariantConfig> = {
   },
 };
 
-const CONTAINER_STYLES = 'flex-1 items-center justify-center px-8 py-12';
-const ICON_CONTAINER_STYLES =
-  'w-20 h-20 rounded-full bg-semantic-error/10 items-center justify-center mb-6';
-const TITLE_STYLES = 'text-xl font-bold text-text-primary text-center';
-const MESSAGE_STYLES = 'text-sm text-text-secondary text-center mt-3 max-w-xs';
-const ACTIONS_CONTAINER_STYLES = 'mt-8 items-center gap-3';
+const Container = styled(YStack, {
+  name: 'Container',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: '$8',
+  paddingVertical: 48,
+});
+
+const IconContainer = styled(Stack, {
+  name: 'IconContainer',
+  width: 80,
+  height: 80,
+  borderRadius: '$full',
+  backgroundColor: '$dangerMuted',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: '$6',
+});
+
+const Title = styled(Text, {
+  name: 'Title',
+  fontSize: '$5',
+  fontWeight: '700',
+  color: '$textPrimary',
+  textAlign: 'center',
+});
+
+const Message = styled(Text, {
+  name: 'Message',
+  fontSize: '$2',
+  color: '$textSecondary',
+  textAlign: 'center',
+  marginTop: '$3',
+  maxWidth: 280,
+});
+
+const ActionsContainer = styled(YStack, {
+  name: 'ActionsContainer',
+  marginTop: '$8',
+  alignItems: 'center',
+  gap: '$3',
+});
+
 const DEFAULT_RETRY_LABEL = 'Try Again';
 
 export function ErrorState({
@@ -75,14 +113,14 @@ export function ErrorState({
   const displayRetryLabel = retryLabel ?? DEFAULT_RETRY_LABEL;
 
   return (
-    <View className={CONTAINER_STYLES}>
-      <View className={ICON_CONTAINER_STYLES}>
-        <MaterialCommunityIcons name={config.icon} size={40} color={colors.semantic.error} />
-      </View>
-      <Text className={TITLE_STYLES}>{displayTitle}</Text>
-      <Text className={MESSAGE_STYLES}>{displayMessage}</Text>
+    <Container>
+      <IconContainer>
+        <MaterialCommunityIcons name={config.icon} size={40} color={colors.accent.danger} />
+      </IconContainer>
+      <Title>{displayTitle}</Title>
+      <Message>{displayMessage}</Message>
       {(onRetry ?? onSecondaryAction) && (
-        <View className={ACTIONS_CONTAINER_STYLES}>
+        <ActionsContainer>
           {onRetry && (
             <Button variant="primary" size="md" onPress={onRetry}>
               {displayRetryLabel}
@@ -93,8 +131,8 @@ export function ErrorState({
               {secondaryActionLabel}
             </Button>
           )}
-        </View>
+        </ActionsContainer>
       )}
-    </View>
+    </Container>
   );
 }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { View, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import { Stack } from 'tamagui';
 
 import { useRouter } from 'expo-router';
 
@@ -39,17 +40,17 @@ export default function HomeScreen(): React.ReactElement {
 
   if (!isHydrated) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-primary">
-        <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
-      </View>
+      <Stack flex={1} alignItems="center" justifyContent="center" backgroundColor="$backgroundBase">
+        <ActivityIndicator size="large" color={colors.accent.primary} />
+      </Stack>
     );
   }
 
   if (hasCompletedOnboarding) {
     return (
-      <View className="flex-1 items-center justify-center bg-background-primary">
-        <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
-      </View>
+      <Stack flex={1} alignItems="center" justifyContent="center" backgroundColor="$backgroundBase">
+        <ActivityIndicator size="large" color={colors.accent.primary} />
+      </Stack>
     );
   }
 

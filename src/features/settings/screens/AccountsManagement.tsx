@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { Alert, FlatList, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, FlatList, Modal, Pressable, ScrollView } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -40,32 +41,126 @@ const ACCOUNT_TYPE_OPTIONS: { type: AccountType; label: string }[] = [
   { type: 'digital_wallet', label: 'Digital Wallet' },
 ];
 
-const CONTAINER_STYLES = 'px-4 py-2';
-const HEADER_STYLES = 'flex-row items-center justify-between px-4 pt-4 pb-2';
-const BACK_BUTTON_STYLES = 'p-2 -ml-2';
-const ADD_BUTTON_STYLES = 'bg-primary-500 px-4 py-2 rounded-xl';
-const CARD_STYLES = 'bg-surface-card mx-4 mb-3 rounded-2xl p-4 border-l-4';
-const CARD_PRESSED_STYLES = 'bg-gray-50';
-const INACTIVE_CARD_STYLES = 'opacity-60';
-const MODAL_OVERLAY_STYLES = 'flex-1 justify-end bg-black/50';
-const MODAL_CONTENT_STYLES = 'bg-white rounded-t-3xl max-h-[90%]';
-const MODAL_HEADER_STYLES =
-  'flex-row items-center justify-between px-4 py-4 border-b border-gray-100';
-const FORM_CONTAINER_STYLES = 'p-4';
-const SECTION_STYLES = 'mb-4';
-const SECTION_LABEL_STYLES = 'text-sm font-medium text-text-primary mb-2';
-const OPTION_ROW_STYLES = 'flex-row flex-wrap gap-2';
-const OPTION_CHIP_BASE_STYLES = 'px-4 py-2 rounded-xl border-2';
-const OPTION_CHIP_SELECTED_STYLES = 'border-primary-500 bg-primary-50';
-const OPTION_CHIP_UNSELECTED_STYLES = 'border-gray-200 bg-white';
-const BANK_INDICATOR_STYLES = 'w-3 h-3 rounded-full mr-2';
-const ACTIONS_STYLES = 'flex-row gap-3 mt-6';
-const DELETE_SECTION_STYLES = 'mt-6 pt-4 border-t border-gray-100';
-
 const ACCOUNT_QUERY_KEYS = {
   all: ['accounts'] as const,
   list: () => [...ACCOUNT_QUERY_KEYS.all, 'list'] as const,
 };
+
+const HeaderContainer = styled(XStack, {
+  name: 'HeaderContainer',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: '$4',
+  paddingTop: '$4',
+  paddingBottom: '$2',
+});
+
+const BackButton = styled(Stack, {
+  name: 'BackButton',
+  padding: '$2',
+  marginLeft: -8,
+});
+
+const AddButton = styled(Stack, {
+  name: 'AddButton',
+  backgroundColor: '$primary',
+  paddingHorizontal: '$4',
+  paddingVertical: '$2',
+  borderRadius: '$3',
+});
+
+const AccountCard = styled(Stack, {
+  name: 'AccountCard',
+  backgroundColor: '$backgroundSurface',
+  marginHorizontal: '$4',
+  marginBottom: '$3',
+  borderRadius: '$4',
+  padding: '$4',
+  borderLeftWidth: 4,
+});
+
+const InactiveBadge = styled(Stack, {
+  name: 'InactiveBadge',
+  backgroundColor: '$backgroundElevated',
+  paddingHorizontal: '$2',
+  paddingVertical: 2,
+  borderRadius: '$2',
+});
+
+const ModalOverlay = styled(Stack, {
+  name: 'ModalOverlay',
+  flex: 1,
+  justifyContent: 'flex-end',
+  backgroundColor: '$backgroundOverlay',
+});
+
+const ModalContent = styled(YStack, {
+  name: 'ModalContent',
+  backgroundColor: '$backgroundElevated',
+  borderTopLeftRadius: '$6',
+  borderTopRightRadius: '$6',
+  maxHeight: '90%',
+});
+
+const ModalHeader = styled(XStack, {
+  name: 'ModalHeader',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: '$4',
+  paddingVertical: '$4',
+  borderBottomWidth: 1,
+  borderBottomColor: '$border',
+});
+
+const FormSection = styled(YStack, {
+  name: 'FormSection',
+  marginBottom: '$4',
+});
+
+const SectionLabel = styled(Text, {
+  name: 'SectionLabel',
+  fontSize: '$2',
+  fontWeight: '500',
+  color: '$textPrimary',
+  marginBottom: '$2',
+});
+
+const OptionRow = styled(XStack, {
+  name: 'OptionRow',
+  flexWrap: 'wrap',
+  gap: '$2',
+});
+
+const OptionChip = styled(XStack, {
+  name: 'OptionChip',
+  paddingHorizontal: '$4',
+  paddingVertical: '$2',
+  borderRadius: '$3',
+  borderWidth: 2,
+  alignItems: 'center',
+});
+
+const BankIndicator = styled(Stack, {
+  name: 'BankIndicator',
+  width: 12,
+  height: 12,
+  borderRadius: '$full',
+  marginRight: '$2',
+});
+
+const ActionsRow = styled(XStack, {
+  name: 'ActionsRow',
+  gap: '$3',
+  marginTop: '$6',
+});
+
+const DeleteSection = styled(Stack, {
+  name: 'DeleteSection',
+  marginTop: '$6',
+  paddingTop: '$4',
+  borderTopWidth: 1,
+  borderTopColor: '$border',
+});
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -85,13 +180,13 @@ function maskAccountNumber(accountNumber: string): string {
 
 function getBankAccentColor(bankCode: string): string {
   const bankColors: Record<string, string> = {
-    bancolombia: 'border-l-bancolombia-yellow',
-    davivienda: 'border-l-davivienda-red',
-    bbva: 'border-l-bbva-blue',
-    nequi: 'border-l-nequi-pink',
-    daviplata: 'border-l-daviplata-orange',
+    bancolombia: colors.bancolombia.yellow,
+    davivienda: colors.davivienda.red,
+    bbva: colors.bbva.blue,
+    nequi: colors.nequi.pink,
+    daviplata: colors.daviplata.orange,
   };
-  return bankColors[bankCode.toLowerCase()] || 'border-l-primary-500';
+  return bankColors[bankCode.toLowerCase()] || colors.accent.primary;
 }
 
 function getInitialFormData(): AccountFormData {
@@ -130,34 +225,40 @@ function AccountItem({ account, onPress }: AccountItemProps): React.ReactElement
   return (
     <Pressable onPress={handlePress} accessibilityRole="button">
       {({ pressed }) => (
-        <View
-          className={`${CARD_STYLES} ${bankAccent} ${pressed ? CARD_PRESSED_STYLES : ''} ${!account.isActive ? INACTIVE_CARD_STYLES : ''}`}
+        <AccountCard
+          borderLeftColor={bankAccent}
+          opacity={pressed ? 0.7 : account.isActive ? 1 : 0.6}
         >
-          <View className="flex-row justify-between items-start">
-            <View className="flex-1">
-              <Body className="font-semibold">{account.bankName}</Body>
-              <Caption muted={false} className="text-text-secondary mt-0.5">
+          <XStack justifyContent="space-between" alignItems="flex-start">
+            <YStack flex={1}>
+              <Body fontWeight="600">{account.bankName}</Body>
+              <Caption color="$textSecondary" marginTop="$1">
                 {account.accountType === 'digital_wallet'
                   ? 'Digital Wallet'
                   : account.accountType.charAt(0).toUpperCase() + account.accountType.slice(1)}{' '}
                 • {maskedNumber}
               </Caption>
-            </View>
+            </YStack>
             {!account.isActive && (
-              <View className="bg-gray-200 px-2 py-0.5 rounded">
-                <Caption size="sm" muted={false} className="text-text-secondary">
+              <InactiveBadge>
+                <Caption fontSize="$1" color="$textSecondary">
                   Inactive
                 </Caption>
-              </View>
+              </InactiveBadge>
             )}
-          </View>
-          <View className="mt-3">
-            <Caption>Balance</Caption>
-            <Body size="lg" className="font-bold">
+          </XStack>
+          <YStack marginTop="$3">
+            <Caption color="$textMuted">Balance</Caption>
+            <Text
+              fontFamily="$mono"
+              fontSize="$4"
+              fontWeight="700"
+              color="$textPrimary"
+            >
               {formatCurrency(account.balance)}
-            </Body>
-          </View>
-        </View>
+            </Text>
+          </YStack>
+        </AccountCard>
       )}
     </Pressable>
   );
@@ -170,9 +271,9 @@ interface BankSelectorProps {
 
 function BankSelector({ selected, onSelect }: BankSelectorProps): React.ReactElement {
   return (
-    <View className={SECTION_STYLES}>
-      <Text className={SECTION_LABEL_STYLES}>Bank</Text>
-      <View className={OPTION_ROW_STYLES}>
+    <FormSection>
+      <SectionLabel>Bank</SectionLabel>
+      <OptionRow>
         {BANK_OPTIONS.map((bank) => (
           <Pressable
             key={bank.code}
@@ -180,22 +281,22 @@ function BankSelector({ selected, onSelect }: BankSelectorProps): React.ReactEle
             accessibilityRole="radio"
             accessibilityState={{ selected: selected === bank.code }}
           >
-            <View
-              className={`${OPTION_CHIP_BASE_STYLES} flex-row items-center ${selected === bank.code ? OPTION_CHIP_SELECTED_STYLES : OPTION_CHIP_UNSELECTED_STYLES}`}
+            <OptionChip
+              borderColor={selected === bank.code ? '$primary' : '$border'}
+              backgroundColor={selected === bank.code ? '$primaryMuted' : '$backgroundSurface'}
             >
-              <View className={BANK_INDICATOR_STYLES} style={{ backgroundColor: bank.color }} />
+              <BankIndicator backgroundColor={bank.color} />
               <Text
-                className={
-                  selected === bank.code ? 'text-primary-600 font-medium' : 'text-text-secondary'
-                }
+                color={selected === bank.code ? '$primary' : '$textSecondary'}
+                fontWeight={selected === bank.code ? '500' : '400'}
               >
                 {bank.name}
               </Text>
-            </View>
+            </OptionChip>
           </Pressable>
         ))}
-      </View>
-    </View>
+      </OptionRow>
+    </FormSection>
   );
 }
 
@@ -206,9 +307,9 @@ interface AccountTypeSelectorProps {
 
 function AccountTypeSelector({ selected, onSelect }: AccountTypeSelectorProps): React.ReactElement {
   return (
-    <View className={SECTION_STYLES}>
-      <Text className={SECTION_LABEL_STYLES}>Account Type</Text>
-      <View className={OPTION_ROW_STYLES}>
+    <FormSection>
+      <SectionLabel>Account Type</SectionLabel>
+      <OptionRow>
         {ACCOUNT_TYPE_OPTIONS.map((option) => (
           <Pressable
             key={option.type}
@@ -216,21 +317,21 @@ function AccountTypeSelector({ selected, onSelect }: AccountTypeSelectorProps): 
             accessibilityRole="radio"
             accessibilityState={{ selected: selected === option.type }}
           >
-            <View
-              className={`${OPTION_CHIP_BASE_STYLES} ${selected === option.type ? OPTION_CHIP_SELECTED_STYLES : OPTION_CHIP_UNSELECTED_STYLES}`}
+            <OptionChip
+              borderColor={selected === option.type ? '$primary' : '$border'}
+              backgroundColor={selected === option.type ? '$primaryMuted' : '$backgroundSurface'}
             >
               <Text
-                className={
-                  selected === option.type ? 'text-primary-600 font-medium' : 'text-text-secondary'
-                }
+                color={selected === option.type ? '$primary' : '$textSecondary'}
+                fontWeight={selected === option.type ? '500' : '400'}
               >
                 {option.label}
               </Text>
-            </View>
+            </OptionChip>
           </Pressable>
         ))}
-      </View>
-    </View>
+      </OptionRow>
+    </FormSection>
   );
 }
 
@@ -291,16 +392,16 @@ function AccountFormModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View className={MODAL_OVERLAY_STYLES}>
-        <View className={MODAL_CONTENT_STYLES}>
-          <View className={MODAL_HEADER_STYLES}>
+      <ModalOverlay>
+        <ModalContent>
+          <ModalHeader>
             <Heading level="h4">{mode === 'create' ? 'Add Account' : 'Edit Account'}</Heading>
             <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
-              <Text className="text-2xl text-text-secondary">×</Text>
+              <Text fontSize="$6" color="$textSecondary">×</Text>
             </Pressable>
-          </View>
+          </ModalHeader>
 
-          <ScrollView className={FORM_CONTAINER_STYLES} keyboardShouldPersistTaps="handled">
+          <ScrollView style={{ padding: 16 }} keyboardShouldPersistTaps="handled">
             <BankSelector selected={formData.bankCode} onSelect={handleBankSelect} />
 
             <AccountTypeSelector
@@ -308,7 +409,7 @@ function AccountFormModal({
               onSelect={handleAccountTypeSelect}
             />
 
-            <View className={SECTION_STYLES}>
+            <FormSection>
               <Input
                 label="Account Number"
                 placeholder="Enter last 4+ digits"
@@ -318,9 +419,9 @@ function AccountFormModal({
                 maxLength={20}
                 errorMessage={accountNumberError}
               />
-            </View>
+            </FormSection>
 
-            <View className={SECTION_STYLES}>
+            <FormSection>
               <Input
                 label="Initial Balance (optional)"
                 placeholder="0"
@@ -329,10 +430,10 @@ function AccountFormModal({
                 keyboardType="numeric"
                 hint="Current balance in Colombian Pesos"
               />
-            </View>
+            </FormSection>
 
-            <View className={ACTIONS_STYLES}>
-              <View className="flex-1">
+            <ActionsRow>
+              <Stack flex={1}>
                 <Button
                   variant="secondary"
                   onPress={onClose}
@@ -341,8 +442,8 @@ function AccountFormModal({
                 >
                   Cancel
                 </Button>
-              </View>
-              <View className="flex-1">
+              </Stack>
+              <Stack flex={1}>
                 <Button
                   variant="primary"
                   onPress={onSave}
@@ -352,11 +453,11 @@ function AccountFormModal({
                 >
                   {mode === 'create' ? 'Add Account' : 'Save Changes'}
                 </Button>
-              </View>
-            </View>
+              </Stack>
+            </ActionsRow>
 
             {mode === 'edit' && onDelete && (
-              <View className={DELETE_SECTION_STYLES}>
+              <DeleteSection>
                 <Button
                   variant="outline"
                   onPress={onDelete}
@@ -366,11 +467,13 @@ function AccountFormModal({
                 >
                   Delete Account
                 </Button>
-              </View>
+              </DeleteSection>
             )}
+
+            <Stack height={32} />
           </ScrollView>
-        </View>
-      </View>
+        </ModalContent>
+      </ModalOverlay>
     </Modal>
   );
 }
@@ -556,7 +659,7 @@ export function AccountsManagement(): React.ReactElement {
     return (
       <Screen
         variant="fixed"
-        backgroundColor={colors.background.secondary}
+        backgroundColor={colors.background.base}
         edges={['top', 'left', 'right']}
       >
         <LoadingState message="Loading accounts..." />
@@ -569,15 +672,15 @@ export function AccountsManagement(): React.ReactElement {
   return (
     <Screen
       variant="fixed"
-      backgroundColor={colors.background.secondary}
+      backgroundColor={colors.background.base}
       edges={['top', 'left', 'right']}
       keyboardAvoiding={false}
     >
-      <View className={HEADER_STYLES}>
+      <HeaderContainer>
         <Pressable onPress={handleBack} accessibilityRole="button" accessibilityLabel="Go back">
-          <View className={BACK_BUTTON_STYLES}>
-            <Text className="text-2xl">←</Text>
-          </View>
+          <BackButton>
+            <Text fontSize="$6" color="$textPrimary">←</Text>
+          </BackButton>
         </Pressable>
         <Heading level="h3">Bank Accounts</Heading>
         <Pressable
@@ -585,23 +688,23 @@ export function AccountsManagement(): React.ReactElement {
           accessibilityRole="button"
           accessibilityLabel="Add account"
         >
-          <View className={ADD_BUTTON_STYLES}>
-            <Text className="text-white font-semibold">+ Add</Text>
-          </View>
+          <AddButton>
+            <Text color="$textInverse" fontWeight="600">+ Add</Text>
+          </AddButton>
         </Pressable>
-      </View>
+      </HeaderContainer>
 
-      <View className={CONTAINER_STYLES}>
-        <Caption>
+      <Stack paddingHorizontal="$4" paddingVertical="$2">
+        <Caption color="$textSecondary">
           {accounts.length} {accounts.length === 1 ? 'account' : 'accounts'} linked
         </Caption>
-      </View>
+      </Stack>
 
       <FlatList
         data={accounts}
         renderItem={renderAccount}
         keyExtractor={keyExtractor}
-        contentContainerClassName="pt-2 pb-8"
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={ListEmptyComponent}
       />

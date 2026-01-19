@@ -1,59 +1,181 @@
-import { Text, type TextProps } from 'react-native';
+import { styled, Text, type GetProps } from 'tamagui';
+
+import { colors } from '@/shared/theme';
 
 type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4';
 type BodySize = 'sm' | 'md' | 'lg';
 type CaptionSize = 'sm' | 'md';
 type AmountType = 'income' | 'expense' | 'transfer' | 'neutral';
 
-interface HeadingProps extends TextProps {
+const HeadingText = styled(Text, {
+  name: 'Heading',
+  color: '$textPrimary',
+  fontWeight: '700',
+
+  variants: {
+    level: {
+      h1: {
+        fontSize: '$9',
+        lineHeight: '$9',
+        letterSpacing: -1,
+      },
+      h2: {
+        fontSize: '$8',
+        lineHeight: '$8',
+        letterSpacing: -0.5,
+      },
+      h3: {
+        fontSize: '$7',
+        lineHeight: '$7',
+        fontWeight: '600',
+      },
+      h4: {
+        fontSize: '$5',
+        lineHeight: '$5',
+        fontWeight: '600',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    level: 'h2',
+  },
+});
+
+const BodyText = styled(Text, {
+  name: 'Body',
+
+  variants: {
+    size: {
+      sm: {
+        fontSize: '$2',
+        lineHeight: '$2',
+      },
+      md: {
+        fontSize: '$3',
+        lineHeight: '$3',
+      },
+      lg: {
+        fontSize: '$4',
+        lineHeight: '$4',
+      },
+    },
+    muted: {
+      true: {
+        color: '$textSecondary',
+      },
+      false: {
+        color: '$textPrimary',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
+    muted: false,
+  },
+});
+
+const CaptionText = styled(Text, {
+  name: 'Caption',
+
+  variants: {
+    size: {
+      sm: {
+        fontSize: '$1',
+        lineHeight: '$1',
+      },
+      md: {
+        fontSize: '$2',
+        lineHeight: '$2',
+      },
+    },
+    muted: {
+      true: {
+        color: '$textMuted',
+      },
+      false: {
+        color: '$textSecondary',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
+    muted: true,
+  },
+});
+
+const AmountText = styled(Text, {
+  name: 'Amount',
+  fontFamily: '$mono',
+  fontWeight: '700',
+
+  variants: {
+    type: {
+      income: {
+        color: '$transactionIncome',
+      },
+      expense: {
+        color: '$transactionExpense',
+      },
+      transfer: {
+        color: '$transactionTransfer',
+      },
+      neutral: {
+        color: '$textPrimary',
+      },
+    },
+    size: {
+      sm: {
+        fontSize: '$2',
+      },
+      md: {
+        fontSize: '$3',
+      },
+      lg: {
+        fontSize: '$4',
+      },
+      xl: {
+        fontSize: '$6',
+      },
+      '2xl': {
+        fontSize: '$8',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    type: 'neutral',
+    size: 'md',
+  },
+});
+
+interface HeadingProps extends Omit<GetProps<typeof HeadingText>, 'level'> {
   level?: HeadingLevel;
   children: React.ReactNode;
 }
 
-interface BodyProps extends TextProps {
+interface BodyProps extends Omit<GetProps<typeof BodyText>, 'size' | 'muted'> {
   size?: BodySize;
   muted?: boolean;
   children: React.ReactNode;
 }
 
-interface CaptionProps extends TextProps {
+interface CaptionProps extends Omit<GetProps<typeof CaptionText>, 'size' | 'muted'> {
   size?: CaptionSize;
   muted?: boolean;
   children: React.ReactNode;
 }
 
-interface AmountProps extends TextProps {
+interface AmountProps extends Omit<GetProps<typeof AmountText>, 'type'> {
   value: number;
   type?: AmountType;
   showSign?: boolean;
   currency?: string;
   locale?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
-
-const HEADING_STYLES: Record<HeadingLevel, string> = {
-  h1: 'text-4xl font-bold text-text-primary leading-10',
-  h2: 'text-3xl font-bold text-text-primary leading-9',
-  h3: 'text-2xl font-semibold text-text-primary leading-8',
-  h4: 'text-xl font-semibold text-text-primary leading-7',
-};
-
-const BODY_STYLES: Record<BodySize, string> = {
-  sm: 'text-sm leading-5',
-  md: 'text-base leading-6',
-  lg: 'text-lg leading-7',
-};
-
-const CAPTION_STYLES: Record<CaptionSize, string> = {
-  sm: 'text-2xs leading-3.5',
-  md: 'text-xs leading-4',
-};
-
-const AMOUNT_TYPE_STYLES: Record<AmountType, string> = {
-  income: 'text-transaction-income',
-  expense: 'text-transaction-expense',
-  transfer: 'text-transaction-transfer',
-  neutral: 'text-text-primary',
-};
 
 function formatCurrency(value: number, currency: string, locale: string): string {
   return new Intl.NumberFormat(locale, {
@@ -67,16 +189,12 @@ function formatCurrency(value: number, currency: string, locale: string): string
 export function Heading({
   level = 'h2',
   children,
-  className,
-  ...textProps
+  ...props
 }: HeadingProps): React.ReactElement {
-  const baseStyle = HEADING_STYLES[level];
-  const combinedClassName = className ? `${baseStyle} ${className}` : baseStyle;
-
   return (
-    <Text {...textProps} className={combinedClassName} accessibilityRole="header">
+    <HeadingText level={level} accessibilityRole="header" {...props}>
       {children}
-    </Text>
+    </HeadingText>
   );
 }
 
@@ -84,19 +202,12 @@ export function Body({
   size = 'md',
   muted = false,
   children,
-  className,
-  ...textProps
+  ...props
 }: BodyProps): React.ReactElement {
-  const baseStyle = BODY_STYLES[size];
-  const colorStyle = muted ? 'text-text-secondary' : 'text-text-primary';
-  const combinedClassName = className
-    ? `${baseStyle} ${colorStyle} ${className}`
-    : `${baseStyle} ${colorStyle}`;
-
   return (
-    <Text {...textProps} className={combinedClassName}>
+    <BodyText size={size} muted={muted} {...props}>
       {children}
-    </Text>
+    </BodyText>
   );
 }
 
@@ -104,19 +215,12 @@ export function Caption({
   size = 'md',
   muted = true,
   children,
-  className,
-  ...textProps
+  ...props
 }: CaptionProps): React.ReactElement {
-  const baseStyle = CAPTION_STYLES[size];
-  const colorStyle = muted ? 'text-text-muted' : 'text-text-secondary';
-  const combinedClassName = className
-    ? `${baseStyle} ${colorStyle} ${className}`
-    : `${baseStyle} ${colorStyle}`;
-
   return (
-    <Text {...textProps} className={combinedClassName}>
+    <CaptionText size={size} muted={muted} {...props}>
       {children}
-    </Text>
+    </CaptionText>
   );
 }
 
@@ -126,8 +230,8 @@ export function Amount({
   showSign = false,
   currency = 'COP',
   locale = 'es-CO',
-  className,
-  ...textProps
+  size = 'md',
+  ...props
 }: AmountProps): React.ReactElement {
   const absoluteValue = Math.abs(value);
   const formattedValue = formatCurrency(absoluteValue, currency, locale);
@@ -140,19 +244,28 @@ export function Amount({
     displayValue = `-${formattedValue}`;
   }
 
-  const typeStyle = AMOUNT_TYPE_STYLES[type];
-  const baseStyle = 'font-bold';
-  const combinedClassName = className
-    ? `${baseStyle} ${typeStyle} ${className}`
-    : `${baseStyle} ${typeStyle}`;
-
   return (
-    <Text
-      {...textProps}
-      className={combinedClassName}
+    <AmountText
+      type={type}
+      size={size}
       accessibilityLabel={`${type !== 'neutral' ? type : ''} ${displayValue}`.trim()}
+      {...props}
     >
       {displayValue}
-    </Text>
+    </AmountText>
   );
 }
+
+export const SectionTitle = styled(Text, {
+  name: 'SectionTitle',
+  color: '$textPrimary',
+  fontSize: '$4',
+  fontWeight: '600',
+  marginBottom: '$3',
+});
+
+export const SectionSubtitle = styled(Text, {
+  name: 'SectionSubtitle',
+  color: '$textSecondary',
+  fontSize: '$2',
+});

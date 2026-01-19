@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Text, View } from 'react-native';
+import { styled, Stack, Text, YStack } from 'tamagui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -14,14 +14,67 @@ interface SmsPermissionDeniedProps {
   onSkip?: () => void;
 }
 
-const FULL_CONTAINER_STYLES = 'flex-1 items-center justify-center px-8 py-12';
-const COMPACT_CONTAINER_STYLES = 'items-center px-6 py-8 bg-background-secondary rounded-2xl mx-4';
-const ICON_CONTAINER_STYLES =
-  'w-20 h-20 rounded-full bg-semantic-warning/10 items-center justify-center mb-6';
-const TITLE_STYLES = 'text-xl font-bold text-text-primary text-center';
-const MESSAGE_STYLES = 'text-sm text-text-secondary text-center mt-3 max-w-xs';
-const ACTIONS_CONTAINER_STYLES = 'mt-8 w-full gap-3';
-const HINT_STYLES = 'text-xs text-text-tertiary text-center mt-4';
+const FullContainer = styled(YStack, {
+  name: 'FullContainer',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: '$8',
+  paddingVertical: 48,
+});
+
+const CompactContainer = styled(YStack, {
+  name: 'CompactContainer',
+  alignItems: 'center',
+  paddingHorizontal: '$6',
+  paddingVertical: '$8',
+  backgroundColor: '$backgroundSurface',
+  borderRadius: '$4',
+  marginHorizontal: '$4',
+});
+
+const IconContainer = styled(Stack, {
+  name: 'IconContainer',
+  width: 80,
+  height: 80,
+  borderRadius: '$full',
+  backgroundColor: '$warningMuted',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: '$6',
+});
+
+const Title = styled(Text, {
+  name: 'Title',
+  fontSize: '$5',
+  fontWeight: '700',
+  color: '$textPrimary',
+  textAlign: 'center',
+});
+
+const Message = styled(Text, {
+  name: 'Message',
+  fontSize: '$2',
+  color: '$textSecondary',
+  textAlign: 'center',
+  marginTop: '$3',
+  maxWidth: 280,
+});
+
+const ActionsContainer = styled(YStack, {
+  name: 'ActionsContainer',
+  marginTop: '$8',
+  width: '100%',
+  gap: '$3',
+});
+
+const Hint = styled(Text, {
+  name: 'Hint',
+  fontSize: '$1',
+  color: '$textMuted',
+  textAlign: 'center',
+  marginTop: '$4',
+});
 
 const TITLE_TEXT = 'SMS Permission Required';
 const MESSAGE_TEXT =
@@ -36,7 +89,7 @@ export function SmsPermissionDenied({
   onRetry,
   onSkip,
 }: SmsPermissionDeniedProps): React.ReactElement {
-  const containerStyles = variant === 'full' ? FULL_CONTAINER_STYLES : COMPACT_CONTAINER_STYLES;
+  const Container = variant === 'full' ? FullContainer : CompactContainer;
 
   const handleOpenSettings = useCallback(async () => {
     await smsPermissions.openAppSettings();
@@ -50,17 +103,17 @@ export function SmsPermissionDenied({
   }, [onRetry]);
 
   return (
-    <View className={containerStyles}>
-      <View className={ICON_CONTAINER_STYLES}>
+    <Container>
+      <IconContainer>
         <MaterialCommunityIcons
           name="message-lock-outline"
           size={40}
-          color={colors.semantic.warning}
+          color={colors.accent.warning}
         />
-      </View>
-      <Text className={TITLE_STYLES}>{TITLE_TEXT}</Text>
-      <Text className={MESSAGE_STYLES}>{MESSAGE_TEXT}</Text>
-      <View className={ACTIONS_CONTAINER_STYLES}>
+      </IconContainer>
+      <Title>{TITLE_TEXT}</Title>
+      <Message>{MESSAGE_TEXT}</Message>
+      <ActionsContainer>
         <Button variant="primary" size="md" fullWidth onPress={handleOpenSettings}>
           {OPEN_SETTINGS_LABEL}
         </Button>
@@ -74,8 +127,8 @@ export function SmsPermissionDenied({
             {MAYBE_LATER_LABEL}
           </Button>
         )}
-      </View>
-      <Text className={HINT_STYLES}>{HINT_TEXT}</Text>
-    </View>
+      </ActionsContainer>
+      <Hint>{HINT_TEXT}</Hint>
+    </Container>
   );
 }

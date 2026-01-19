@@ -1,13 +1,10 @@
 import { useMemo } from 'react';
 
-import { View, Text, Pressable } from 'react-native';
-
-import { Circle } from '@shopify/react-native-skia';
-import { type SharedValue } from 'react-native-reanimated';
-import { CartesianChart, Bar, useChartPressState } from 'victory-native';
+import { BarChart } from 'react-native-gifted-charts';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { Card } from '@/shared/components/ui';
-import { colors } from '@/shared/theme/colors';
+import { colors } from '@/shared/theme';
 
 type TimeRange = 'weekly' | 'monthly';
 
@@ -32,37 +29,105 @@ interface ChartSummary {
   netChange: number;
 }
 
-const CHART_HEIGHT = 200;
-const CONTAINER_STYLES = 'mt-6';
-const HEADER_STYLES = 'flex-row justify-between items-center px-4 mb-4';
-const TITLE_STYLES = 'text-lg font-semibold text-text-primary';
-const TOGGLE_CONTAINER_STYLES = 'flex-row bg-background-tertiary rounded-lg p-0.5';
-const TOGGLE_ACTIVE_STYLES = 'px-3 py-1.5 rounded-md bg-surface-card';
-const TOGGLE_INACTIVE_STYLES = 'px-3 py-1.5 rounded-md';
-const TOGGLE_TEXT_ACTIVE_STYLES = 'text-sm font-medium text-text-primary';
-const TOGGLE_TEXT_INACTIVE_STYLES = 'text-sm font-medium text-text-muted';
-const SUMMARY_CONTAINER_STYLES = 'flex-row justify-around mt-4 pt-4 border-t border-gray-100';
-const SUMMARY_ITEM_STYLES = 'items-center';
-const SUMMARY_LABEL_STYLES = 'text-xs text-text-muted mb-1';
-const EMPTY_STATE_STYLES = 'items-center justify-center py-12';
-const EMPTY_TEXT_STYLES = 'text-sm text-text-muted';
+const CHART_HEIGHT = 180;
 
-const CHART_COLORS = {
-  income: colors.transaction.income,
-  expense: colors.transaction.expense,
-  grid: colors.text.muted,
-  axis: colors.text.secondary,
-};
+const SectionHeader = styled(XStack, {
+  name: 'SectionHeader',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: '$4',
+  marginBottom: '$4',
+});
 
-function ToolTipIndicator({
-  x,
-  y,
-}: {
-  x: SharedValue<number>;
-  y: SharedValue<number>;
-}): React.ReactElement {
-  return <Circle cx={x} cy={y} r={8} color={colors.primary.DEFAULT} />;
-}
+const SectionTitle = styled(Text, {
+  name: 'SectionTitle',
+  color: '$textPrimary',
+  fontSize: '$4',
+  fontWeight: '600',
+});
+
+const ToggleContainer = styled(XStack, {
+  name: 'ToggleContainer',
+  backgroundColor: '$backgroundElevated',
+  borderRadius: '$2',
+  padding: '$0.5',
+});
+
+const ToggleButton = styled(Stack, {
+  name: 'ToggleButton',
+  paddingHorizontal: '$3',
+  paddingVertical: 6,
+  borderRadius: 6,
+
+  variants: {
+    active: {
+      true: {
+        backgroundColor: '$backgroundSurface',
+      },
+      false: {
+        backgroundColor: 'transparent',
+      },
+    },
+  } as const,
+});
+
+const ToggleText = styled(Text, {
+  name: 'ToggleText',
+  fontSize: '$2',
+  fontWeight: '500',
+
+  variants: {
+    active: {
+      true: {
+        color: '$textPrimary',
+      },
+      false: {
+        color: '$textMuted',
+      },
+    },
+  } as const,
+});
+
+const SummaryContainer = styled(XStack, {
+  name: 'SummaryContainer',
+  justifyContent: 'space-around',
+  marginTop: '$4',
+  paddingTop: '$4',
+  borderTopWidth: 1,
+  borderTopColor: '$border',
+});
+
+const SummaryItem = styled(YStack, {
+  name: 'SummaryItem',
+  alignItems: 'center',
+});
+
+const SummaryLabel = styled(Text, {
+  name: 'SummaryLabel',
+  color: '$textMuted',
+  fontSize: '$1',
+  marginBottom: '$1',
+});
+
+const SummaryValue = styled(Text, {
+  name: 'SummaryValue',
+  fontFamily: '$mono',
+  fontSize: '$3',
+  fontWeight: '600',
+});
+
+const EmptyContainer = styled(YStack, {
+  name: 'EmptyContainer',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: '$12',
+});
+
+const EmptyText = styled(Text, {
+  name: 'EmptyText',
+  color: '$textMuted',
+  fontSize: '$2',
+});
 
 function calculateSummary(data: SpendingDataPoint[]): ChartSummary {
   return data.reduce(
@@ -84,47 +149,35 @@ function TimeRangeToggle({
 }): React.ReactElement {
   if (!onChange) {
     return (
-      <View className={TOGGLE_CONTAINER_STYLES}>
-        <View className={TOGGLE_ACTIVE_STYLES}>
-          <Text className={TOGGLE_TEXT_ACTIVE_STYLES}>
-            {timeRange === 'weekly' ? 'Week' : 'Month'}
-          </Text>
-        </View>
-      </View>
+      <ToggleContainer>
+        <ToggleButton active>
+          <ToggleText active>{timeRange === 'weekly' ? 'Week' : 'Month'}</ToggleText>
+        </ToggleButton>
+      </ToggleContainer>
     );
   }
 
   return (
-    <View className={TOGGLE_CONTAINER_STYLES}>
-      <Pressable
-        className={timeRange === 'weekly' ? TOGGLE_ACTIVE_STYLES : TOGGLE_INACTIVE_STYLES}
+    <ToggleContainer>
+      <ToggleButton
+        active={timeRange === 'weekly'}
         onPress={() => onChange('weekly')}
+        pressStyle={{ opacity: 0.7 }}
         accessibilityRole="button"
         accessibilityState={{ selected: timeRange === 'weekly' }}
       >
-        <Text
-          className={
-            timeRange === 'weekly' ? TOGGLE_TEXT_ACTIVE_STYLES : TOGGLE_TEXT_INACTIVE_STYLES
-          }
-        >
-          Week
-        </Text>
-      </Pressable>
-      <Pressable
-        className={timeRange === 'monthly' ? TOGGLE_ACTIVE_STYLES : TOGGLE_INACTIVE_STYLES}
+        <ToggleText active={timeRange === 'weekly'}>Week</ToggleText>
+      </ToggleButton>
+      <ToggleButton
+        active={timeRange === 'monthly'}
         onPress={() => onChange('monthly')}
+        pressStyle={{ opacity: 0.7 }}
         accessibilityRole="button"
         accessibilityState={{ selected: timeRange === 'monthly' }}
       >
-        <Text
-          className={
-            timeRange === 'monthly' ? TOGGLE_TEXT_ACTIVE_STYLES : TOGGLE_TEXT_INACTIVE_STYLES
-          }
-        >
-          Month
-        </Text>
-      </Pressable>
-    </View>
+        <ToggleText active={timeRange === 'monthly'}>Month</ToggleText>
+      </ToggleButton>
+    </ToggleContainer>
   );
 }
 
@@ -135,40 +188,30 @@ function ChartSummaryRow({
   summary: ChartSummary;
   formatCurrency: (amount: number) => string;
 }): React.ReactElement {
-  const netChangeColor =
-    summary.netChange >= 0 ? 'text-transaction-income' : 'text-transaction-expense';
+  const netChangeColor = summary.netChange >= 0 ? colors.transaction.income : colors.transaction.expense;
   const netChangeSign = summary.netChange >= 0 ? '+' : '';
 
   return (
-    <View className={SUMMARY_CONTAINER_STYLES}>
-      <View className={SUMMARY_ITEM_STYLES}>
-        <Text className={SUMMARY_LABEL_STYLES}>Income</Text>
-        <Text className="text-base font-semibold text-transaction-income">
+    <SummaryContainer>
+      <SummaryItem>
+        <SummaryLabel>Income</SummaryLabel>
+        <SummaryValue color={colors.transaction.income}>
           +{formatCurrency(summary.totalIncome)}
-        </Text>
-      </View>
-      <View className={SUMMARY_ITEM_STYLES}>
-        <Text className={SUMMARY_LABEL_STYLES}>Expenses</Text>
-        <Text className="text-base font-semibold text-transaction-expense">
+        </SummaryValue>
+      </SummaryItem>
+      <SummaryItem>
+        <SummaryLabel>Expenses</SummaryLabel>
+        <SummaryValue color={colors.transaction.expense}>
           -{formatCurrency(summary.totalExpense)}
-        </Text>
-      </View>
-      <View className={SUMMARY_ITEM_STYLES}>
-        <Text className={SUMMARY_LABEL_STYLES}>Net</Text>
-        <Text className={`text-base font-semibold ${netChangeColor}`}>
-          {netChangeSign}
-          {formatCurrency(Math.abs(summary.netChange))}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function EmptyState(): React.ReactElement {
-  return (
-    <View className={EMPTY_STATE_STYLES}>
-      <Text className={EMPTY_TEXT_STYLES}>No spending data available</Text>
-    </View>
+        </SummaryValue>
+      </SummaryItem>
+      <SummaryItem>
+        <SummaryLabel>Net</SummaryLabel>
+        <SummaryValue color={netChangeColor}>
+          {netChangeSign}{formatCurrency(Math.abs(summary.netChange))}
+        </SummaryValue>
+      </SummaryItem>
+    </SummaryContainer>
   );
 }
 
@@ -179,95 +222,109 @@ export function SpendingChart({
   onTimeRangeChange,
   isLoading = false,
 }: SpendingChartProps): React.ReactElement {
-  const { state, isActive } = useChartPressState({ x: '', y: { income: 0, expense: 0 } });
-
   const summary = useMemo(() => calculateSummary(data), [data]);
 
+  const chartData = useMemo(() => {
+    return data.flatMap((point, index) => [
+      {
+        value: point.income,
+        label: point.label,
+        frontColor: colors.transaction.income,
+        spacing: 4,
+        labelWidth: 40,
+        labelTextStyle: { color: colors.text.muted, fontSize: 10 },
+      },
+      {
+        value: point.expense,
+        frontColor: colors.transaction.expense,
+        spacing: index === data.length - 1 ? 0 : 16,
+      },
+    ]);
+  }, [data]);
+
   const maxValue = useMemo(() => {
-    if (data.length === 0) {
-      return 1000;
-    }
+    if (data.length === 0) return 1000;
     return Math.max(...data.flatMap((d) => [d.income, d.expense])) * 1.1;
   }, [data]);
 
   if (isLoading) {
     return (
-      <View className={CONTAINER_STYLES}>
-        <View className={HEADER_STYLES}>
-          <Text className={TITLE_STYLES}>Spending Overview</Text>
+      <YStack marginTop="$6">
+        <SectionHeader>
+          <SectionTitle>Spending Overview</SectionTitle>
           <TimeRangeToggle timeRange={timeRange} onChange={onTimeRangeChange} />
-        </View>
+        </SectionHeader>
         <Card variant="elevated">
-          <View className={EMPTY_STATE_STYLES}>
-            <Text className={EMPTY_TEXT_STYLES}>Loading chart...</Text>
-          </View>
+          <EmptyContainer>
+            <EmptyText>Loading chart...</EmptyText>
+          </EmptyContainer>
         </Card>
-      </View>
+      </YStack>
     );
   }
 
   if (data.length === 0) {
     return (
-      <View className={CONTAINER_STYLES}>
-        <View className={HEADER_STYLES}>
-          <Text className={TITLE_STYLES}>Spending Overview</Text>
+      <YStack marginTop="$6">
+        <SectionHeader>
+          <SectionTitle>Spending Overview</SectionTitle>
           <TimeRangeToggle timeRange={timeRange} onChange={onTimeRangeChange} />
-        </View>
+        </SectionHeader>
         <Card variant="elevated">
-          <EmptyState />
+          <EmptyContainer>
+            <EmptyText>No spending data available</EmptyText>
+          </EmptyContainer>
         </Card>
-      </View>
+      </YStack>
     );
   }
 
   return (
-    <View className={CONTAINER_STYLES}>
-      <View className={HEADER_STYLES}>
-        <Text className={TITLE_STYLES}>Spending Overview</Text>
+    <YStack marginTop="$6">
+      <SectionHeader>
+        <SectionTitle>Spending Overview</SectionTitle>
         <TimeRangeToggle timeRange={timeRange} onChange={onTimeRangeChange} />
-      </View>
+      </SectionHeader>
       <Card variant="elevated">
-        <View style={{ height: CHART_HEIGHT }}>
-          <CartesianChart
-            data={data}
-            xKey="label"
-            yKeys={['income', 'expense']}
-            domainPadding={{ left: 30, right: 30, top: 20 }}
-            domain={{ y: [0, maxValue] }}
-            chartPressState={state}
-            axisOptions={{
-              font: null,
-              labelColor: CHART_COLORS.axis,
-              lineColor: CHART_COLORS.grid,
-              tickCount: { y: 4, x: data.length },
+        <Stack height={CHART_HEIGHT} marginBottom="$2">
+          <BarChart
+            data={chartData}
+            barWidth={12}
+            spacing={4}
+            roundedTop
+            roundedBottom
+            hideRules
+            xAxisThickness={0}
+            yAxisThickness={0}
+            yAxisTextStyle={{ color: colors.text.muted, fontSize: 10 }}
+            noOfSections={4}
+            maxValue={maxValue}
+            isAnimated
+            animationDuration={500}
+            backgroundColor={colors.background.surface}
+            height={CHART_HEIGHT - 40}
+            yAxisLabelWidth={50}
+            formatYLabel={(label) => {
+              const num = parseFloat(label);
+              if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+              if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
+              return label;
             }}
-          >
-            {({ points, chartBounds }) => (
-              <>
-                <Bar
-                  points={points.income}
-                  chartBounds={chartBounds}
-                  color={CHART_COLORS.income}
-                  roundedCorners={{ topLeft: 4, topRight: 4 }}
-                  barWidth={12}
-                  innerPadding={0.3}
-                />
-                <Bar
-                  points={points.expense}
-                  chartBounds={chartBounds}
-                  color={CHART_COLORS.expense}
-                  roundedCorners={{ topLeft: 4, topRight: 4 }}
-                  barWidth={12}
-                  innerPadding={0.3}
-                />
-                {isActive && <ToolTipIndicator x={state.x.position} y={state.y.expense.position} />}
-              </>
-            )}
-          </CartesianChart>
-        </View>
+          />
+        </Stack>
+        <XStack justifyContent="center" gap="$4" marginTop="$2">
+          <XStack alignItems="center" gap="$1">
+            <Stack width={12} height={12} borderRadius="$1" backgroundColor={colors.transaction.income} />
+            <Text color="$textSecondary" fontSize="$1">Income</Text>
+          </XStack>
+          <XStack alignItems="center" gap="$1">
+            <Stack width={12} height={12} borderRadius="$1" backgroundColor={colors.transaction.expense} />
+            <Text color="$textSecondary" fontSize="$1">Expense</Text>
+          </XStack>
+        </XStack>
         <ChartSummaryRow summary={summary} formatCurrency={formatCurrency} />
       </Card>
-    </View>
+    </YStack>
   );
 }
 

@@ -49,7 +49,7 @@ function TabItem({ isFocused, onPress, onLongPress, options }: TabItemProps): Re
     const backgroundColor = interpolateColor(
       progress.value,
       [0, 1],
-      ['transparent', colors.primary[50]]
+      ['transparent', colors.accent.primary + '20']
     );
     return {
       backgroundColor,
@@ -78,7 +78,7 @@ function TabItem({ isFocused, onPress, onLongPress, options }: TabItemProps): Re
     scale.value = withSpring(1, SPRING_CONFIG);
   }, [scale]);
 
-  const iconColor = isFocused ? colors.primary.DEFAULT : colors.text.muted;
+  const iconColor = isFocused ? colors.accent.primary : colors.text.muted;
   const label = options.tabBarLabel ?? options.title ?? '';
 
   const renderIcon = (): React.ReactNode => {
@@ -164,9 +164,9 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps): R
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.background.primary,
+    backgroundColor: colors.background.surface,
     borderTopWidth: 1,
-    borderTopColor: colors.background.tertiary,
+    borderTopColor: colors.border.default,
     paddingTop: 8,
     paddingBottom: 24,
     paddingHorizontal: 8,

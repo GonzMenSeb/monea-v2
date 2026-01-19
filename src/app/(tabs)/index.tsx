@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
-import { ScrollView, View, Text, RefreshControl } from 'react-native';
+import { ScrollView, RefreshControl } from 'react-native';
+import { Stack, Text, YStack } from 'tamagui';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
@@ -18,12 +19,6 @@ import { useTransactionStore } from '@/features/transactions/store/transactionSt
 import { Screen } from '@/shared/components/layout';
 import { colors } from '@/shared/theme';
 import { formatCurrency, getGreeting } from '@/shared/utils';
-
-const HEADER_CONTAINER_STYLES = 'px-4 pt-4 pb-2';
-const HEADER_TITLE_STYLES = 'text-2xl font-bold text-text-primary';
-const HEADER_SUBTITLE_STYLES = 'text-sm text-text-secondary mt-1';
-const BALANCE_CONTAINER_STYLES = 'px-4 mt-4';
-const CONTENT_CONTAINER_STYLES = 'pb-8';
 
 export default function DashboardScreen(): React.ReactElement {
   const router = useRouter();
@@ -84,35 +79,40 @@ export default function DashboardScreen(): React.ReactElement {
     <Screen
       testID="dashboard-screen"
       variant="fixed"
-      backgroundColor={colors.background.primary}
+      backgroundColor={colors.background.base}
       edges={['top', 'left', 'right']}
       keyboardAvoiding={false}
     >
       <ScrollView
-        className="flex-1"
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
-        contentContainerClassName={CONTENT_CONTAINER_STYLES}
+        contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
-            colors={[colors.primary.DEFAULT]}
-            tintColor={colors.primary.DEFAULT}
+            colors={[colors.accent.primary]}
+            tintColor={colors.accent.primary}
+            progressBackgroundColor={colors.background.surface}
           />
         }
       >
-        <View className={HEADER_CONTAINER_STYLES}>
-          <Text className={HEADER_TITLE_STYLES}>{getGreeting()}</Text>
-          <Text className={HEADER_SUBTITLE_STYLES}>Here&apos;s your financial overview</Text>
-        </View>
+        <Stack paddingHorizontal="$4" paddingTop="$4" paddingBottom="$2">
+          <Text fontSize="$6" fontWeight="700" color="$textPrimary">
+            {getGreeting()}
+          </Text>
+          <Text fontSize="$2" color="$textSecondary" marginTop="$1">
+            Here&apos;s your financial overview
+          </Text>
+        </Stack>
 
-        <View className={BALANCE_CONTAINER_STYLES}>
+        <Stack paddingHorizontal="$4" marginTop="$4">
           <BalanceCard
             totalBalance={data?.totalBalance ?? 0}
             percentageChange={data?.percentageChange}
             trendDirection={data?.trendDirection ?? 'neutral'}
           />
-        </View>
+        </Stack>
 
         <AccountsOverview
           accounts={accounts}

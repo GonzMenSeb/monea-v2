@@ -1,14 +1,10 @@
 import { useCallback } from 'react';
 
-import {
-  Modal,
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  type ViewStyle,
-  type StyleProp,
-} from 'react-native';
+import { Modal, ScrollView } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
+
+import { Button } from '@/shared/components/ui';
+import { colors } from '@/shared/theme';
 
 import type Transaction from '@/infrastructure/database/models/Transaction';
 import type { TransactionType } from '@/infrastructure/database/models/Transaction';
@@ -22,29 +18,116 @@ interface TransactionDetailProps {
   accountNumber?: string;
 }
 
-interface DetailRowProps {
-  label: string;
-  value: string;
-  valueStyle?: StyleProp<ViewStyle>;
-}
-
 const TRANSACTION_TYPE_CONFIG: Record<
   TransactionType,
-  { sign: string; colorClass: string; label: string }
+  { sign: string; color: string; label: string }
 > = {
-  income: { sign: '+', colorClass: 'text-transaction-income', label: 'Income' },
-  expense: { sign: '-', colorClass: 'text-transaction-expense', label: 'Expense' },
-  transfer_in: { sign: '+', colorClass: 'text-transaction-transfer', label: 'Transfer In' },
-  transfer_out: { sign: '-', colorClass: 'text-transaction-transfer', label: 'Transfer Out' },
+  income: { sign: '+', color: colors.transaction.income, label: 'Income' },
+  expense: { sign: '-', color: colors.transaction.expense, label: 'Expense' },
+  transfer_in: { sign: '+', color: colors.transaction.transfer, label: 'Transfer In' },
+  transfer_out: { sign: '-', color: colors.transaction.transfer, label: 'Transfer Out' },
 };
 
 const BANK_COLORS: Record<string, string> = {
-  bancolombia: 'bg-bancolombia-yellow',
-  davivienda: 'bg-davivienda-red',
-  bbva: 'bg-bbva-blue',
-  nequi: 'bg-nequi-pink',
-  daviplata: 'bg-daviplata-orange',
+  bancolombia: colors.bancolombia.yellow,
+  davivienda: colors.davivienda.red,
+  bbva: colors.bbva.blue,
+  nequi: colors.nequi.pink,
+  daviplata: colors.daviplata.orange,
 };
+
+const Backdrop = styled(Stack, {
+  name: 'Backdrop',
+  flex: 1,
+  backgroundColor: '$backgroundOverlay',
+  justifyContent: 'flex-end',
+});
+
+const ModalContent = styled(YStack, {
+  name: 'ModalContent',
+  backgroundColor: '$backgroundElevated',
+  borderTopLeftRadius: '$6',
+  borderTopRightRadius: '$6',
+  maxHeight: '85%',
+});
+
+const Handle = styled(Stack, {
+  name: 'Handle',
+  width: 48,
+  height: 4,
+  borderRadius: '$full',
+  alignSelf: 'center',
+  marginTop: '$3',
+  marginBottom: '$2',
+});
+
+const HeaderSection = styled(YStack, {
+  name: 'HeaderSection',
+  paddingHorizontal: '$6',
+  paddingTop: '$4',
+  paddingBottom: '$6',
+  borderBottomWidth: 1,
+  borderBottomColor: '$border',
+  alignItems: 'center',
+});
+
+const TypeLabel = styled(Text, {
+  name: 'TypeLabel',
+  color: '$textSecondary',
+  fontSize: '$4',
+  marginBottom: '$1',
+});
+
+const AmountText = styled(Text, {
+  name: 'AmountText',
+  fontFamily: '$mono',
+  fontSize: 40,
+  fontWeight: '700',
+  letterSpacing: -1,
+});
+
+const MerchantText = styled(Text, {
+  name: 'MerchantText',
+  color: '$textPrimary',
+  fontSize: '$4',
+  fontWeight: '600',
+  marginTop: '$3',
+});
+
+const DetailRow = styled(XStack, {
+  name: 'DetailRow',
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
+  paddingVertical: '$3',
+  borderBottomWidth: 1,
+  borderBottomColor: '$border',
+});
+
+const DetailLabel = styled(Text, {
+  name: 'DetailLabel',
+  color: '$textSecondary',
+  fontSize: '$2',
+  flexShrink: 0,
+  marginRight: '$4',
+});
+
+const DetailValue = styled(Text, {
+  name: 'DetailValue',
+  color: '$textPrimary',
+  fontSize: '$2',
+  fontWeight: '500',
+  textAlign: 'right',
+  flex: 1,
+});
+
+const FooterSection = styled(Stack, {
+  name: 'FooterSection',
+  paddingHorizontal: '$6',
+  paddingBottom: '$8',
+  paddingTop: '$4',
+  borderTopWidth: 1,
+  borderTopColor: '$border',
+});
 
 function formatDateTime(date: Date): string {
   return date.toLocaleDateString('es-CO', {
@@ -58,14 +141,12 @@ function formatDateTime(date: Date): string {
   });
 }
 
-function DetailRow({ label, value }: DetailRowProps): React.ReactElement {
+function DetailItem({ label, value }: { label: string; value: string }): React.ReactElement {
   return (
-    <View className="flex-row justify-between items-start py-3 border-b border-gray-100">
-      <Text className="text-sm text-text-secondary flex-shrink-0 mr-4">{label}</Text>
-      <Text className="text-sm text-text-primary font-medium text-right flex-1" numberOfLines={2}>
-        {value}
-      </Text>
-    </View>
+    <DetailRow>
+      <DetailLabel>{label}</DetailLabel>
+      <DetailValue numberOfLines={2}>{value}</DetailValue>
+    </DetailRow>
   );
 }
 
@@ -81,10 +162,6 @@ export function TransactionDetail({
     onClose();
   }, [onClose]);
 
-  const handleContentPress = useCallback(() => {
-    // Prevent closing when pressing the content
-  }, []);
-
   if (!transaction) {
     return null;
   }
@@ -92,10 +169,10 @@ export function TransactionDetail({
   const typeConfig = TRANSACTION_TYPE_CONFIG[transaction.type];
   const formattedAmount = `${typeConfig.sign}${formatCurrency(transaction.amount)}`;
   const displayTitle = transaction.merchant || transaction.description || typeConfig.label;
-  const bankAccentClass =
+  const bankAccentColor =
     bankName && BANK_COLORS[bankName.toLowerCase()]
       ? BANK_COLORS[bankName.toLowerCase()]
-      : 'bg-primary-500';
+      : colors.accent.primary;
 
   return (
     <Modal
@@ -105,70 +182,64 @@ export function TransactionDetail({
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <Pressable
-        className="flex-1 bg-surface-overlay justify-end"
+      <Backdrop
         onPress={handleBackdropPress}
         accessibilityRole="button"
         accessibilityLabel="Close transaction details"
       >
-        <Pressable onPress={handleContentPress} className="bg-white rounded-t-3xl max-h-[85%]">
-          <View className={`h-1 w-12 ${bankAccentClass} rounded-full self-center mt-3 mb-2`} />
+        <ModalContent onPress={(e: { stopPropagation: () => void }) => e.stopPropagation()}>
+          <Handle backgroundColor={bankAccentColor} />
 
-          <View className="px-6 pt-4 pb-6 border-b border-gray-100">
-            <Text className="text-lg text-text-secondary text-center mb-1">{typeConfig.label}</Text>
-            <Text
-              className={`text-4xl font-bold ${typeConfig.colorClass} text-center`}
-              accessibilityLabel={`Amount: ${formattedAmount}`}
-            >
+          <HeaderSection>
+            <TypeLabel>{typeConfig.label}</TypeLabel>
+            <AmountText color={typeConfig.color} accessibilityLabel={`Amount: ${formattedAmount}`}>
               {formattedAmount}
-            </Text>
-            <Text className="text-lg font-semibold text-text-primary text-center mt-3">
-              {displayTitle}
-            </Text>
-          </View>
+            </AmountText>
+            <MerchantText>{displayTitle}</MerchantText>
+          </HeaderSection>
 
-          <ScrollView className="px-6" showsVerticalScrollIndicator={false}>
-            <View className="py-2">
-              <DetailRow label="Date" value={formatDateTime(transaction.transactionDate)} />
+          <ScrollView style={{ paddingHorizontal: 24 }} showsVerticalScrollIndicator={false}>
+            <YStack paddingVertical="$2">
+              <DetailItem label="Date" value={formatDateTime(transaction.transactionDate)} />
 
               {transaction.description && transaction.merchant && (
-                <DetailRow label="Description" value={transaction.description} />
+                <DetailItem label="Description" value={transaction.description} />
               )}
 
-              {bankName && <DetailRow label="Bank" value={bankName} />}
+              {bankName && <DetailItem label="Bank" value={bankName} />}
 
               {accountNumber && (
-                <DetailRow label="Account" value={`****${accountNumber.slice(-4)}`} />
+                <DetailItem label="Account" value={`****${accountNumber.slice(-4)}`} />
               )}
 
               {transaction.balanceAfter !== undefined && transaction.balanceAfter !== null && (
-                <DetailRow label="Balance After" value={formatCurrency(transaction.balanceAfter)} />
+                <DetailItem label="Balance After" value={formatCurrency(transaction.balanceAfter)} />
               )}
 
               {transaction.reference && (
-                <DetailRow label="Reference" value={transaction.reference} />
+                <DetailItem label="Reference" value={transaction.reference} />
               )}
 
               {transaction.categoryId && (
-                <DetailRow label="Category ID" value={transaction.categoryId} />
+                <DetailItem label="Category ID" value={transaction.categoryId} />
               )}
-            </View>
+            </YStack>
 
-            <View className="h-8" />
+            <Stack height={32} />
           </ScrollView>
 
-          <View className="px-6 pb-8 pt-4 border-t border-gray-100">
-            <Pressable
-              className="bg-background-tertiary py-3.5 rounded-xl active:bg-gray-200"
+          <FooterSection>
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
               onPress={onClose}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
             >
-              <Text className="text-base font-semibold text-text-primary text-center">Close</Text>
-            </Pressable>
-          </View>
-        </Pressable>
-      </Pressable>
+              Close
+            </Button>
+          </FooterSection>
+        </ModalContent>
+      </Backdrop>
     </Modal>
   );
 }

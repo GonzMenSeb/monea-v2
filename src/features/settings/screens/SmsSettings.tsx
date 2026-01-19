@@ -1,32 +1,155 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Pressable, ScrollView, Switch, View } from 'react-native';
+import { ScrollView, Switch } from 'react-native';
+import { styled, Stack, XStack, YStack, Text } from 'tamagui';
 
 import { useRouter } from 'expo-router';
 
 import { useSmsSync } from '@/features/sms-sync/hooks';
 import { Screen } from '@/shared/components/layout';
-import { Heading, Body, Caption } from '@/shared/components/ui';
 import { colors } from '@/shared/theme';
 
 import type { PermissionState } from '@/infrastructure/sms';
 
-const HEADER_STYLES = 'flex-row items-center px-4 pt-4 pb-2';
-const BACK_BUTTON_STYLES = 'p-2 -ml-2';
-const SECTION_CONTAINER_STYLES = 'mb-6';
-const SECTION_HEADER_STYLES = 'px-4 py-2';
-const CARD_STYLES = 'bg-surface-card mx-4 rounded-2xl overflow-hidden';
-const ITEM_STYLES = 'flex-row items-center justify-between px-4 py-3.5';
-const ITEM_SEPARATOR_STYLES = 'h-px bg-gray-100 ml-4';
-const ICON_CONTAINER_STYLES = 'w-10 h-10 rounded-xl items-center justify-center mr-3';
-const CONTENT_CONTAINER_STYLES = 'flex-1';
-const STATUS_CARD_STYLES = 'bg-surface-card mx-4 rounded-2xl p-4 mb-4';
-const BANK_CHIP_STYLES = 'px-3 py-1.5 rounded-full mr-2 mb-2';
-const ACTION_BUTTON_STYLES = 'bg-primary-500 mx-4 py-3 rounded-xl items-center';
-const ACTION_BUTTON_PRESSED_STYLES = 'bg-primary-600';
-const SECONDARY_BUTTON_STYLES =
-  'bg-surface-card mx-4 py-3 rounded-xl items-center border border-gray-200';
-const SECONDARY_BUTTON_PRESSED_STYLES = 'bg-gray-50';
+const HeaderContainer = styled(XStack, {
+  name: 'HeaderContainer',
+  alignItems: 'center',
+  paddingHorizontal: '$4',
+  paddingTop: '$4',
+  paddingBottom: '$2',
+});
+
+const BackButton = styled(Stack, {
+  name: 'BackButton',
+  padding: '$2',
+  marginLeft: -8,
+  pressStyle: { opacity: 0.7 },
+});
+
+const HeaderTitle = styled(Text, {
+  name: 'HeaderTitle',
+  flex: 1,
+  textAlign: 'center',
+  marginRight: 32,
+  fontSize: '$5',
+  fontWeight: '600',
+  color: '$textPrimary',
+});
+
+const SectionContainer = styled(YStack, {
+  name: 'SectionContainer',
+  marginBottom: '$6',
+});
+
+const SectionHeader = styled(Stack, {
+  name: 'SectionHeader',
+  paddingHorizontal: '$4',
+  paddingVertical: '$2',
+});
+
+const SectionLabel = styled(Text, {
+  name: 'SectionLabel',
+  textTransform: 'uppercase',
+  letterSpacing: 1,
+  fontWeight: '600',
+  fontSize: '$1',
+  color: '$textMuted',
+});
+
+const Card = styled(YStack, {
+  name: 'Card',
+  backgroundColor: '$backgroundSurface',
+  marginHorizontal: '$4',
+  borderRadius: '$4',
+  overflow: 'hidden',
+});
+
+const StatusCard = styled(YStack, {
+  name: 'StatusCard',
+  marginHorizontal: '$4',
+  borderRadius: '$4',
+  padding: '$4',
+  marginBottom: '$4',
+});
+
+const ItemRow = styled(XStack, {
+  name: 'ItemRow',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: '$4',
+  paddingVertical: 14,
+});
+
+const ItemSeparator = styled(Stack, {
+  name: 'ItemSeparator',
+  height: 1,
+  backgroundColor: '$border',
+  marginLeft: '$4',
+});
+
+const IconContainer = styled(Stack, {
+  name: 'IconContainer',
+  width: 40,
+  height: 40,
+  borderRadius: '$3',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginRight: '$3',
+});
+
+const BankChip = styled(Stack, {
+  name: 'BankChip',
+  paddingHorizontal: '$3',
+  paddingVertical: 6,
+  borderRadius: '$full',
+  marginRight: '$2',
+  marginBottom: '$2',
+});
+
+const ActionButton = styled(Stack, {
+  name: 'ActionButton',
+  backgroundColor: '$accentPrimary',
+  marginHorizontal: '$4',
+  paddingVertical: '$3',
+  borderRadius: '$3',
+  alignItems: 'center',
+  pressStyle: { opacity: 0.8 },
+});
+
+const SecondaryButton = styled(Stack, {
+  name: 'SecondaryButton',
+  backgroundColor: '$backgroundSurface',
+  marginHorizontal: '$4',
+  paddingVertical: '$3',
+  borderRadius: '$3',
+  alignItems: 'center',
+  borderWidth: 1,
+  borderColor: '$border',
+  pressStyle: { opacity: 0.8 },
+});
+
+const BodyText = styled(Text, {
+  name: 'BodyText',
+  color: '$textPrimary',
+  fontSize: '$3',
+
+  variants: {
+    size: {
+      lg: { fontSize: '$4' },
+      md: { fontSize: '$3' },
+      sm: { fontSize: '$2' },
+    },
+    secondary: {
+      true: { color: '$textSecondary' },
+    },
+  } as const,
+});
+
+const CaptionText = styled(Text, {
+  name: 'CaptionText',
+  color: '$textMuted',
+  fontSize: '$1',
+});
 
 interface PermissionStatusProps {
   state: PermissionState;
@@ -34,55 +157,51 @@ interface PermissionStatusProps {
   hasReceivePermission: boolean;
 }
 
+const STATUS_COLORS: Record<PermissionState, string> = {
+  granted: colors.accent.primary + '20',
+  denied: colors.accent.warning + '20',
+  blocked: colors.accent.danger + '20',
+  unknown: colors.background.elevated,
+  checking: colors.background.elevated,
+};
+
 function PermissionStatus({
   state,
   hasReadPermission,
   hasReceivePermission,
 }: PermissionStatusProps): React.ReactElement {
-  const statusConfig: Record<PermissionState, { icon: string; title: string; bgClass: string }> = {
-    granted: { icon: '✅', title: 'All permissions granted', bgClass: 'bg-success-50' },
-    denied: { icon: '⚠️', title: 'Permissions required', bgClass: 'bg-warning-50' },
-    blocked: { icon: '❌', title: 'Permissions blocked', bgClass: 'bg-error-50' },
-    unknown: { icon: '❓', title: 'Checking permissions...', bgClass: 'bg-gray-100' },
-    checking: { icon: '⏳', title: 'Checking permissions...', bgClass: 'bg-gray-100' },
+  const statusConfig: Record<PermissionState, { icon: string; title: string }> = {
+    granted: { icon: '✅', title: 'All permissions granted' },
+    denied: { icon: '⚠️', title: 'Permissions required' },
+    blocked: { icon: '❌', title: 'Permissions blocked' },
+    unknown: { icon: '❓', title: 'Checking permissions...' },
+    checking: { icon: '⏳', title: 'Checking permissions...' },
   };
 
   const config = statusConfig[state];
 
   return (
-    <View className={`${STATUS_CARD_STYLES} ${config.bgClass}`}>
-      <View className="flex-row items-center mb-3">
-        <Body size="lg" className="mr-2">
-          {config.icon}
-        </Body>
-        <Body className="font-semibold">{config.title}</Body>
-      </View>
+    <StatusCard backgroundColor={STATUS_COLORS[state]}>
+      <XStack alignItems="center" marginBottom="$3">
+        <BodyText size="lg" marginRight="$2">{config.icon}</BodyText>
+        <BodyText fontWeight="600">{config.title}</BodyText>
+      </XStack>
 
-      <View className="space-y-2">
-        <View className="flex-row items-center justify-between">
-          <Caption muted={false} className="text-text-secondary">
-            {'Read SMS'}
-          </Caption>
-          <Caption
-            muted={false}
-            className={hasReadPermission ? 'text-success-600' : 'text-error-500'}
-          >
+      <YStack gap="$2">
+        <XStack alignItems="center" justifyContent="space-between">
+          <CaptionText color="$textSecondary">Read SMS</CaptionText>
+          <CaptionText color={hasReadPermission ? colors.accent.primary : colors.accent.danger}>
             {hasReadPermission ? 'Granted' : 'Not granted'}
-          </Caption>
-        </View>
-        <View className="flex-row items-center justify-between">
-          <Caption muted={false} className="text-text-secondary">
-            {'Receive SMS'}
-          </Caption>
-          <Caption
-            muted={false}
-            className={hasReceivePermission ? 'text-success-600' : 'text-error-500'}
-          >
+          </CaptionText>
+        </XStack>
+        <XStack alignItems="center" justifyContent="space-between">
+          <CaptionText color="$textSecondary">Receive SMS</CaptionText>
+          <CaptionText color={hasReceivePermission ? colors.accent.primary : colors.accent.danger}>
             {hasReceivePermission ? 'Granted' : 'Not granted'}
-          </Caption>
-        </View>
-      </View>
-    </View>
+          </CaptionText>
+        </XStack>
+      </YStack>
+    </StatusCard>
   );
 }
 
@@ -103,21 +222,21 @@ function SettingRow({
 }: SettingRowProps): React.ReactElement {
   return (
     <>
-      <View className={ITEM_STYLES}>
-        <View className={`${ICON_CONTAINER_STYLES} bg-primary-50`}>
-          <Body size="lg">{icon}</Body>
-        </View>
-        <View className={CONTENT_CONTAINER_STYLES}>
-          <Body>{title}</Body>
+      <ItemRow>
+        <IconContainer backgroundColor={colors.accent.primary + '20'}>
+          <BodyText size="lg">{icon}</BodyText>
+        </IconContainer>
+        <YStack flex={1}>
+          <BodyText>{title}</BodyText>
           {description && (
-            <Caption muted={false} className="text-text-secondary mt-0.5">
+            <CaptionText color="$textSecondary" marginTop="$1">
               {description}
-            </Caption>
+            </CaptionText>
           )}
-        </View>
+        </YStack>
         {rightElement}
-      </View>
-      {!isLast && <View className={ITEM_SEPARATOR_STYLES} />}
+      </ItemRow>
+      {!isLast && <ItemSeparator />}
     </>
   );
 }
@@ -129,26 +248,27 @@ interface SyncStatsProps {
 
 function SyncStats({ unprocessedCount, isListening }: SyncStatsProps): React.ReactElement {
   return (
-    <View className={STATUS_CARD_STYLES}>
-      <View className="flex-row justify-between">
-        <View className="flex-1 items-center">
-          <Body size="lg" className="font-bold text-primary-600">
+    <StatusCard backgroundColor="$backgroundSurface">
+      <XStack justifyContent="space-between">
+        <YStack flex={1} alignItems="center">
+          <BodyText size="lg" fontWeight="700" color={colors.accent.primary}>
             {isListening ? 'Active' : 'Inactive'}
-          </Body>
-          <Caption className="mt-1">{'Sync Status'}</Caption>
-        </View>
-        <View className="w-px bg-gray-200" />
-        <View className="flex-1 items-center">
-          <Body
+          </BodyText>
+          <CaptionText marginTop="$1">Sync Status</CaptionText>
+        </YStack>
+        <Stack width={1} backgroundColor="$border" />
+        <YStack flex={1} alignItems="center">
+          <BodyText
             size="lg"
-            className={`font-bold ${unprocessedCount > 0 ? 'text-warning-500' : 'text-success-600'}`}
+            fontWeight="700"
+            color={unprocessedCount > 0 ? colors.accent.warning : colors.accent.primary}
           >
             {unprocessedCount}
-          </Body>
-          <Caption className="mt-1">{'Unprocessed'}</Caption>
-        </View>
-      </View>
-    </View>
+          </BodyText>
+          <CaptionText marginTop="$1">Unprocessed</CaptionText>
+        </YStack>
+      </XStack>
+    </StatusCard>
   );
 }
 
@@ -166,29 +286,20 @@ function getBankTextColor(bankColor: string): string {
 
 function SupportedBanks(): React.ReactElement {
   return (
-    <View className={SECTION_CONTAINER_STYLES}>
-      <View className={SECTION_HEADER_STYLES}>
-        <Caption className="uppercase tracking-wider font-semibold">{'Supported Banks'}</Caption>
-      </View>
-      <View className="px-4 flex-row flex-wrap">
+    <SectionContainer>
+      <SectionHeader>
+        <SectionLabel>Supported Banks</SectionLabel>
+      </SectionHeader>
+      <XStack paddingHorizontal="$4" flexWrap="wrap">
         {SUPPORTED_BANKS.map((bank) => (
-          <View
-            key={bank.code}
-            className={BANK_CHIP_STYLES}
-            style={{ backgroundColor: bank.color + '20' }}
-          >
-            <Caption
-              size="sm"
-              muted={false}
-              className="font-medium"
-              style={{ color: getBankTextColor(bank.color) }}
-            >
+          <BankChip key={bank.code} backgroundColor={bank.color + '20'}>
+            <CaptionText fontWeight="500" color={getBankTextColor(bank.color)}>
               {bank.name}
-            </Caption>
-          </View>
+            </CaptionText>
+          </BankChip>
         ))}
-      </View>
-    </View>
+      </XStack>
+    </SectionContainer>
   );
 }
 
@@ -255,25 +366,21 @@ export function SmsSettings(): React.ReactElement {
   return (
     <Screen
       variant="fixed"
-      backgroundColor={colors.background.secondary}
+      backgroundColor={colors.background.surface}
       edges={['top', 'left', 'right']}
       keyboardAvoiding={false}
     >
-      <View className={HEADER_STYLES}>
-        <Pressable onPress={handleBack} accessibilityRole="button" accessibilityLabel="Go back">
-          <View className={BACK_BUTTON_STYLES}>
-            <Body size="lg">{'←'}</Body>
-          </View>
-        </Pressable>
-        <Heading level="h3" className="flex-1 text-center mr-8">
-          {'SMS Settings'}
-        </Heading>
-      </View>
+      <HeaderContainer>
+        <BackButton onPress={handleBack} accessibilityRole="button" accessibilityLabel="Go back">
+          <BodyText size="lg">←</BodyText>
+        </BackButton>
+        <HeaderTitle>SMS Settings</HeaderTitle>
+      </HeaderContainer>
 
       <ScrollView
-        className="flex-1"
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="pt-4 pb-8"
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: 32 }}
       >
         <PermissionStatus
           state={permissionState}
@@ -282,40 +389,28 @@ export function SmsSettings(): React.ReactElement {
         />
 
         {showPermissionActions && (
-          <View className="mb-4">
+          <YStack marginBottom="$4">
             {permissionState === 'denied' ? (
-              <Pressable onPress={handleRequestPermissions} accessibilityRole="button">
-                {({ pressed }) => (
-                  <View
-                    className={`${ACTION_BUTTON_STYLES} ${pressed ? ACTION_BUTTON_PRESSED_STYLES : ''}`}
-                  >
-                    <Body className="text-white font-semibold">{'Grant Permissions'}</Body>
-                  </View>
-                )}
-              </Pressable>
+              <ActionButton onPress={handleRequestPermissions} accessibilityRole="button">
+                <BodyText color="$textInverse" fontWeight="600">Grant Permissions</BodyText>
+              </ActionButton>
             ) : (
-              <Pressable onPress={handleOpenSettings} accessibilityRole="button">
-                {({ pressed }) => (
-                  <View
-                    className={`${SECONDARY_BUTTON_STYLES} ${pressed ? SECONDARY_BUTTON_PRESSED_STYLES : ''}`}
-                  >
-                    <Body className="text-primary-600 font-semibold">{'Open App Settings'}</Body>
-                  </View>
-                )}
-              </Pressable>
+              <SecondaryButton onPress={handleOpenSettings} accessibilityRole="button">
+                <BodyText color={colors.accent.primary} fontWeight="600">Open App Settings</BodyText>
+              </SecondaryButton>
             )}
-          </View>
+          </YStack>
         )}
 
         {permissionsGranted && (
           <SyncStats unprocessedCount={unprocessedCount} isListening={isListening} />
         )}
 
-        <View className={SECTION_CONTAINER_STYLES}>
-          <View className={SECTION_HEADER_STYLES}>
-            <Caption className="uppercase tracking-wider font-semibold">{'Real-time Sync'}</Caption>
-          </View>
-          <View className={CARD_STYLES}>
+        <SectionContainer>
+          <SectionHeader>
+            <SectionLabel>Real-time Sync</SectionLabel>
+          </SectionHeader>
+          <Card>
             <SettingRow
               icon="📡"
               title="Auto-sync incoming SMS"
@@ -326,82 +421,72 @@ export function SmsSettings(): React.ReactElement {
                   value={isListening}
                   onValueChange={handleToggleSync}
                   disabled={!permissionsGranted}
-                  trackColor={{ false: colors.text.muted, true: colors.primary[200] }}
-                  thumbColor={isListening ? colors.primary[500] : '#f4f3f4'}
+                  trackColor={{ false: colors.text.muted, true: colors.accent.primary + '50' }}
+                  thumbColor={isListening ? colors.accent.primary : '#f4f3f4'}
                 />
               }
             />
-          </View>
+          </Card>
           {!permissionsGranted && (
-            <View className="px-4 mt-2">
-              <Caption className="text-warning-500">
-                {'Grant SMS permissions to enable real-time sync'}
-              </Caption>
-            </View>
+            <Stack paddingHorizontal="$4" marginTop="$2">
+              <CaptionText color={colors.accent.warning}>
+                Grant SMS permissions to enable real-time sync
+              </CaptionText>
+            </Stack>
           )}
-        </View>
+        </SectionContainer>
 
         {permissionsGranted && unprocessedCount > 0 && (
-          <View className="mb-6">
-            <Pressable
+          <YStack marginBottom="$6">
+            <SecondaryButton
               onPress={handleReprocessFailed}
               disabled={reprocessing || isSyncing}
+              opacity={reprocessing || isSyncing ? 0.5 : 1}
               accessibilityRole="button"
             >
-              {({ pressed }) => (
-                <View
-                  className={`${SECONDARY_BUTTON_STYLES} ${
-                    reprocessing || isSyncing
-                      ? 'opacity-50'
-                      : pressed
-                        ? SECONDARY_BUTTON_PRESSED_STYLES
-                        : ''
-                  }`}
-                >
-                  <Body className="text-primary-600 font-semibold">{reprocessButtonText}</Body>
-                </View>
-              )}
-            </Pressable>
-          </View>
+              <BodyText color={colors.accent.primary} fontWeight="600">
+                {reprocessButtonText}
+              </BodyText>
+            </SecondaryButton>
+          </YStack>
         )}
 
         <SupportedBanks />
 
-        <View className={SECTION_CONTAINER_STYLES}>
-          <View className={SECTION_HEADER_STYLES}>
-            <Caption className="uppercase tracking-wider font-semibold">{'How it works'}</Caption>
-          </View>
-          <View className={`${CARD_STYLES} p-4`}>
-            <View className="space-y-3">
-              <View className="flex-row items-start">
-                <Body className="mr-3">{'1.'}</Body>
-                <Body className="flex-1 text-text-secondary">
-                  {'Monea reads incoming SMS messages from supported Colombian banks'}
-                </Body>
-              </View>
-              <View className="flex-row items-start">
-                <Body className="mr-3">{'2.'}</Body>
-                <Body className="flex-1 text-text-secondary">
-                  {'Transaction data is extracted and stored locally on your device'}
-                </Body>
-              </View>
-              <View className="flex-row items-start">
-                <Body className="mr-3">{'3.'}</Body>
-                <Body className="flex-1 text-text-secondary">
-                  {'Your data never leaves your phone - complete privacy guaranteed'}
-                </Body>
-              </View>
-            </View>
-          </View>
-        </View>
+        <SectionContainer>
+          <SectionHeader>
+            <SectionLabel>How it works</SectionLabel>
+          </SectionHeader>
+          <Card padding="$4">
+            <YStack gap="$3">
+              <XStack alignItems="flex-start">
+                <BodyText marginRight="$3">1.</BodyText>
+                <BodyText flex={1} secondary>
+                  Monea reads incoming SMS messages from supported Colombian banks
+                </BodyText>
+              </XStack>
+              <XStack alignItems="flex-start">
+                <BodyText marginRight="$3">2.</BodyText>
+                <BodyText flex={1} secondary>
+                  Transaction data is extracted and stored locally on your device
+                </BodyText>
+              </XStack>
+              <XStack alignItems="flex-start">
+                <BodyText marginRight="$3">3.</BodyText>
+                <BodyText flex={1} secondary>
+                  Your data never leaves your phone - complete privacy guaranteed
+                </BodyText>
+              </XStack>
+            </YStack>
+          </Card>
+        </SectionContainer>
 
-        <View className="px-4">
-          <Caption className="text-center">
-            {
-              'SMS data is processed locally and never uploaded to any server. Your financial information remains private and secure on your device.'
-            }
-          </Caption>
-        </View>
+        <Stack paddingHorizontal="$4">
+          <CaptionText textAlign="center">
+            SMS data is processed locally and never uploaded to any server. Your financial
+            information remains private and secure on your device.
+          </CaptionText>
+        </Stack>
       </ScrollView>
     </Screen>
   );

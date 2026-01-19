@@ -1,14 +1,124 @@
 import { useCallback } from 'react';
 
-import { ActivityIndicator, Pressable, Text, View, type PressableProps } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import { styled, Stack, Text, type GetProps } from 'tamagui';
 
 import { useHaptics } from '@/shared/hooks/useHaptics';
 import { colors } from '@/shared/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps extends Omit<PressableProps, 'children'> {
+const ButtonFrame = styled(Stack, {
+  name: 'Button',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexDirection: 'row',
+  borderRadius: '$3',
+  pressStyle: {
+    opacity: 0.8,
+    scale: 0.98,
+  },
+  animation: 'fast',
+
+  variants: {
+    variant: {
+      primary: {
+        backgroundColor: '$accentPrimary',
+      },
+      secondary: {
+        backgroundColor: '$backgroundElevated',
+      },
+      outline: {
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderColor: '$accentPrimary',
+      },
+      ghost: {
+        backgroundColor: 'transparent',
+      },
+      danger: {
+        backgroundColor: '$accentDanger',
+      },
+    },
+    size: {
+      sm: {
+        paddingHorizontal: '$3',
+        paddingVertical: '$1.5',
+        height: 36,
+      },
+      md: {
+        paddingHorizontal: '$4',
+        paddingVertical: '$2.5',
+        height: 44,
+      },
+      lg: {
+        paddingHorizontal: '$6',
+        paddingVertical: '$3.5',
+        height: 52,
+      },
+    },
+    fullWidth: {
+      true: {
+        width: '100%',
+      },
+    },
+    disabled: {
+      true: {
+        opacity: 0.5,
+        pointerEvents: 'none',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md',
+  },
+});
+
+const ButtonText = styled(Text, {
+  name: 'ButtonText',
+  fontWeight: '600',
+
+  variants: {
+    variant: {
+      primary: {
+        color: '$textInverse',
+      },
+      secondary: {
+        color: '$textPrimary',
+      },
+      outline: {
+        color: '$accentPrimary',
+      },
+      ghost: {
+        color: '$accentPrimary',
+      },
+      danger: {
+        color: '$white',
+      },
+    },
+    size: {
+      sm: {
+        fontSize: '$2',
+      },
+      md: {
+        fontSize: '$3',
+      },
+      lg: {
+        fontSize: '$4',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md',
+  },
+});
+
+interface ButtonProps extends Omit<GetProps<typeof ButtonFrame>, 'children'> {
   children: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -18,44 +128,6 @@ interface ButtonProps extends Omit<PressableProps, 'children'> {
   fullWidth?: boolean;
   haptic?: boolean;
 }
-
-const VARIANT_STYLES: Record<ButtonVariant, { base: string; pressed: string; text: string }> = {
-  primary: {
-    base: 'bg-primary-500',
-    pressed: 'bg-primary-600',
-    text: 'text-white',
-  },
-  secondary: {
-    base: 'bg-background-tertiary',
-    pressed: 'bg-gray-200',
-    text: 'text-text-primary',
-  },
-  outline: {
-    base: 'bg-transparent border-2 border-primary-500',
-    pressed: 'bg-primary-50',
-    text: 'text-primary-500',
-  },
-};
-
-const SIZE_STYLES: Record<ButtonSize, { container: string; text: string; icon: number }> = {
-  sm: {
-    container: 'px-3 py-1.5 rounded-lg',
-    text: 'text-sm font-medium',
-    icon: 16,
-  },
-  md: {
-    container: 'px-4 py-2.5 rounded-xl',
-    text: 'text-base font-semibold',
-    icon: 20,
-  },
-  lg: {
-    container: 'px-6 py-3.5 rounded-xl',
-    text: 'text-lg font-semibold',
-    icon: 24,
-  },
-};
-
-const DISABLED_STYLES = 'opacity-50';
 
 export function Button({
   children,
@@ -68,66 +140,46 @@ export function Button({
   haptic = true,
   disabled,
   onPress,
-  ...pressableProps
+  ...props
 }: ButtonProps): React.ReactElement {
   const { light } = useHaptics();
-  const variantStyle = VARIANT_STYLES[variant];
-  const sizeStyle = SIZE_STYLES[size];
   const isDisabled = disabled || loading;
 
-  const handlePress = useCallback(
-    (event: Parameters<NonNullable<PressableProps['onPress']>>[0]) => {
-      if (!isDisabled && onPress) {
-        if (haptic) {
-          light();
-        }
-        onPress(event);
+  const handlePress = useCallback((event: Parameters<NonNullable<typeof onPress>>[0]) => {
+    if (!isDisabled && onPress) {
+      if (haptic) {
+        light();
       }
-    },
-    [isDisabled, onPress, haptic, light]
-  );
-
-  const getContainerStyle = (pressed: boolean): string => {
-    const baseStyles = [
-      'flex-row items-center justify-center',
-      sizeStyle.container,
-      pressed ? variantStyle.pressed : variantStyle.base,
-    ];
-
-    if (fullWidth) {
-      baseStyles.push('w-full');
+      onPress(event);
     }
+  }, [isDisabled, onPress, haptic, light]);
 
-    if (isDisabled) {
-      baseStyles.push(DISABLED_STYLES);
-    }
-
-    return baseStyles.join(' ');
-  };
-
-  const loaderColor = variant === 'primary' ? colors.text.inverse : colors.primary.DEFAULT;
+  const loaderColor = variant === 'primary' || variant === 'danger'
+    ? colors.text.inverse
+    : colors.accent.primary;
 
   return (
-    <Pressable
-      {...pressableProps}
+    <ButtonFrame
+      variant={variant}
+      size={size}
+      fullWidth={fullWidth}
       disabled={isDisabled}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}
+      {...props}
     >
-      {({ pressed }) => (
-        <View className={getContainerStyle(pressed)}>
-          {loading ? (
-            <ActivityIndicator size="small" color={loaderColor} />
-          ) : (
-            <>
-              {leftIcon && <View className="mr-2">{leftIcon}</View>}
-              <Text className={`${sizeStyle.text} ${variantStyle.text}`}>{children}</Text>
-              {rightIcon && <View className="ml-2">{rightIcon}</View>}
-            </>
-          )}
-        </View>
+      {loading ? (
+        <ActivityIndicator size="small" color={loaderColor} />
+      ) : (
+        <>
+          {leftIcon && <Stack marginRight="$2">{leftIcon}</Stack>}
+          <ButtonText variant={variant} size={size}>
+            {children}
+          </ButtonText>
+          {rightIcon && <Stack marginLeft="$2">{rightIcon}</Stack>}
+        </>
       )}
-    </Pressable>
+    </ButtonFrame>
   );
 }

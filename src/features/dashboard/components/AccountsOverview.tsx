@@ -1,9 +1,11 @@
 import { useCallback, memo } from 'react';
 
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
 import { AccountCard } from '@/shared/components/ui/Card';
+import { colors } from '@/shared/theme';
 
 import type Account from '@/infrastructure/database/models/Account';
 
@@ -18,24 +20,81 @@ interface AccountsOverviewProps {
   maxItems?: number;
 }
 
-const CONTAINER_STYLES = 'mt-6';
-const HEADER_CONTAINER_STYLES = 'flex-row justify-between items-center px-4 mb-3';
-const TITLE_STYLES = 'text-lg font-semibold text-text-primary';
-const SEE_ALL_STYLES = 'text-sm font-medium text-primary-500';
-const SEE_ALL_PRESSED_STYLES = 'text-sm font-medium text-primary-700';
-const SCROLL_CONTAINER_STYLES = 'pl-4';
-const SCROLL_CONTENT_STYLES = 'pr-4';
-const ITEM_STYLES = 'w-72 mr-3';
-const ITEM_LAST_STYLES = 'w-72';
-const EMPTY_CONTAINER_STYLES = 'py-8 items-center px-4';
-const EMPTY_TEXT_STYLES = 'text-sm text-text-muted text-center';
-const ERROR_TEXT_STYLES = 'text-sm text-semantic-error text-center';
-const ADD_CARD_STYLES =
-  'w-72 h-32 rounded-2xl border-2 border-dashed border-gray-300 items-center justify-center';
-const ADD_CARD_PRESSED_STYLES =
-  'w-72 h-32 rounded-2xl border-2 border-dashed border-primary-400 items-center justify-center bg-primary-50';
-const ADD_TEXT_STYLES = 'text-sm font-medium text-text-secondary mt-2';
-const ADD_ICON_STYLES = 'text-2xl text-text-secondary';
+const SectionHeader = styled(XStack, {
+  name: 'SectionHeader',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: '$4',
+  marginBottom: '$3',
+});
+
+const SectionTitle = styled(Text, {
+  name: 'SectionTitle',
+  color: '$textPrimary',
+  fontSize: '$4',
+  fontWeight: '600',
+});
+
+const SeeAllButton = styled(Text, {
+  name: 'SeeAllButton',
+  color: '$accentPrimary',
+  fontSize: '$2',
+  fontWeight: '500',
+  pressStyle: {
+    opacity: 0.7,
+  },
+});
+
+const EmptyContainer = styled(YStack, {
+  name: 'EmptyContainer',
+  paddingVertical: '$8',
+  alignItems: 'center',
+  paddingHorizontal: '$4',
+});
+
+const EmptyText = styled(Text, {
+  name: 'EmptyText',
+  color: '$textMuted',
+  fontSize: '$2',
+  textAlign: 'center',
+});
+
+const ErrorText = styled(Text, {
+  name: 'ErrorText',
+  color: '$accentDanger',
+  fontSize: '$2',
+  textAlign: 'center',
+});
+
+const AddAccountCard = styled(Stack, {
+  name: 'AddAccountCard',
+  width: 288,
+  height: 128,
+  borderRadius: '$4',
+  borderWidth: 2,
+  borderStyle: 'dashed',
+  borderColor: '$border',
+  alignItems: 'center',
+  justifyContent: 'center',
+  pressStyle: {
+    borderColor: '$accentPrimary',
+    backgroundColor: 'rgba(0, 212, 170, 0.05)',
+  },
+});
+
+const AddIcon = styled(Text, {
+  name: 'AddIcon',
+  color: '$textSecondary',
+  fontSize: 24,
+});
+
+const AddText = styled(Text, {
+  name: 'AddText',
+  color: '$textSecondary',
+  fontSize: '$2',
+  fontWeight: '500',
+  marginTop: '$2',
+});
 
 const AccountRow = memo(function AccountRow({
   account,
@@ -56,7 +115,7 @@ const AccountRow = memo(function AccountRow({
   );
 
   return (
-    <View className={isLast ? ITEM_LAST_STYLES : ITEM_STYLES}>
+    <Stack width={288} marginRight={isLast ? 0 : '$3'}>
       <AccountCard
         account={{
           id: account.id,
@@ -70,28 +129,24 @@ const AccountRow = memo(function AccountRow({
         formatCurrency={formatCurrency}
         onSelect={handleSelect}
       />
-    </View>
+    </Stack>
   );
 });
 
-function AddAccountCard({ onPress }: { onPress?: () => void }): React.ReactElement | null {
+function AddAccountButton({ onPress }: { onPress?: () => void }): React.ReactElement | null {
   if (!onPress) {
     return null;
   }
 
   return (
-    <Pressable
+    <AddAccountCard
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel="Add a new bank account"
     >
-      {({ pressed }) => (
-        <View className={pressed ? ADD_CARD_PRESSED_STYLES : ADD_CARD_STYLES}>
-          <Text className={ADD_ICON_STYLES}>+</Text>
-          <Text className={ADD_TEXT_STYLES}>Add Account</Text>
-        </View>
-      )}
-    </Pressable>
+      <AddIcon>+</AddIcon>
+      <AddText>Add Account</AddText>
+    </AddAccountCard>
   );
 }
 
@@ -110,69 +165,66 @@ export function AccountsOverview({
 
   if (isLoading && accounts.length === 0) {
     return (
-      <View className={CONTAINER_STYLES}>
-        <View className={HEADER_CONTAINER_STYLES}>
-          <Text className={TITLE_STYLES}>Your Accounts</Text>
-        </View>
+      <YStack marginTop="$6">
+        <SectionHeader>
+          <SectionTitle>Your Accounts</SectionTitle>
+        </SectionHeader>
         <LoadingState message="Loading accounts..." variant="inline" />
-      </View>
+      </YStack>
     );
   }
 
   if (error) {
     return (
-      <View className={CONTAINER_STYLES}>
-        <View className={HEADER_CONTAINER_STYLES}>
-          <Text className={TITLE_STYLES}>Your Accounts</Text>
-        </View>
-        <View className={EMPTY_CONTAINER_STYLES}>
-          <Text className={ERROR_TEXT_STYLES}>Unable to load accounts</Text>
-        </View>
-      </View>
+      <YStack marginTop="$6">
+        <SectionHeader>
+          <SectionTitle>Your Accounts</SectionTitle>
+        </SectionHeader>
+        <EmptyContainer>
+          <ErrorText>Unable to load accounts</ErrorText>
+        </EmptyContainer>
+      </YStack>
     );
   }
 
   if (displayedAccounts.length === 0) {
     return (
-      <View className={CONTAINER_STYLES}>
-        <View className={HEADER_CONTAINER_STYLES}>
-          <Text className={TITLE_STYLES}>Your Accounts</Text>
-        </View>
-        <View className={EMPTY_CONTAINER_STYLES}>
-          <Text className={EMPTY_TEXT_STYLES}>
+      <YStack marginTop="$6">
+        <SectionHeader>
+          <SectionTitle>Your Accounts</SectionTitle>
+        </SectionHeader>
+        <EmptyContainer>
+          <EmptyText>
             No accounts linked yet. Link your bank accounts to start tracking.
-          </Text>
+          </EmptyText>
           {onAddAccountPress && (
-            <View className="mt-4">
-              <AddAccountCard onPress={onAddAccountPress} />
-            </View>
+            <Stack marginTop="$4">
+              <AddAccountButton onPress={onAddAccountPress} />
+            </Stack>
           )}
-        </View>
-      </View>
+        </EmptyContainer>
+      </YStack>
     );
   }
 
   return (
-    <View className={CONTAINER_STYLES}>
-      <View className={HEADER_CONTAINER_STYLES}>
-        <Text className={TITLE_STYLES}>Your Accounts</Text>
+    <YStack marginTop="$6">
+      <SectionHeader>
+        <SectionTitle>Your Accounts</SectionTitle>
         {(hasMore || onSeeAllPress) && (
-          <Pressable
+          <SeeAllButton
             onPress={onSeeAllPress}
             accessibilityRole="button"
             accessibilityLabel="See all accounts"
           >
-            {({ pressed }) => (
-              <Text className={pressed ? SEE_ALL_PRESSED_STYLES : SEE_ALL_STYLES}>See All</Text>
-            )}
-          </Pressable>
+            See All
+          </SeeAllButton>
         )}
-      </View>
+      </SectionHeader>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        className={SCROLL_CONTAINER_STYLES}
-        contentContainerClassName={SCROLL_CONTENT_STYLES}
+        contentContainerStyle={{ paddingLeft: 16, paddingRight: 16 }}
       >
         {displayedAccounts.map((account, index) => (
           <AccountRow
@@ -184,12 +236,12 @@ export function AccountsOverview({
           />
         ))}
         {onAddAccountPress && (
-          <View className={ITEM_LAST_STYLES}>
-            <AddAccountCard onPress={onAddAccountPress} />
-          </View>
+          <Stack width={288}>
+            <AddAccountButton onPress={onAddAccountPress} />
+          </Stack>
         )}
       </ScrollView>
-    </View>
+    </YStack>
   );
 }
 

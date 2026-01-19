@@ -1,9 +1,9 @@
 import { useCallback, useRef, memo } from 'react';
 
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-
+import { StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
+import { Stack, Text, XStack } from 'tamagui';
 
 import { useHaptics } from '@/shared/hooks/useHaptics';
 import { colors } from '@/shared/theme';
@@ -50,10 +50,12 @@ function SwipeAction({
       accessibilityRole="button"
       accessibilityLabel={label}
     >
-      <View style={styles.swipeActionContent}>
-        <MaterialCommunityIcons name={icon} size={24} color={colors.text.inverse} />
-        <Text style={styles.swipeActionLabel}>{label}</Text>
-      </View>
+      <Stack alignItems="center" justifyContent="center" gap="$1">
+        <MaterialCommunityIcons name={icon} size={24} color={colors.text.primary} />
+        <Text color="$textPrimary" fontSize="$1" fontWeight="600">
+          {label}
+        </Text>
+      </Stack>
     </Pressable>
   );
 }
@@ -64,14 +66,14 @@ const RightActionsComponent = memo(function RightActions({
   onDelete: () => void;
 }): React.ReactElement {
   return (
-    <View style={styles.rightActionsContainer}>
+    <XStack marginRight="$4">
       <SwipeAction
         icon="delete-outline"
         label="Delete"
-        backgroundColor={colors.semantic.error}
+        backgroundColor={colors.accent.danger}
         onPress={onDelete}
       />
-    </View>
+    </XStack>
   );
 });
 
@@ -81,14 +83,14 @@ const LeftActionsComponent = memo(function LeftActions({
   onCategorize: () => void;
 }): React.ReactElement {
   return (
-    <View style={styles.leftActionsContainer}>
+    <XStack marginLeft="$4">
       <SwipeAction
         icon="tag-outline"
         label="Category"
-        backgroundColor={colors.primary.DEFAULT}
+        backgroundColor={colors.accent.primary}
         onPress={onCategorize}
       />
-    </View>
+    </XStack>
   );
 });
 
@@ -174,29 +176,11 @@ export const SwipeableTransactionItem = memo(function SwipeableTransactionItem({
 });
 
 const styles = StyleSheet.create({
-  rightActionsContainer: {
-    flexDirection: 'row',
-    marginRight: 16,
-  },
-  leftActionsContainer: {
-    flexDirection: 'row',
-    marginLeft: 16,
-  },
   swipeAction: {
     width: 80,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
-  },
-  swipeActionContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  swipeActionLabel: {
-    color: colors.text.inverse,
-    fontSize: 12,
-    fontWeight: '600',
   },
 });
 

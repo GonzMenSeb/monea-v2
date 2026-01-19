@@ -1,8 +1,7 @@
 import { memo, useCallback } from 'react';
 
-import { Pressable, Text, View } from 'react-native';
-
-import { ActivityIndicator } from 'react-native-paper';
+import { Pressable, ActivityIndicator } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
 
@@ -25,39 +24,34 @@ interface SyncStatusProps {
 
 const STATUS_CONFIG = {
   syncing: {
-    color: colors.semantic.info,
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    textColor: 'text-blue-700',
-    icon: 'syncing',
+    color: colors.accent.info,
+    bgColor: colors.accent.info + '20',
+    textColor: colors.accent.info,
+    dotColor: colors.accent.info,
   },
   listening: {
-    color: colors.semantic.success,
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
-    textColor: 'text-green-700',
-    icon: 'active',
+    color: colors.accent.primary,
+    bgColor: colors.accent.primary + '20',
+    textColor: colors.accent.primary,
+    dotColor: colors.accent.primary,
   },
   idle: {
     color: colors.text.secondary,
-    bgColor: 'bg-gray-50',
-    borderColor: 'border-gray-200',
-    textColor: 'text-gray-600',
-    icon: 'idle',
+    bgColor: colors.background.surface,
+    textColor: colors.text.secondary,
+    dotColor: colors.text.muted,
   },
   error: {
-    color: colors.semantic.error,
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    textColor: 'text-red-700',
-    icon: 'error',
+    color: colors.accent.danger,
+    bgColor: colors.accent.danger + '20',
+    textColor: colors.accent.danger,
+    dotColor: colors.accent.danger,
   },
   permissionDenied: {
-    color: colors.semantic.warning,
-    bgColor: 'bg-yellow-50',
-    borderColor: 'border-yellow-200',
-    textColor: 'text-yellow-700',
-    icon: 'warning',
+    color: colors.accent.warning,
+    bgColor: colors.accent.warning + '20',
+    textColor: colors.accent.warning,
+    dotColor: colors.accent.warning,
   },
 } as const;
 
@@ -120,21 +114,10 @@ function getStatusDescription(
   }
 }
 
-const CONTAINER_STYLES = {
-  compact: 'flex-row items-center px-3 py-2 rounded-lg border',
-  detailed: 'px-4 py-3 rounded-xl border',
-  badge: 'flex-row items-center px-2 py-1 rounded-full',
-};
-
-function getIndicatorDotStyle(statusType: StatusType): string {
-  if (statusType === 'listening') {
-    return 'bg-green-500';
-  }
-  if (statusType === 'error') {
-    return 'bg-red-500';
-  }
-  return 'bg-gray-400';
-}
+const StatusDot = styled(Stack, {
+  name: 'StatusDot',
+  borderRadius: '$full',
+});
 
 function CompactContent({
   statusType,
@@ -146,16 +129,16 @@ function CompactContent({
   config: (typeof STATUS_CONFIG)[StatusType];
 }): React.ReactElement {
   return (
-    <>
+    <XStack alignItems="center">
       {statusType === 'syncing' ? (
         <ActivityIndicator size="small" color={config.color} />
       ) : (
-        <View className={`w-2 h-2 rounded-full ${getIndicatorDotStyle(statusType)}`} />
+        <StatusDot width={8} height={8} backgroundColor={config.dotColor} />
       )}
-      <Text className={`ml-2 text-sm font-medium ${config.textColor}`}>
+      <Text marginLeft="$2" fontSize="$2" fontWeight="500" color={config.textColor}>
         {getStatusLabel(statusType, isListening)}
       </Text>
-    </>
+    </XStack>
   );
 }
 
@@ -177,29 +160,34 @@ function DetailedContent({
   unprocessedCount: number;
 }): React.ReactElement {
   const description = getStatusDescription(statusType, lastProcessResult, unprocessedCount);
-  const messageClassName = `mt-1 text-sm ${statusType === 'error' ? 'text-red-600' : 'text-text-secondary'}`;
 
   return (
-    <>
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center">
+    <YStack>
+      <XStack alignItems="center" justifyContent="space-between">
+        <XStack alignItems="center">
           {statusType === 'syncing' ? (
             <ActivityIndicator size="small" color={config.color} />
           ) : (
-            <View className={`w-3 h-3 rounded-full ${getIndicatorDotStyle(statusType)}`} />
+            <StatusDot width={12} height={12} backgroundColor={config.dotColor} />
           )}
-          <Text className={`ml-2 text-base font-semibold ${config.textColor}`}>
+          <Text marginLeft="$2" fontSize="$3" fontWeight="600" color={config.textColor}>
             {getStatusLabel(statusType, isListening)}
           </Text>
-        </View>
+        </XStack>
         {lastSyncResult && statusType !== 'error' && (
-          <Text className="text-xs text-text-muted">{lastSyncResult.created} new</Text>
+          <Text fontSize="$1" color="$textMuted">{lastSyncResult.created} new</Text>
         )}
-      </View>
+      </XStack>
       {(description || error) && (
-        <Text className={messageClassName}>{error?.message ?? description}</Text>
+        <Text
+          marginTop="$1"
+          fontSize="$2"
+          color={statusType === 'error' ? '$danger' : '$textSecondary'}
+        >
+          {error?.message ?? description}
+        </Text>
       )}
-    </>
+    </YStack>
   );
 }
 
@@ -217,16 +205,16 @@ function BadgeContent({
   const showCount = unprocessedCount > 0 && statusType !== 'syncing';
 
   return (
-    <>
+    <XStack alignItems="center">
       {statusType === 'syncing' ? (
         <ActivityIndicator size={12} color={config.color} />
       ) : (
-        <View className={`w-1.5 h-1.5 rounded-full ${getIndicatorDotStyle(statusType)}`} />
+        <StatusDot width={6} height={6} backgroundColor={config.dotColor} />
       )}
-      <Text className={`ml-1.5 text-xs font-medium ${config.textColor}`}>
+      <Text marginLeft="$1" fontSize="$1" fontWeight="500" color={config.textColor}>
         {showCount ? unprocessedCount : getStatusLabel(statusType, isListening)}
       </Text>
-    </>
+    </XStack>
   );
 }
 
@@ -243,8 +231,6 @@ export const SyncStatus = memo(function SyncStatus({
 }: SyncStatusProps): React.ReactElement {
   const statusType = getStatusType({ isSyncing, isListening, permissionState, error });
   const config = STATUS_CONFIG[statusType];
-
-  const containerStyle = `${CONTAINER_STYLES[variant]} ${config.bgColor} ${variant !== 'badge' ? config.borderColor : ''}`;
 
   const handlePress = useCallback(() => {
     onPress?.();
@@ -278,20 +264,28 @@ export const SyncStatus = memo(function SyncStatus({
     }
   };
 
+  const containerStyle = {
+    backgroundColor: config.bgColor,
+    borderRadius: variant === 'badge' ? 999 : 12,
+    paddingHorizontal: variant === 'badge' ? 8 : variant === 'compact' ? 12 : 16,
+    paddingVertical: variant === 'badge' ? 4 : variant === 'compact' ? 8 : 12,
+  };
+
   if (onPress) {
     return (
       <Pressable
         onPress={handlePress}
         accessibilityRole="button"
         accessibilityLabel={getStatusLabel(statusType, isListening)}
-        className={containerStyle}
       >
-        {renderContent()}
+        <Stack {...containerStyle}>
+          {renderContent()}
+        </Stack>
       </Pressable>
     );
   }
 
-  return <View className={containerStyle}>{renderContent()}</View>;
+  return <Stack {...containerStyle}>{renderContent()}</Stack>;
 });
 
 export type { SyncStatusProps, SyncStatusVariant };

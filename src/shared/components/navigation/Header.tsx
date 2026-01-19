@@ -82,15 +82,15 @@ function HeaderButton({
 
 const VARIANT_STYLES: Record<HeaderVariant, object> = {
   default: {
-    backgroundColor: colors.background.primary,
+    backgroundColor: colors.background.base,
     borderBottomWidth: 1,
-    borderBottomColor: colors.background.tertiary,
+    borderBottomColor: colors.border.default,
   },
   transparent: {
     backgroundColor: 'transparent',
   },
   elevated: {
-    backgroundColor: colors.background.primary,
+    backgroundColor: colors.background.surface,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

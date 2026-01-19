@@ -208,7 +208,7 @@ export function DashboardSkeleton(): React.ReactElement {
 
 const styles = StyleSheet.create({
   skeleton: {
-    backgroundColor: colors.background.tertiary,
+    backgroundColor: colors.background.elevated,
   },
   group: {
     flexDirection: 'column',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   card: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.background.surface,
     borderRadius: 12,
     padding: 16,
     gap: 12,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   balanceCard: {
-    backgroundColor: colors.primary.DEFAULT,
+    backgroundColor: colors.background.surface,
     borderRadius: 16,
     padding: 20,
     gap: 8,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   },
   accountCard: {
     flex: 1,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.background.surface,
     borderRadius: 12,
     padding: 12,
     flexDirection: 'row',

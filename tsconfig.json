@@ -15,7 +15,8 @@
       "@/core/*": ["src/core/*"],
       "@/infrastructure/*": ["src/infrastructure/*"],
       "@/app/*": ["src/app/*"]
-    }
+    },
+    "types": ["react-native", "@types/react"]
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { View, Text } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -15,16 +15,28 @@ import { Screen } from '@/shared/components/layout';
 import { colors } from '@/shared/theme';
 import { formatCurrency, getDateRangeForCurrentMonth } from '@/shared/utils';
 
-const HEADER_CONTAINER_STYLES = 'px-4 pt-4 pb-2';
-const HEADER_TITLE_STYLES = 'text-2xl font-bold text-text-primary';
-const SUMMARY_CONTAINER_STYLES =
-  'flex-row justify-between px-4 py-3 mb-2 bg-background-secondary rounded-xl mx-4';
-const SUMMARY_ITEM_STYLES = 'items-center';
-const SUMMARY_LABEL_STYLES = 'text-xs text-text-secondary mb-1';
-const SUMMARY_INCOME_STYLES = 'text-sm font-semibold text-semantic-success';
-const SUMMARY_EXPENSE_STYLES = 'text-sm font-semibold text-semantic-error';
-const SUMMARY_NET_STYLES = 'text-sm font-semibold text-text-primary';
-const LIST_CONTAINER_STYLES = 'flex-1';
+const SummaryContainer = styled(XStack, {
+  name: 'SummaryContainer',
+  justifyContent: 'space-between',
+  paddingHorizontal: '$4',
+  paddingVertical: '$3',
+  marginBottom: '$2',
+  backgroundColor: '$backgroundSurface',
+  borderRadius: '$4',
+  marginHorizontal: '$4',
+});
+
+const SummaryItem = styled(YStack, {
+  name: 'SummaryItem',
+  alignItems: 'center',
+});
+
+const SummaryLabel = styled(Text, {
+  name: 'SummaryLabel',
+  fontSize: '$1',
+  color: '$textSecondary',
+  marginBottom: '$1',
+});
 
 interface TransactionSummaryHeaderProps {
   totalIncome: number;
@@ -38,20 +50,26 @@ function TransactionSummaryHeader({
   netBalance,
 }: TransactionSummaryHeaderProps): React.ReactElement {
   return (
-    <View className={SUMMARY_CONTAINER_STYLES}>
-      <View className={SUMMARY_ITEM_STYLES}>
-        <Text className={SUMMARY_LABEL_STYLES}>Income</Text>
-        <Text className={SUMMARY_INCOME_STYLES}>{formatCurrency(totalIncome)}</Text>
-      </View>
-      <View className={SUMMARY_ITEM_STYLES}>
-        <Text className={SUMMARY_LABEL_STYLES}>Expenses</Text>
-        <Text className={SUMMARY_EXPENSE_STYLES}>{formatCurrency(totalExpense)}</Text>
-      </View>
-      <View className={SUMMARY_ITEM_STYLES}>
-        <Text className={SUMMARY_LABEL_STYLES}>Balance</Text>
-        <Text className={SUMMARY_NET_STYLES}>{formatCurrency(netBalance)}</Text>
-      </View>
-    </View>
+    <SummaryContainer>
+      <SummaryItem>
+        <SummaryLabel>Income</SummaryLabel>
+        <Text fontSize="$2" fontWeight="600" color="$income">
+          {formatCurrency(totalIncome)}
+        </Text>
+      </SummaryItem>
+      <SummaryItem>
+        <SummaryLabel>Expenses</SummaryLabel>
+        <Text fontSize="$2" fontWeight="600" color="$expense">
+          {formatCurrency(totalExpense)}
+        </Text>
+      </SummaryItem>
+      <SummaryItem>
+        <SummaryLabel>Balance</SummaryLabel>
+        <Text fontSize="$2" fontWeight="600" color="$textPrimary">
+          {formatCurrency(netBalance)}
+        </Text>
+      </SummaryItem>
+    </SummaryContainer>
   );
 }
 
@@ -92,14 +110,16 @@ export default function TransactionsScreen(): React.ReactElement {
   return (
     <Screen
       variant="fixed"
-      backgroundColor={colors.background.primary}
+      backgroundColor={colors.background.base}
       edges={['top', 'left', 'right']}
       keyboardAvoiding={false}
     >
-      <View className={HEADER_CONTAINER_STYLES}>
-        <Text className={HEADER_TITLE_STYLES}>Transactions</Text>
-      </View>
-      <View className={LIST_CONTAINER_STYLES}>
+      <Stack paddingHorizontal="$4" paddingTop="$4" paddingBottom="$2">
+        <Text fontSize="$6" fontWeight="700" color="$textPrimary">
+          Transactions
+        </Text>
+      </Stack>
+      <Stack flex={1}>
         <TransactionList
           transactions={transactions}
           isLoading={isLoading}
@@ -109,7 +129,7 @@ export default function TransactionsScreen(): React.ReactElement {
           formatCurrency={formatCurrency}
           ListHeaderComponent={listHeaderComponent}
         />
-      </View>
+      </Stack>
     </Screen>
   );
 }

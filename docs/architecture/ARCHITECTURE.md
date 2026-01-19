@@ -116,21 +116,27 @@ The application follows a **vertical slice architecture** where code is organize
 - Handles transaction volumes expected (1000+ per month per account)
 - Query performance remains constant as data grows
 
-### UI Framework: NativeWind + React Native Paper
+### UI Framework: Tamagui
 
-| Library | Purpose |
+| Feature | Benefit |
 |---------|---------|
-| NativeWind | Utility-first styling (TailwindCSS for RN) |
-| React Native Paper | Material Design 3 components |
+| Styled components | Type-safe, co-located styles with variants |
+| Theme tokens | Consistent spacing, colors, typography via $tokens |
+| Dark theme | Premium crypto/broker aesthetic |
+| Performance | Compile-time optimization, minimal runtime |
 
-**Why dual frameworks:**
-- NativeWind: Rapid UI development, consistent spacing/colors, smaller component files
-- React Native Paper: Pre-built accessible components (dialogs, FABs, menus) that follow Material guidelines
+**Why Tamagui:**
+- Type-safe styling with full TypeScript support
+- Built-in dark theme support with theme tokens
+- Styled component pattern familiar to web developers
+- Excellent performance through compile-time optimizations
+- Active ecosystem with React Native focus
 
-**Alternatives Considered:**
-- Tamagui: Powerful but steeper learning curve
-- Gluestack: Good but less mature ecosystem
-- Styled Components: More verbose than utility classes
+**Theme Design:**
+- Dark backgrounds (#0A0B0E base, #12141A surface, #1A1D26 elevated)
+- Teal primary accent (#00D4AA) for income/positive actions
+- Red accent (#FF4757) for expenses/danger states
+- Monospace fonts for currency amounts
 
 ### Navigation: Expo Router
 
@@ -228,7 +234,7 @@ monea/
 │
 ├── CLAUDE.md                         # Project configuration for Claude
 ├── app.json                          # Expo configuration
-├── tailwind.config.js                # NativeWind theme
+├── tamagui.config.ts                 # Tamagui theme configuration
 ├── tsconfig.json                     # TypeScript configuration
 └── package.json
 ```
@@ -306,7 +312,7 @@ React Context provides dependencies to components:
 ```
 App
 └── QueryClientProvider (React Query)
-    └── PaperProvider (Theme)
+    └── TamaguiProvider (Theme)
         └── DatabaseProvider (WatermelonDB)
             └── Navigation
 ```
@@ -474,7 +480,7 @@ App
 | 2024-01 | Android only | Colombian market, faster MVP | iOS (small market share) |
 | 2024-01 | WatermelonDB | Lazy loading, RN-native | SQLite (no observables), Realm (complex) |
 | 2024-01 | Zustand + React Query | Minimal boilerplate, separation | Redux (verbose), MobX (complex) |
-| 2024-01 | NativeWind | Utility-first, fast development | Styled Components (verbose) |
+| 2024-01 | Tamagui | Type-safe styling, dark theme, performance | NativeWind (className strings), Styled Components (verbose) |
 | 2024-01 | Feature-based structure | Maintainability at scale | Layer-based (harder to navigate) |
 | 2024-01 | Pattern-based parsing | Centralized config, reusable extractors | Strategy classes (more files) |
 | 2026-01 | Detox E2E testing | Native Android testing, CI support | Maestro (less mature) |

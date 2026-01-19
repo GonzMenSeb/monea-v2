@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
-import { TextInput, View, Text, Pressable, type TextInputProps } from 'react-native';
+import { TextInput, type TextInputProps } from 'react-native';
+import { styled, Stack, Text, XStack } from 'tamagui';
+
+import { colors } from '@/shared/theme';
 
 type InputState = 'default' | 'error' | 'success';
 type InputSize = 'sm' | 'md' | 'lg';
@@ -18,45 +21,112 @@ interface InputProps extends Omit<TextInputProps, 'editable'> {
   onRightIconPress?: () => void;
 }
 
-const SIZE_STYLES: Record<InputSize, { container: string; input: string; label: string }> = {
-  sm: {
-    container: 'min-h-[40px]',
-    input: 'text-sm px-3 py-2',
-    label: 'text-xs mb-1',
+const InputContainer = styled(Stack, {
+  name: 'InputContainer',
+  width: '100%',
+});
+
+const InputWrapper = styled(XStack, {
+  name: 'InputWrapper',
+  backgroundColor: '$backgroundSurface',
+  borderRadius: '$3',
+  borderWidth: 2,
+  alignItems: 'center',
+
+  variants: {
+    size: {
+      sm: {
+        minHeight: 40,
+      },
+      md: {
+        minHeight: 48,
+      },
+      lg: {
+        minHeight: 56,
+      },
+    },
+    state: {
+      default: {
+        borderColor: '$border',
+      },
+      error: {
+        borderColor: '$accentDanger',
+      },
+      success: {
+        borderColor: '$accentPrimary',
+      },
+    },
+    focused: {
+      true: {},
+    },
+    disabled: {
+      true: {
+        opacity: 0.6,
+        backgroundColor: '$backgroundElevated',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
+    state: 'default',
   },
-  md: {
-    container: 'min-h-[48px]',
-    input: 'text-base px-4 py-3',
-    label: 'text-sm mb-1.5',
+});
+
+const Label = styled(Text, {
+  name: 'InputLabel',
+  color: '$textPrimary',
+  fontWeight: '500',
+  marginBottom: '$1.5',
+
+  variants: {
+    size: {
+      sm: {
+        fontSize: '$1',
+      },
+      md: {
+        fontSize: '$2',
+      },
+      lg: {
+        fontSize: '$3',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
   },
-  lg: {
-    container: 'min-h-[56px]',
-    input: 'text-lg px-4 py-3.5',
-    label: 'text-base mb-2',
+});
+
+const HintText = styled(Text, {
+  name: 'InputHint',
+  marginTop: '$1',
+  fontSize: '$1',
+
+  variants: {
+    state: {
+      default: {
+        color: '$textMuted',
+      },
+      error: {
+        color: '$accentDanger',
+      },
+      success: {
+        color: '$accentPrimary',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    state: 'default',
   },
+});
+
+const SIZE_STYLES: Record<InputSize, { fontSize: number; paddingHorizontal: number }> = {
+  sm: { fontSize: 14, paddingHorizontal: 12 },
+  md: { fontSize: 16, paddingHorizontal: 16 },
+  lg: { fontSize: 18, paddingHorizontal: 16 },
 };
-
-const STATE_STYLES: Record<InputState, { border: string; borderFocused: string; message: string }> =
-  {
-    default: {
-      border: 'border-gray-300',
-      borderFocused: 'border-primary-500',
-      message: 'text-text-secondary',
-    },
-    error: {
-      border: 'border-semantic-error',
-      borderFocused: 'border-semantic-error',
-      message: 'text-semantic-error',
-    },
-    success: {
-      border: 'border-semantic-success',
-      borderFocused: 'border-semantic-success',
-      message: 'text-semantic-success',
-    },
-  };
-
-const BASE_INPUT_STYLES = 'rounded-xl border-2 bg-white text-text-primary';
-const DISABLED_STYLES = 'bg-background-tertiary opacity-60';
 
 function getValidationState(
   explicitState: InputState | undefined,
@@ -88,85 +158,83 @@ export function Input({
   onRightIconPress,
   onFocus,
   onBlur,
-  className,
   ...inputProps
 }: InputProps): React.ReactElement {
   const [isFocused, setIsFocused] = useState(false);
 
   const validationState = getValidationState(explicitState, errorMessage, successMessage);
   const sizeStyle = SIZE_STYLES[size];
-  const stateStyle = STATE_STYLES[validationState];
 
-  const handleFocus: TextInputProps['onFocus'] = (e) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  };
+  const handleFocus: TextInputProps['onFocus'] = useCallback(
+    (e: Parameters<NonNullable<TextInputProps['onFocus']>>[0]) => {
+      setIsFocused(true);
+      onFocus?.(e);
+    },
+    [onFocus]
+  );
 
-  const handleBlur: TextInputProps['onBlur'] = (e) => {
-    setIsFocused(false);
-    onBlur?.(e);
-  };
-
-  const getBorderStyle = (): string => {
-    if (disabled) {
-      return 'border-gray-200';
-    }
-    return isFocused ? stateStyle.borderFocused : stateStyle.border;
-  };
-
-  const inputContainerStyles = [
-    BASE_INPUT_STYLES,
-    sizeStyle.container,
-    getBorderStyle(),
-    disabled && DISABLED_STYLES,
-    (leftIcon || rightIcon) && 'flex-row items-center',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const handleBlur: TextInputProps['onBlur'] = useCallback(
+    (e: Parameters<NonNullable<TextInputProps['onBlur']>>[0]) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    },
+    [onBlur]
+  );
 
   const feedbackMessage = errorMessage || successMessage || hint;
-  const feedbackColor = errorMessage
-    ? STATE_STYLES.error.message
-    : successMessage
-      ? STATE_STYLES.success.message
-      : 'text-text-muted';
+  const feedbackState: InputState = errorMessage ? 'error' : successMessage ? 'success' : 'default';
+
+  const borderColor = isFocused && validationState === 'default'
+    ? colors.accent.primary
+    : validationState === 'error'
+      ? colors.accent.danger
+      : validationState === 'success'
+        ? colors.accent.primary
+        : colors.border.default;
 
   return (
-    <View className="w-full">
-      {label && <Text className={`${sizeStyle.label} font-medium text-text-primary`}>{label}</Text>}
+    <InputContainer>
+      {label && <Label size={size}>{label}</Label>}
 
-      <View className={inputContainerStyles}>
-        {leftIcon && <View className="pl-3">{leftIcon}</View>}
+      <InputWrapper
+        size={size}
+        state={validationState}
+        disabled={disabled}
+        style={{ borderColor }}
+      >
+        {leftIcon && <Stack paddingLeft="$3">{leftIcon}</Stack>}
 
         <TextInput
           {...inputProps}
           editable={!disabled}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          placeholderTextColor="#9CA3AF"
-          className={`flex-1 ${sizeStyle.input} ${leftIcon ? 'pl-2' : ''} ${rightIcon ? 'pr-2' : ''}`}
+          placeholderTextColor={colors.text.muted}
+          style={{
+            flex: 1,
+            fontSize: sizeStyle.fontSize,
+            paddingHorizontal: leftIcon ? 8 : sizeStyle.paddingHorizontal,
+            paddingRight: rightIcon ? 8 : sizeStyle.paddingHorizontal,
+            color: colors.text.primary,
+          }}
           accessibilityState={{ disabled }}
           accessibilityLabel={label}
           accessibilityHint={hint}
         />
 
         {rightIcon && (
-          <Pressable
-            testID="right-icon-pressable"
-            onPress={onRightIconPress}
-            disabled={disabled || !onRightIconPress}
-            className="pr-3"
-            accessibilityRole={onRightIconPress ? 'button' : 'none'}
+          <Stack
+            paddingRight="$3"
+            onPress={disabled || !onRightIconPress ? undefined : onRightIconPress}
+            pressStyle={onRightIconPress ? { opacity: 0.7 } : undefined}
+            accessibilityRole={onRightIconPress ? 'button' : undefined}
           >
             {rightIcon}
-          </Pressable>
+          </Stack>
         )}
-      </View>
+      </InputWrapper>
 
-      {feedbackMessage && (
-        <Text className={`mt-1 text-xs ${feedbackColor}`}>{feedbackMessage}</Text>
-      )}
-    </View>
+      {feedbackMessage && <HintText state={feedbackState}>{feedbackMessage}</HintText>}
+    </InputContainer>
   );
 }

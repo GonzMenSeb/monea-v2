@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
-import { Text, View } from 'react-native';
+import { styled, Stack, Text, YStack } from 'tamagui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -20,14 +20,62 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-const CONTAINER_STYLES = 'flex-1 items-center justify-center px-8 py-12 bg-background-primary';
-const ICON_CONTAINER_STYLES =
-  'w-20 h-20 rounded-full bg-semantic-error/10 items-center justify-center mb-6';
-const TITLE_STYLES = 'text-xl font-bold text-text-primary text-center';
-const MESSAGE_STYLES = 'text-sm text-text-secondary text-center mt-3 max-w-xs';
-const ERROR_DETAILS_STYLES =
-  'text-xs text-text-tertiary text-center mt-4 max-w-xs font-mono bg-background-secondary p-3 rounded-lg';
-const ACTION_CONTAINER_STYLES = 'mt-8';
+const Container = styled(YStack, {
+  name: 'Container',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: '$8',
+  paddingVertical: 48,
+  backgroundColor: '$backgroundBase',
+});
+
+const IconContainer = styled(Stack, {
+  name: 'IconContainer',
+  width: 80,
+  height: 80,
+  borderRadius: '$full',
+  backgroundColor: '$dangerMuted',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: '$6',
+});
+
+const Title = styled(Text, {
+  name: 'Title',
+  fontSize: '$5',
+  fontWeight: '700',
+  color: '$textPrimary',
+  textAlign: 'center',
+});
+
+const Message = styled(Text, {
+  name: 'Message',
+  fontSize: '$2',
+  color: '$textSecondary',
+  textAlign: 'center',
+  marginTop: '$3',
+  maxWidth: 280,
+});
+
+const ErrorDetails = styled(Text, {
+  name: 'ErrorDetails',
+  fontSize: '$1',
+  color: '$textMuted',
+  textAlign: 'center',
+  marginTop: '$4',
+  maxWidth: 280,
+  fontFamily: '$mono',
+  backgroundColor: '$backgroundSurface',
+  padding: '$3',
+  borderRadius: '$3',
+});
+
+const ActionContainer = styled(Stack, {
+  name: 'ActionContainer',
+  marginTop: '$8',
+});
+
 const DEFAULT_RETRY_LABEL = 'Try Again';
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -61,30 +109,30 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       }
 
       return (
-        <View className={CONTAINER_STYLES}>
-          <View className={ICON_CONTAINER_STYLES}>
+        <Container>
+          <IconContainer>
             <MaterialCommunityIcons
               name="alert-circle-outline"
               size={40}
-              color={colors.semantic.error}
+              color={colors.accent.danger}
             />
-          </View>
-          <Text className={TITLE_STYLES}>Something went wrong</Text>
-          <Text className={MESSAGE_STYLES}>
+          </IconContainer>
+          <Title>Something went wrong</Title>
+          <Message>
             An unexpected error occurred. Please try again or restart the app if the problem
             persists.
-          </Text>
+          </Message>
           {__DEV__ && this.state.error && (
-            <Text className={ERROR_DETAILS_STYLES} numberOfLines={3}>
+            <ErrorDetails numberOfLines={3}>
               {this.state.error.message}
-            </Text>
+            </ErrorDetails>
           )}
-          <View className={ACTION_CONTAINER_STYLES}>
+          <ActionContainer>
             <Button variant="primary" size="md" onPress={this.handleReset}>
               {DEFAULT_RETRY_LABEL}
             </Button>
-          </View>
-        </View>
+          </ActionContainer>
+        </Container>
       );
     }
 

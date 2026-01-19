@@ -1,16 +1,31 @@
 export const colors = {
-  primary: {
-    50: '#E8F4EA',
-    100: '#C6E4CB',
-    200: '#A0D3A9',
-    300: '#7AC287',
-    400: '#5DB46C',
-    500: '#40A652',
-    600: '#359845',
-    700: '#2A8838',
-    800: '#1F782B',
-    900: '#0D5E17',
-    DEFAULT: '#40A652',
+  background: {
+    base: '#0A0B0E',
+    surface: '#12141A',
+    elevated: '#1A1D26',
+    overlay: 'rgba(0,0,0,0.8)',
+  },
+  accent: {
+    primary: '#00D4AA',
+    secondary: '#7B61FF',
+    warning: '#FFB800',
+    danger: '#FF4757',
+    info: '#3B82F6',
+  },
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#8B8D97',
+    muted: '#5C5E66',
+    inverse: '#0A0B0E',
+  },
+  transaction: {
+    income: '#00D4AA',
+    expense: '#FF4757',
+    transfer: '#7B61FF',
+  },
+  border: {
+    default: '#2A2D36',
+    muted: '#1F2128',
   },
   bancolombia: {
     yellow: '#FDDA24',
@@ -20,13 +35,11 @@ export const colors = {
   davivienda: {
     red: '#E30613',
     darkRed: '#B8050F',
-    white: '#FFFFFF',
   },
   bbva: {
     blue: '#004481',
     aqua: '#1973B8',
     navy: '#002F6C',
-    white: '#FFFFFF',
   },
   nequi: {
     purple: '#200040',
@@ -37,33 +50,6 @@ export const colors = {
     red: '#E30613',
     orange: '#F7941D',
     darkRed: '#B8050F',
-  },
-  background: {
-    primary: '#FFFFFF',
-    secondary: '#F8F9FA',
-    tertiary: '#F1F3F5',
-  },
-  surface: {
-    card: '#FFFFFF',
-    elevated: '#FFFFFF',
-    overlay: 'rgba(0, 0, 0, 0.5)',
-  },
-  text: {
-    primary: '#1A1A1A',
-    secondary: '#6B7280',
-    muted: '#9CA3AF',
-    inverse: '#FFFFFF',
-  },
-  semantic: {
-    success: '#10B981',
-    error: '#EF4444',
-    warning: '#F59E0B',
-    info: '#3B82F6',
-  },
-  transaction: {
-    income: '#10B981',
-    expense: '#EF4444',
-    transfer: '#3B82F6',
   },
 } as const;
 

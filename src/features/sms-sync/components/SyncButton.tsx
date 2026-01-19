@@ -1,9 +1,9 @@
 import { memo, useCallback } from 'react';
 
-import { Pressable, Text, View, type PressableProps } from 'react-native';
+import { Pressable, ActivityIndicator, type PressableProps } from 'react-native';
+import { styled, Stack, Text, XStack } from 'tamagui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ActivityIndicator } from 'react-native-paper';
 
 import { colors } from '@/shared/theme';
 
@@ -30,29 +30,32 @@ interface ButtonState {
 }
 
 const SIZE_CONFIG = {
-  sm: { icon: 18, text: 'text-sm', padding: 'px-3 py-2', iconOnly: 'p-2' },
-  md: { icon: 22, text: 'text-base', padding: 'px-4 py-2.5', iconOnly: 'p-3' },
-  lg: { icon: 26, text: 'text-lg', padding: 'px-5 py-3', iconOnly: 'p-4' },
+  sm: { icon: 18, text: 12, paddingH: 12, paddingV: 8, iconOnly: 8 },
+  md: { icon: 22, text: 14, paddingH: 16, paddingV: 10, iconOnly: 12 },
+  lg: { icon: 26, text: 16, paddingH: 20, paddingV: 12, iconOnly: 16 },
 } as const;
 
-const VARIANT_STYLES = {
+const VARIANT_CONFIG = {
   primary: {
-    base: 'bg-primary-500 rounded-xl',
-    pressed: 'bg-primary-600',
-    text: 'text-white font-semibold',
-    iconColor: colors.text.inverse,
+    bgColor: colors.accent.primary,
+    pressedBgColor: colors.accent.primary + 'CC',
+    textColor: colors.background.base,
+    iconColor: colors.background.base,
+    borderRadius: 12,
   },
   secondary: {
-    base: 'bg-background-tertiary rounded-xl border border-gray-200',
-    pressed: 'bg-gray-200',
-    text: 'text-text-primary font-medium',
-    iconColor: colors.primary.DEFAULT,
+    bgColor: colors.background.surface,
+    pressedBgColor: colors.background.elevated,
+    textColor: colors.text.primary,
+    iconColor: colors.accent.primary,
+    borderRadius: 12,
   },
   icon: {
-    base: 'bg-primary-50 rounded-full',
-    pressed: 'bg-primary-100',
-    text: '',
-    iconColor: colors.primary.DEFAULT,
+    bgColor: colors.accent.primary + '20',
+    pressedBgColor: colors.accent.primary + '40',
+    textColor: colors.text.primary,
+    iconColor: colors.accent.primary,
+    borderRadius: 999,
   },
 } as const;
 
@@ -76,11 +79,17 @@ function getButtonState(
   return { icon: 'sync-off', label: 'Start Sync', disabled: false };
 }
 
+const ButtonContainer = styled(XStack, {
+  name: 'ButtonContainer',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
 interface SyncButtonContentProps {
   isSyncing: boolean;
   icon: ButtonState['icon'];
   label: string;
-  variantStyle: (typeof VARIANT_STYLES)[SyncButtonVariant];
+  variantConfig: (typeof VARIANT_CONFIG)[SyncButtonVariant];
   sizeConfig: (typeof SIZE_CONFIG)[SyncButtonSize];
   showLabel: boolean;
 }
@@ -89,26 +98,42 @@ const SyncButtonContent = memo(function SyncButtonContent({
   isSyncing,
   icon,
   label,
-  variantStyle,
+  variantConfig,
   sizeConfig,
   showLabel,
 }: SyncButtonContentProps): React.ReactElement {
   if (isSyncing) {
     return (
-      <View className="flex-row items-center justify-center">
-        <ActivityIndicator size="small" color={variantStyle.iconColor} />
+      <ButtonContainer>
+        <ActivityIndicator size="small" color={variantConfig.iconColor} />
         {showLabel && (
-          <Text className={`ml-2 ${sizeConfig.text} ${variantStyle.text}`}>{label}</Text>
+          <Text
+            marginLeft="$2"
+            fontSize={sizeConfig.text}
+            fontWeight="600"
+            color={variantConfig.textColor}
+          >
+            {label}
+          </Text>
         )}
-      </View>
+      </ButtonContainer>
     );
   }
 
   return (
-    <View className="flex-row items-center justify-center">
-      <MaterialCommunityIcons name={icon} size={sizeConfig.icon} color={variantStyle.iconColor} />
-      {showLabel && <Text className={`ml-2 ${sizeConfig.text} ${variantStyle.text}`}>{label}</Text>}
-    </View>
+    <ButtonContainer>
+      <MaterialCommunityIcons name={icon} size={sizeConfig.icon} color={variantConfig.iconColor} />
+      {showLabel && (
+        <Text
+          marginLeft="$2"
+          fontSize={sizeConfig.text}
+          fontWeight="600"
+          color={variantConfig.textColor}
+        >
+          {label}
+        </Text>
+      )}
+    </ButtonContainer>
   );
 });
 
@@ -125,7 +150,7 @@ export const SyncButton = memo(function SyncButton({
   ...pressableProps
 }: SyncButtonProps): React.ReactElement {
   const buttonState = getButtonState(isSyncing, isListening, permissionState);
-  const variantStyle = VARIANT_STYLES[variant];
+  const variantConfig = VARIANT_CONFIG[variant];
   const sizeConfig = SIZE_CONFIG[size];
 
   const isDisabled = disabled || buttonState.disabled;
@@ -140,20 +165,6 @@ export const SyncButton = memo(function SyncButton({
     }
   }, [permissionState, onPermissionPress, onSyncPress]);
 
-  const getContainerStyle = (pressed: boolean): string => {
-    const styles = [
-      'items-center justify-center',
-      variant === 'icon' ? sizeConfig.iconOnly : sizeConfig.padding,
-      pressed ? variantStyle.pressed : variantStyle.base,
-    ];
-
-    if (isDisabled) {
-      styles.push('opacity-50');
-    }
-
-    return styles.join(' ');
-  };
-
   return (
     <Pressable
       {...pressableProps}
@@ -164,16 +175,24 @@ export const SyncButton = memo(function SyncButton({
       accessibilityState={{ disabled: isDisabled }}
     >
       {({ pressed }) => (
-        <View className={getContainerStyle(pressed)}>
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          paddingHorizontal={variant === 'icon' ? sizeConfig.iconOnly : sizeConfig.paddingH}
+          paddingVertical={variant === 'icon' ? sizeConfig.iconOnly : sizeConfig.paddingV}
+          borderRadius={variantConfig.borderRadius}
+          backgroundColor={pressed ? variantConfig.pressedBgColor : variantConfig.bgColor}
+          opacity={isDisabled ? 0.5 : 1}
+        >
           <SyncButtonContent
             isSyncing={isSyncing}
             icon={buttonState.icon}
             label={label}
-            variantStyle={variantStyle}
+            variantConfig={variantConfig}
             sizeConfig={sizeConfig}
             showLabel={showLabel}
           />
-        </View>
+        </Stack>
       )}
     </Pressable>
   );

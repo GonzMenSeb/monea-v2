@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Linking, Pressable, ScrollView, View } from 'react-native';
+import { Linking, Pressable, ScrollView } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { useRouter } from 'expo-router';
 
@@ -29,16 +30,82 @@ interface SettingSection {
   items: SettingItem[];
 }
 
-const SECTION_CONTAINER_STYLES = 'mb-6';
-const SECTION_HEADER_STYLES = 'px-4 py-2';
-const ITEM_CONTAINER_STYLES = 'bg-surface-card mx-4 rounded-2xl overflow-hidden';
-const ITEM_PRESSED_STYLES = 'bg-gray-50';
-const ITEM_STYLES = 'flex-row items-center px-4 py-3.5';
-const ITEM_SEPARATOR_STYLES = 'h-px bg-gray-100 ml-14';
-const ICON_CONTAINER_STYLES = 'w-10 h-10 rounded-xl items-center justify-center mr-3';
-const CONTENT_CONTAINER_STYLES = 'flex-1';
-const CHEVRON_STYLES = 'text-text-muted text-lg ml-2';
-const VERSION_STYLES = 'text-center py-6';
+const SectionContainer = styled(YStack, {
+  name: 'SectionContainer',
+  marginBottom: '$6',
+});
+
+const SectionHeader = styled(Stack, {
+  name: 'SectionHeader',
+  paddingHorizontal: '$4',
+  paddingVertical: '$2',
+});
+
+const SectionTitle = styled(Text, {
+  name: 'SectionTitle',
+  color: '$textSecondary',
+  fontSize: '$1',
+  fontWeight: '600',
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+});
+
+const ItemsContainer = styled(YStack, {
+  name: 'ItemsContainer',
+  backgroundColor: '$backgroundSurface',
+  marginHorizontal: '$4',
+  borderRadius: '$4',
+  overflow: 'hidden',
+});
+
+const ItemRow = styled(XStack, {
+  name: 'ItemRow',
+  alignItems: 'center',
+  paddingHorizontal: '$4',
+  paddingVertical: '$3',
+});
+
+const ItemSeparator = styled(Stack, {
+  name: 'ItemSeparator',
+  height: 1,
+  backgroundColor: '$border',
+  marginLeft: 56,
+});
+
+const IconContainer = styled(Stack, {
+  name: 'IconContainer',
+  width: 40,
+  height: 40,
+  borderRadius: '$3',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginRight: '$3',
+});
+
+const ContentContainer = styled(YStack, {
+  name: 'ContentContainer',
+  flex: 1,
+});
+
+const Chevron = styled(Text, {
+  name: 'Chevron',
+  color: '$textMuted',
+  fontSize: '$4',
+  marginLeft: '$2',
+});
+
+const VersionContainer = styled(YStack, {
+  name: 'VersionContainer',
+  alignItems: 'center',
+  paddingVertical: '$6',
+});
+
+const BadgeContainer = styled(Stack, {
+  name: 'BadgeContainer',
+  paddingHorizontal: '$2',
+  paddingVertical: '$1',
+  borderRadius: '$full',
+});
 
 interface SettingItemRowProps {
   item: SettingItem;
@@ -47,31 +114,29 @@ interface SettingItemRowProps {
 
 function SettingItemRow({ item, isLast }: SettingItemRowProps): React.ReactElement {
   const isDestructive = item.variant === 'destructive';
-  const textColorClass = isDestructive ? 'text-error-500' : 'text-text-primary';
-  const iconBgClass = isDestructive ? 'bg-error-50' : 'bg-primary-50';
 
   return (
     <>
       <Pressable onPress={item.onPress} accessibilityRole="button" accessibilityLabel={item.title}>
         {({ pressed }) => (
-          <View className={`${ITEM_STYLES} ${pressed ? ITEM_PRESSED_STYLES : ''}`}>
-            <View className={`${ICON_CONTAINER_STYLES} ${iconBgClass}`}>
+          <ItemRow opacity={pressed ? 0.7 : 1}>
+            <IconContainer
+              backgroundColor={isDestructive ? '$dangerMuted' : '$primaryMuted'}
+            >
               <Body size="lg">{item.icon}</Body>
-            </View>
-            <View className={CONTENT_CONTAINER_STYLES}>
-              <Body className={textColorClass}>{item.title}</Body>
+            </IconContainer>
+            <ContentContainer>
+              <Body color={isDestructive ? '$danger' : '$textPrimary'}>{item.title}</Body>
               {item.description && (
-                <Caption muted={false} className="text-text-secondary mt-0.5">
-                  {item.description}
-                </Caption>
+                <Caption color="$textSecondary">{item.description}</Caption>
               )}
-            </View>
+            </ContentContainer>
             {item.rightElement}
-            {item.showChevron !== false && <Body className={CHEVRON_STYLES}>{'›'}</Body>}
-          </View>
+            {item.showChevron !== false && <Chevron>{'›'}</Chevron>}
+          </ItemRow>
         )}
       </Pressable>
-      {!isLast && <View className={ITEM_SEPARATOR_STYLES} />}
+      {!isLast && <ItemSeparator />}
     </>
   );
 }
@@ -82,16 +147,16 @@ interface SettingSectionViewProps {
 
 function SettingSectionView({ section }: SettingSectionViewProps): React.ReactElement {
   return (
-    <View className={SECTION_CONTAINER_STYLES}>
-      <View className={SECTION_HEADER_STYLES}>
-        <Caption className="uppercase tracking-wider font-semibold">{section.title}</Caption>
-      </View>
-      <View className={ITEM_CONTAINER_STYLES}>
+    <SectionContainer>
+      <SectionHeader>
+        <SectionTitle>{section.title}</SectionTitle>
+      </SectionHeader>
+      <ItemsContainer>
         {section.items.map((item, index) => (
           <SettingItemRow key={item.id} item={item} isLast={index === section.items.length - 1} />
         ))}
-      </View>
-    </View>
+      </ItemsContainer>
+    </SectionContainer>
   );
 }
 
@@ -102,23 +167,23 @@ interface PermissionStatusBadgeProps {
 function PermissionStatusBadge({ state }: PermissionStatusBadgeProps): React.ReactElement {
   const statusConfig: Record<
     PermissionState,
-    { label: string; bgClass: string; textClass: string }
+    { label: string; bgColor: string; textColor: string }
   > = {
-    granted: { label: 'Enabled', bgClass: 'bg-success-50', textClass: 'text-success-600' },
-    denied: { label: 'Denied', bgClass: 'bg-error-50', textClass: 'text-error-500' },
-    blocked: { label: 'Blocked', bgClass: 'bg-error-50', textClass: 'text-error-500' },
-    unknown: { label: 'Unknown', bgClass: 'bg-gray-100', textClass: 'text-text-secondary' },
-    checking: { label: 'Checking...', bgClass: 'bg-gray-100', textClass: 'text-text-secondary' },
+    granted: { label: 'Enabled', bgColor: colors.accent.primary + '20', textColor: colors.accent.primary },
+    denied: { label: 'Denied', bgColor: colors.accent.danger + '20', textColor: colors.accent.danger },
+    blocked: { label: 'Blocked', bgColor: colors.accent.danger + '20', textColor: colors.accent.danger },
+    unknown: { label: 'Unknown', bgColor: colors.background.surface, textColor: colors.text.secondary },
+    checking: { label: 'Checking...', bgColor: colors.background.surface, textColor: colors.text.secondary },
   };
 
   const config = statusConfig[state];
 
   return (
-    <View className={`px-2.5 py-1 rounded-full ${config.bgClass}`}>
-      <Caption size="sm" muted={false} className={config.textClass}>
+    <BadgeContainer backgroundColor={config.bgColor}>
+      <Caption color={config.textColor} fontSize="$1">
         {config.label}
       </Caption>
-    </View>
+    </BadgeContainer>
   );
 }
 
@@ -254,29 +319,29 @@ export function SettingsScreen(): React.ReactElement {
   return (
     <Screen
       variant="fixed"
-      backgroundColor={colors.background.primary}
+      backgroundColor={colors.background.base}
       edges={['top', 'left', 'right']}
       keyboardAvoiding={false}
     >
-      <View className="px-4 pt-4 pb-2">
-        <Heading level="h2">{'Settings'}</Heading>
-      </View>
+      <Stack paddingHorizontal="$4" paddingTop="$4" paddingBottom="$2">
+        <Heading level="h2">Settings</Heading>
+      </Stack>
 
       <ScrollView
-        className="flex-1"
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="pt-2 pb-8"
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 32 }}
       >
         {sections.map((section) => (
           <SettingSectionView key={section.title} section={section} />
         ))}
 
-        <View className={VERSION_STYLES}>
-          <Caption>{'Monea v1.0.0'}</Caption>
-          <Caption size="sm" className="mt-1">
-            {'Made with ❤️ in Colombia'}
+        <VersionContainer>
+          <Caption color="$textMuted">Monea v1.0.0</Caption>
+          <Caption color="$textMuted" fontSize="$1" marginTop="$1">
+            Made with ❤️ in Colombia
           </Caption>
-        </View>
+        </VersionContainer>
       </ScrollView>
     </Screen>
   );

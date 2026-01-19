@@ -1,4 +1,5 @@
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
 
@@ -12,39 +13,109 @@ interface LoadingStateProps {
   color?: string;
 }
 
-const SIZE_CONFIG: Record<LoadingStateSize, { indicator: 'small' | 'large'; text: string }> = {
-  sm: { indicator: 'small', text: 'text-xs' },
-  md: { indicator: 'small', text: 'text-sm' },
-  lg: { indicator: 'large', text: 'text-base' },
-};
+const LoadingContainer = styled(Stack, {
+  name: 'LoadingContainer',
+  alignItems: 'center',
+  justifyContent: 'center',
 
-const VARIANT_STYLES: Record<LoadingStateVariant, string> = {
-  default: 'flex-1 items-center justify-center py-12',
-  overlay: 'absolute inset-0 items-center justify-center bg-surface-overlay z-50',
-  inline: 'flex-row items-center justify-center py-4',
-};
+  variants: {
+    variant: {
+      default: {
+        flex: 1,
+        paddingVertical: '$12',
+      },
+      overlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: '$backgroundOverlay',
+        zIndex: 50,
+      },
+      inline: {
+        flexDirection: 'row',
+        paddingVertical: '$4',
+      },
+    },
+  } as const,
 
-const MESSAGE_STYLES = 'text-text-secondary mt-3';
-const INLINE_MESSAGE_STYLES = 'text-text-secondary ml-3';
+  defaultVariants: {
+    variant: 'default',
+  },
+});
+
+const LoadingMessage = styled(Text, {
+  name: 'LoadingMessage',
+  color: '$textSecondary',
+
+  variants: {
+    variant: {
+      default: {
+        marginTop: '$3',
+      },
+      overlay: {
+        marginTop: '$3',
+      },
+      inline: {
+        marginLeft: '$3',
+      },
+    },
+    size: {
+      sm: {
+        fontSize: '$1',
+      },
+      md: {
+        fontSize: '$2',
+      },
+      lg: {
+        fontSize: '$3',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    variant: 'default',
+    size: 'md',
+  },
+});
+
+const SIZE_CONFIG: Record<LoadingStateSize, 'small' | 'large'> = {
+  sm: 'small',
+  md: 'small',
+  lg: 'large',
+};
 
 export function LoadingState({
   size = 'md',
   variant = 'default',
   message,
-  color = colors.primary.DEFAULT,
+  color = colors.accent.primary,
 }: LoadingStateProps): React.ReactElement {
-  const sizeConfig = SIZE_CONFIG[size];
-  const containerStyle = VARIANT_STYLES[variant];
+  const indicatorSize = SIZE_CONFIG[size];
   const isInline = variant === 'inline';
 
+  if (isInline) {
+    return (
+      <XStack alignItems="center" justifyContent="center" paddingVertical="$4">
+        <ActivityIndicator testID="activity-indicator" size={indicatorSize} color={color} />
+        {message && (
+          <LoadingMessage variant="inline" size={size}>
+            {message}
+          </LoadingMessage>
+        )}
+      </XStack>
+    );
+  }
+
   return (
-    <View className={containerStyle}>
-      <ActivityIndicator testID="activity-indicator" size={sizeConfig.indicator} color={color} />
+    <LoadingContainer variant={variant}>
+      <ActivityIndicator testID="activity-indicator" size={indicatorSize} color={color} />
       {message && (
-        <Text className={`${sizeConfig.text} ${isInline ? INLINE_MESSAGE_STYLES : MESSAGE_STYLES}`}>
+        <LoadingMessage variant={variant} size={size}>
           {message}
-        </Text>
+        </LoadingMessage>
       )}
-    </View>
+    </LoadingContainer>
   );
 }

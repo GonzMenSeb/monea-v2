@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 
-import { View } from 'react-native';
+import { Stack } from 'tamagui';
 
 import { TransactionCard } from '@/shared/components/ui/Card';
 
@@ -13,8 +13,6 @@ interface TransactionItemProps {
   onPress?: (transactionId: string) => void;
   showBankAccent?: boolean;
 }
-
-const CONTAINER_STYLES = 'px-4';
 
 function defaultFormatTime(date: Date): string {
   return date.toLocaleTimeString('es-CO', {
@@ -29,14 +27,13 @@ export const TransactionItem = memo(function TransactionItem({
   formatCurrency,
   formatTime = defaultFormatTime,
   onPress,
-  showBankAccent = false,
 }: TransactionItemProps): React.ReactElement {
   const handlePress = useCallback(() => {
     onPress?.(transaction.id);
   }, [transaction.id, onPress]);
 
   return (
-    <View className={CONTAINER_STYLES}>
+    <Stack paddingHorizontal="$4">
       <TransactionCard
         transaction={{
           id: transaction.id,
@@ -45,13 +42,12 @@ export const TransactionItem = memo(function TransactionItem({
           merchant: transaction.merchant,
           description: transaction.description,
           transactionDate: transaction.transactionDate,
-          bankName: showBankAccent ? undefined : undefined,
         }}
         formatCurrency={formatCurrency}
         formatDate={formatTime}
         onPress={onPress ? handlePress : undefined}
       />
-    </View>
+    </Stack>
   );
 });
 
