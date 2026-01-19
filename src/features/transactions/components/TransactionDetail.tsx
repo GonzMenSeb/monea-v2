@@ -130,6 +130,31 @@ const FooterSection = styled(Stack, {
   borderTopColor: '$border',
 });
 
+const RawSmsContainer = styled(YStack, {
+  name: 'RawSmsContainer',
+  marginTop: '$4',
+  padding: '$3',
+  backgroundColor: '$backgroundSurface',
+  borderRadius: '$3',
+  borderWidth: 1,
+  borderColor: '$border',
+});
+
+const RawSmsLabel = styled(Text, {
+  name: 'RawSmsLabel',
+  color: '$textSecondary',
+  fontSize: '$1',
+  marginBottom: '$2',
+});
+
+const RawSmsText = styled(Text, {
+  name: 'RawSmsText',
+  color: '$textSecondary',
+  fontSize: '$1',
+  fontFamily: '$mono',
+  lineHeight: 18,
+});
+
 function formatDateTime(date: Date): string {
   return date.toLocaleDateString('es-CO', {
     weekday: 'long',
@@ -227,6 +252,13 @@ export function TransactionDetail({
               {transaction.categoryId && (
                 <DetailItem label="Category ID" value={transaction.categoryId} />
               )}
+
+              <RawSmsContainer>
+                <RawSmsLabel>Original Message</RawSmsLabel>
+                <RawSmsText>
+                  {transaction.rawSms || '(No SMS data stored for this transaction)'}
+                </RawSmsText>
+              </RawSmsContainer>
             </YStack>
 
             <Stack height={32} />

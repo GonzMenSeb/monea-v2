@@ -47,6 +47,32 @@ const DeleteContainer = styled(YStack, {
   gap: '$2',
 });
 
+const RawSmsContainer = styled(YStack, {
+  name: 'RawSmsContainer',
+  marginHorizontal: '$4',
+  marginTop: '$4',
+  padding: '$3',
+  backgroundColor: '$backgroundSurface',
+  borderRadius: '$3',
+  borderWidth: 1,
+  borderColor: '$border',
+});
+
+const RawSmsLabel = styled(Text, {
+  name: 'RawSmsLabel',
+  color: '$textSecondary',
+  fontSize: '$1',
+  marginBottom: '$2',
+});
+
+const RawSmsText = styled(Text, {
+  name: 'RawSmsText',
+  color: '$textSecondary',
+  fontSize: '$1',
+  fontFamily: '$mono',
+  lineHeight: 18,
+});
+
 export default function EditTransactionScreen(): React.ReactElement {
   const router = useRouter();
   const { success } = useHaptics();
@@ -209,6 +235,13 @@ export default function EditTransactionScreen(): React.ReactElement {
           onCancel={handleBack}
           isLoading={updateMutation.isPending}
         />
+
+        <RawSmsContainer>
+          <RawSmsLabel>Original Message</RawSmsLabel>
+          <RawSmsText>
+            {transaction.rawSms || '(No SMS data stored for this transaction)'}
+          </RawSmsText>
+        </RawSmsContainer>
 
         <DeleteContainer>
           <Button

@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { useRouter } from 'expo-router';
 
-import { AccountRepository } from '@/infrastructure/database';
+import { AccountRepository, TransactionRepository } from '@/infrastructure/database';
 
 import { AccountsManagement } from '../screens/AccountsManagement';
 
@@ -48,11 +48,16 @@ const mockAccountRepository = {
   findByAccountNumber: jest.fn(),
 };
 
+const mockTransactionRepository = {
+  getBalancesByAccountIds: jest.fn().mockResolvedValue(new Map([['1', 100000]])),
+};
+
 describe('AccountsManagement', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     (AccountRepository as jest.Mock).mockImplementation(() => mockAccountRepository);
+    (TransactionRepository as jest.Mock).mockImplementation(() => mockTransactionRepository);
     jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   });
 

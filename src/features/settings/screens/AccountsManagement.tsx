@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
-import { database, AccountRepository } from '@/infrastructure/database';
+import { database, AccountRepository, TransactionRepository } from '@/infrastructure/database';
 import { EmptyState, LoadingState } from '@/shared/components/feedback';
 import { Screen } from '@/shared/components/layout';
 import { Button, Input, Heading, Body, Caption } from '@/shared/components/ui';
@@ -15,6 +15,16 @@ import { colors } from '@/shared/theme';
 import type { CreateAccountData, UpdateAccountData } from '@/infrastructure/database';
 import type Account from '@/infrastructure/database/models/Account';
 import type { BankCode, AccountType } from '@/infrastructure/database/models/Account';
+
+interface AccountWithCalculatedBalance {
+  id: string;
+  bankCode: BankCode;
+  bankName: string;
+  accountNumber: string;
+  accountType: AccountType;
+  balance: number;
+  isActive: boolean;
+}
 
 interface AccountFormData {
   bankCode: BankCode;
@@ -200,7 +210,7 @@ function getInitialFormData(): AccountFormData {
   };
 }
 
-function accountToFormData(account: Account): AccountFormData {
+function accountToFormData(account: AccountWithCalculatedBalance): AccountFormData {
   return {
     bankCode: account.bankCode,
     bankName: account.bankName,
@@ -211,8 +221,8 @@ function accountToFormData(account: Account): AccountFormData {
 }
 
 interface AccountItemProps {
-  account: Account;
-  onPress: (account: Account) => void;
+  account: AccountWithCalculatedBalance;
+  onPress: (account: AccountWithCalculatedBalance) => void;
 }
 
 function AccountItem({ account, onPress }: AccountItemProps): React.ReactElement {
@@ -487,11 +497,29 @@ export function AccountsManagement(): React.ReactElement {
   const [accountNumberError, setAccountNumberError] = useState<string | undefined>();
 
   const accountRepository = useMemo(() => new AccountRepository(database), []);
+  const transactionRepository = useMemo(() => new TransactionRepository(database), []);
 
   const accountsQuery = useQuery({
     queryKey: ACCOUNT_QUERY_KEYS.list(),
-    queryFn: async (): Promise<Account[]> => {
-      return accountRepository.findAll();
+    queryFn: async (): Promise<AccountWithCalculatedBalance[]> => {
+      const accounts = await accountRepository.findAll();
+
+      if (accounts.length === 0) {
+        return [];
+      }
+
+      const accountIds = accounts.map((a) => a.id);
+      const balances = await transactionRepository.getBalancesByAccountIds(accountIds);
+
+      return accounts.map((account) => ({
+        id: account.id,
+        bankCode: account.bankCode,
+        bankName: account.bankName,
+        accountNumber: account.accountNumber,
+        accountType: account.accountType,
+        balance: balances.get(account.id) ?? 0,
+        isActive: account.isActive,
+      }));
     },
   });
 
@@ -557,7 +585,7 @@ export function AccountsManagement(): React.ReactElement {
     setModalVisible(true);
   }, []);
 
-  const openEditModal = useCallback((account: Account) => {
+  const openEditModal = useCallback((account: AccountWithCalculatedBalance) => {
     setFormMode('edit');
     setFormData(accountToFormData(account));
     setEditingAccountId(account.id);
@@ -654,11 +682,13 @@ export function AccountsManagement(): React.ReactElement {
   }, [editingAccountId, deleteMutation]);
 
   const renderAccount = useCallback(
-    ({ item }: { item: Account }) => <AccountItem account={item} onPress={openEditModal} />,
+    ({ item }: { item: AccountWithCalculatedBalance }) => (
+      <AccountItem account={item} onPress={openEditModal} />
+    ),
     [openEditModal]
   );
 
-  const keyExtractor = useCallback((item: Account) => item.id, []);
+  const keyExtractor = useCallback((item: AccountWithCalculatedBalance) => item.id, []);
 
   const ListEmptyComponent = useMemo(
     () => (
