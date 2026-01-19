@@ -1,5 +1,35 @@
+import { createDefaultRegistry } from './banks';
+
+import type { BankInfo } from './types';
+
 export { TransactionParser, transactionParser } from './TransactionParser';
-export { BANK_INFO, BANK_PATTERNS, detectBankFromContent } from './BankPatterns';
+export { ParserRegistry } from './ParserRegistry';
+
+export {
+  BANCOLOMBIA_PATTERNS,
+  BANCOOMEVA_PATTERNS,
+  BBVA_PATTERNS,
+  BancolombiaParser,
+  BancoomevaParser,
+  BbvaParser,
+  DAVIPLATA_PATTERNS,
+  DAVIVIENDA_PATTERNS,
+  DaviplataParser,
+  DaviviendaParser,
+  NEQUI_PATTERNS,
+  NequiParser,
+  createDefaultRegistry,
+} from './banks';
+
+const defaultRegistry = createDefaultRegistry();
+
+export function detectBankFromContent(smsBody: string): BankInfo | null {
+  const parser = defaultRegistry.findParser(smsBody);
+  return parser ? parser.bank : null;
+}
+
+export { BANK_INFO, BaseBankParser, PATTERNS, type TransactionPattern } from './shared';
+
 export {
   extractAmount,
   formatCOP,
@@ -7,6 +37,7 @@ export {
   parseAmount,
   type AmountExtractionResult,
 } from './AmountExtractor';
+
 export {
   extractDate,
   formatCODate,
@@ -17,6 +48,7 @@ export {
   parseTimeOnly,
   type DateExtractionResult,
 } from './DateExtractor';
+
 export {
   categorizeMerchant,
   extractDescription,
@@ -27,6 +59,7 @@ export {
   type MerchantCategory,
   type MerchantExtractionResult,
 } from './MerchantExtractor';
+
 export type {
   BankCode,
   BankInfo,

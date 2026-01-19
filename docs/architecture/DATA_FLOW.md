@@ -61,12 +61,25 @@ This document describes how data flows through the Monea application.
        ▼
 ┌──────────────────────────────────────────────────────────┐
 │                   TransactionParser                       │
-│  ┌────────────────────┐  ┌───────────────┐  ┌─────────┐ │
-│  │detectBankFromContent│─▶│ BANK_PATTERNS │─▶│ Extract │ │
-│  │ (identifies bank    │  │ (matches SMS  │  │ Amount, │ │
-│  │  from message body) │  │   patterns)   │  │ Date,   │ │
-│  └────────────────────┘  └───────────────┘  │ Merchant│ │
-│                                              └─────────┘ │
+│                          │                                │
+│                          ▼                                │
+│                 ┌────────────────┐                       │
+│                 │ ParserRegistry │                       │
+│                 │  findParser()  │                       │
+│                 └────────┬───────┘                       │
+│                          │                                │
+│      ┌───────────────────┼───────────────────┐           │
+│      ▼                   ▼                   ▼           │
+│  ┌────────┐        ┌──────────┐        ┌─────────┐      │
+│  │Nequi   │        │Bancolombia│       │  BBVA   │      │
+│  │Parser  │        │  Parser  │        │ Parser  │ ...  │
+│  └────┬───┘        └────┬─────┘        └────┬────┘      │
+│       └─────────────────┼───────────────────┘           │
+│                         ▼                                │
+│              ┌─────────────────────┐                    │
+│              │  BaseBankParser     │                    │
+│              │  extractTransaction │                    │
+│              └─────────────────────┘                    │
 └──────────────────────────────────────────────────────────┘
        │
        ▼

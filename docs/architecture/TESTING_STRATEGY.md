@@ -112,33 +112,40 @@ describe('useNetworkStatus', () => {
 
 ### Parser Testing
 
-The SMS parser is critical and requires extensive testing:
+The SMS parser is critical and requires extensive testing. Each bank has its own dedicated test file:
 
 ```typescript
-// TransactionParser.test.ts
-describe('TransactionParser', () => {
-  describe('Bancolombia', () => {
-    it('parses purchase transaction correctly', () => {
-      const sms = {
-        address: 'Bancolombia',
-        body: 'Bancolombia le informa compra por $50.000 en EXITO',
-        date: new Date(),
-      };
+// src/core/parser/banks/bancolombia/__tests__/BancolombiaParser.test.ts
+import { BancolombiaParser } from '../BancolombiaParser';
 
-      const result = parseTransaction(sms);
+describe('BancolombiaParser', () => {
+  const parser = new BancolombiaParser();
 
-      expect(result).toEqual({
-        bank: 'bancolombia',
-        type: 'expense',
-        amount: 50000,
-        merchant: 'EXITO',
-      });
+  describe('bank info', () => {
+    it('has correct bank code', () => {
+      expect(parser.bankCode).toBe('bancolombia');
     });
   });
 
-  // Test all banks and transaction types
+  describe('purchase transactions', () => {
+    it('parses purchase correctly', () => {
+      const sms = 'Bancolombia le informa compra por $50.000 en EXITO';
+      const result = parser.parse(sms, 'Bancolombia');
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.type).toBe('expense');
+        expect(result.amount).toBe(50000);
+        expect(result.merchant).toBe('EXITO');
+      }
+    });
+  });
+
+  // Test all transaction types for this bank
 });
 ```
+
+**Test Location**: `src/core/parser/banks/{bankcode}/__tests__/{BankName}Parser.test.ts`
 
 ## Integration Testing
 
