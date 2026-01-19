@@ -229,27 +229,38 @@ To add support for a new bank:
 
 1. Collect sample SMS messages from the bank (at least 3-5 real samples)
 2. Identify the message patterns for each transaction type
-3. Add bank to `BANK_INFO` in `src/core/parser/BankPatterns.ts`:
+3. Create bank directory: `src/core/parser/banks/{bankcode}/`
+4. Create `patterns.ts` with bank-specific patterns:
    ```typescript
-   [bank-code]: {
-     code: 'bank-code',
-     name: 'Bank Name',
-   }
-   ```
-4. Add patterns to `BANK_PATTERNS` in the same file:
-   ```typescript
-   [bank-code]: [
+   import { PATTERNS, type TransactionPattern } from '../../shared';
+
+   export const NEWBANK_PATTERNS: TransactionPattern[] = [
      {
        type: 'expense',
        pattern: /regex-pattern/i,
        groups: { amount: 1, merchant: 2, ... }
      },
      // ... other transaction types
-   ]
+   ];
    ```
-5. Add comprehensive tests in `src/core/parser/__tests__/`
-6. Test with `npm test parser`
-7. Update this documentation with the new bank's patterns
+5. Create `{BankName}Parser.ts` extending `BaseBankParser`:
+   ```typescript
+   import { NEWBANK_PATTERNS } from './patterns';
+   import { BaseBankParser, type TransactionPattern } from '../../shared';
+   import type { BankCode } from '../../types';
+
+   export class NewBankParser extends BaseBankParser {
+     readonly bankCode: BankCode = 'newbank';
+     readonly patterns: TransactionPattern[] = NEWBANK_PATTERNS;
+   }
+   ```
+6. Create `index.ts` exporting the parser
+7. Register parser in `src/core/parser/banks/index.ts`
+8. Add bank code to `BankCode` type in `src/core/parser/types.ts`
+9. Add bank info to `BANK_INFO` in `src/core/parser/shared/patternHelpers.ts`
+10. Create tests in `banks/{bankcode}/__tests__/{BankName}Parser.test.ts`
+11. Test with `npm test parser`
+12. Update this documentation with the new bank's patterns
 
 ### Pattern Guidelines
 

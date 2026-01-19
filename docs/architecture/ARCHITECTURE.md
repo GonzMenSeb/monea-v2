@@ -226,13 +226,19 @@ monea/
 │   ├── core/                         # Business logic (domain-pure)
 │   │   └── parser/
 │   │       ├── TransactionParser.ts  # Main parser entry point
-│   │       ├── BankPatterns.ts       # Bank info and regex patterns
-│   │       ├── AmountExtractor.ts    # COP amount extraction
-│   │       ├── DateExtractor.ts      # Date/time extraction
-│   │       ├── MerchantExtractor.ts  # Merchant name extraction
+│   │       ├── ParserRegistry.ts     # Bank parser registry
 │   │       ├── types.ts              # Parser interfaces
 │   │       ├── index.ts              # Public exports
-│   │       └── __tests__/            # Parser unit tests
+│   │       ├── extractors/           # Amount, date extractors
+│   │       ├── shared/               # BaseBankParser, pattern helpers
+│   │       ├── banks/                # Per-bank parser implementations
+│   │       │   ├── bancolombia/      # BancolombiaParser + patterns + tests
+│   │       │   ├── bancoomeva/       # BancoomevaParser + patterns + tests
+│   │       │   ├── bbva/             # BBVAParser + patterns + tests
+│   │       │   ├── daviplata/        # DaviplataParser + patterns + tests
+│   │       │   ├── davivienda/       # DaviviendaParser + patterns + tests
+│   │       │   └── nequi/            # NequiParser + patterns + tests
+│   │       └── __tests__/            # Integration tests
 │   │
 │   └── infrastructure/               # External system integrations
 │       ├── database/
@@ -273,9 +279,9 @@ monea/
 
 ## Design Patterns
 
-### 1. Pattern-Based Parsing (SMS Parsing)
+### 1. Modular Bank Parsers (SMS Parsing)
 
-Each bank has different SMS formats. The parser uses a pattern-based approach with centralized bank configurations:
+Each bank has different SMS formats. The parser uses a **modular strategy pattern** where each bank has its own parser class:
 
 ```
 ┌──────────────────────┐
@@ -285,25 +291,38 @@ Each bank has different SMS formats. The parser uses a pattern-based approach wi
            │ uses
            ▼
 ┌──────────────────────┐
-│    BankPatterns.ts   │
-│  ┌────────────────┐  │
-│  │  BANK_INFO     │  │  Bank identifiers & senders
-│  │  BANK_PATTERNS │  │  Regex patterns per bank
-│  └────────────────┘  │
+│   ParserRegistry     │
+│  (Bank Parser Mgmt)  │
 └──────────┬───────────┘
-           │ extracts via
-     ┌─────┴─────┬─────────────┐
-     ▼           ▼             ▼
-┌─────────┐ ┌─────────┐ ┌─────────────┐
-│ Amount  │ │  Date   │ │  Merchant   │
-│Extractor│ │Extractor│ │  Extractor  │
-└─────────┘ └─────────┘ └─────────────┘
+           │ finds
+           ▼
+┌──────────────────────────────────────────────────────────┐
+│                    BaseBankParser                         │
+│  (Abstract base class with common extraction logic)       │
+└──────────────────────────────────────────────────────────┘
+           │ extended by
+     ┌─────┴─────┬─────────────┬─────────────┬─────────────┐
+     ▼           ▼             ▼             ▼             ▼
+┌──────────┐┌──────────┐┌──────────┐┌──────────┐┌──────────┐
+│Bancolombia││  Nequi   ││Davivienda││ Daviplata││   BBVA   │
+│  Parser   ││  Parser  ││  Parser  ││  Parser  ││  Parser  │
+└──────────┘└──────────┘└──────────┘└──────────┘└──────────┘
+     │           │             │             │             │
+     └───────────┴─────────────┴─────────────┴─────────────┘
+                               │ uses
+                     ┌─────────┴─────────┐
+                     ▼                   ▼
+               ┌─────────┐         ┌─────────┐
+               │ Amount  │         │  Date   │
+               │Extractor│         │Extractor│
+               └─────────┘         └─────────┘
 ```
 
 **Benefits:**
-- Adding new banks requires updating BANK_INFO and BANK_PATTERNS
-- Extractors are reusable across all banks
-- Centralized configuration for easy maintenance
+- **SOLID Compliance**: Each bank parser has single responsibility
+- **Open/Closed**: Add new banks without modifying existing code
+- **Testability**: Each bank has dedicated tests in its directory
+- **Maintainability**: Bank-specific logic isolated in own directory
 
 ### 2. Repository Pattern (Data Access)
 
@@ -485,7 +504,7 @@ App
 
 | Future Feature | Extension Strategy |
 |----------------|-------------------|
-| New bank support | Add patterns to `BANK_PATTERNS` in `BankPatterns.ts` |
+| New bank support | Create new parser in `banks/{bankcode}/` extending `BaseBankParser` |
 | Multi-device sync | Add sync layer to infrastructure |
 | Export to CSV | Add service to `features/backup/` (backup feature exists) |
 | Multiple currencies | Extend `AmountExtractor` |
@@ -508,6 +527,7 @@ App
 | 2024-01 | Tamagui | Type-safe styling, dark theme, performance | NativeWind (className strings), Styled Components (verbose) |
 | 2024-01 | Feature-based structure | Maintainability at scale | Layer-based (harder to navigate) |
 | 2024-01 | Pattern-based parsing | Centralized config, reusable extractors | Strategy classes (more files) |
+| 2026-01 | Modular bank parsers | SOLID compliance, per-bank testing | Monolithic BankPatterns.ts |
 | 2026-01 | Detox E2E testing | Native Android testing, CI support | Maestro (less mature) |
 
 ---

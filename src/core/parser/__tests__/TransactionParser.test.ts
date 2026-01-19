@@ -1,4 +1,4 @@
-import { BANK_INFO } from '../BankPatterns';
+import { BANK_INFO } from '../shared';
 import { TransactionParser, transactionParser } from '../TransactionParser';
 
 describe('TransactionParser', () => {

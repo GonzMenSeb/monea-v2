@@ -1,10 +1,31 @@
+import { parseAmount, parseDate } from '../extractors';
 import {
   BANK_INFO,
-  BANK_PATTERNS,
-  parseAmount,
-  parseDate,
-  detectBankFromContent,
-} from '../BankPatterns';
+  BANCOLOMBIA_PATTERNS,
+  BANCOOMEVA_PATTERNS,
+  BBVA_PATTERNS,
+  DAVIPLATA_PATTERNS,
+  DAVIVIENDA_PATTERNS,
+  NEQUI_PATTERNS,
+  createDefaultRegistry,
+} from '../index';
+
+import type { BankCode } from '../types';
+
+const BANK_PATTERNS = {
+  bancolombia: BANCOLOMBIA_PATTERNS,
+  davivienda: DAVIVIENDA_PATTERNS,
+  bbva: BBVA_PATTERNS,
+  nequi: NEQUI_PATTERNS,
+  daviplata: DAVIPLATA_PATTERNS,
+  bancoomeva: BANCOOMEVA_PATTERNS,
+};
+
+function detectBankFromContent(smsBody: string): { code: BankCode; name: string } | null {
+  const registry = createDefaultRegistry();
+  const parser = registry.findParser(smsBody);
+  return parser ? parser.bank : null;
+}
 
 describe('BankPatterns', () => {
   describe('BANK_INFO', () => {

@@ -59,7 +59,10 @@ src/
 │   ├── utils/              # Utility functions
 │   └── theme/              # Design tokens, colors, typography
 ├── core/                   # Business logic (SMS parsing engine)
-│   └── parser/             # Bank message parsing strategies
+│   └── parser/             # Modular bank parsers (strategy pattern)
+│       ├── banks/          # Per-bank parser implementations
+│       ├── shared/         # BaseBankParser, pattern helpers
+│       └── extractors/     # Amount, date, merchant extractors
 └── infrastructure/         # External integrations
     ├── database/           # WatermelonDB setup, models, repos
     └── sms/                # SMS reading native module
@@ -321,10 +324,14 @@ describe('TransactionItem', () => {
 
 ### Adding a New Bank Parser
 1. Collect real SMS samples from the bank
-2. Add bank info to `src/core/parser/BankPatterns.ts` (BANK_INFO and BANK_PATTERNS)
-3. Implement extraction patterns in the BANK_PATTERNS object
-4. Write comprehensive tests with real message samples in `src/core/parser/__tests__/`
-5. Update `docs/SMS_PATTERNS.md` with the new bank's message formats
+2. Create bank directory: `src/core/parser/banks/{bankcode}/`
+3. Create `patterns.ts` with bank-specific regex patterns
+4. Create `{BankName}Parser.ts` extending `BaseBankParser`
+5. Create `index.ts` exporting the parser
+6. Register parser in `src/core/parser/banks/index.ts`
+7. Add bank code to `BankCode` type in `src/core/parser/types.ts`
+8. Write tests in `banks/{bankcode}/__tests__/{BankName}Parser.test.ts`
+9. Update `docs/SMS_PATTERNS.md` with the new bank's message formats
 
 ### Creating a Component
 1. Define props interface
@@ -400,5 +407,8 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`
 | `src/app/_layout.tsx` | Root layout with providers |
 | `src/infrastructure/database/schema.ts` | Database schema |
 | `src/core/parser/TransactionParser.ts` | Main SMS parsing engine |
+| `src/core/parser/ParserRegistry.ts` | Bank parser registry |
+| `src/core/parser/shared/BaseBankParser.ts` | Abstract base class for bank parsers |
+| `src/core/parser/banks/index.ts` | Bank parser auto-registration |
 | `src/shared/utils/formatting.ts` | Currency and date formatting utilities |
 | `.detoxrc.js` | Detox E2E test configuration |
