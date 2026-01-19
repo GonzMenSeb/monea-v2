@@ -47,6 +47,7 @@
     "plugins": [
       "expo-router",
       ["@lovesworking/watermelondb-expo-plugin-sdk-52-plus"],
+      "@config-plugins/detox",
       [
         "expo-build-properties",
         {

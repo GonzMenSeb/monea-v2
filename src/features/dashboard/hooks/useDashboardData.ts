@@ -5,8 +5,19 @@ import { useQuery, useQueries } from '@tanstack/react-query';
 import { database, TransactionRepository, AccountRepository } from '@/infrastructure/database';
 
 import type Account from '@/infrastructure/database/models/Account';
+import type { BankCode, AccountType } from '@/infrastructure/database/models/Account';
 import type Transaction from '@/infrastructure/database/models/Transaction';
 import type { TransactionSummary, AccountSummary } from '@/infrastructure/database/repositories';
+
+export interface AccountWithBalance {
+  id: string;
+  bankCode: BankCode;
+  bankName: string;
+  accountNumber: string;
+  accountType: AccountType;
+  balance: number;
+  isActive: boolean;
+}
 
 type TimeRange = 'weekly' | 'monthly';
 
@@ -18,7 +29,7 @@ interface SpendingDataPoint {
 
 interface DashboardData {
   totalBalance: number;
-  accounts: Account[];
+  accounts: AccountWithBalance[];
   recentTransactions: Transaction[];
   transactionSummary: TransactionSummary;
   spendingData: SpendingDataPoint[];
@@ -37,7 +48,7 @@ interface UseDashboardDataResult {
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
-  accounts: Account[];
+  accounts: AccountWithBalance[];
   accountsLoading: boolean;
   accountsError: Error | null;
   recentTransactions: Transaction[];
@@ -212,15 +223,59 @@ export function useDashboardData(options: UseDashboardDataOptions = {}): UseDash
 
   const accountsQuery = useQuery({
     queryKey: DASHBOARD_QUERY_KEYS.accounts(),
-    queryFn: async (): Promise<Account[]> => {
-      return accountRepository.findActive();
+    queryFn: async (): Promise<AccountWithBalance[]> => {
+      const accounts = await accountRepository.findActive();
+
+      if (accounts.length === 0) {
+        return [];
+      }
+
+      const accountIds = accounts.map((a) => a.id);
+      const balances = await transactionRepository.getBalancesByAccountIds(accountIds);
+
+      return accounts.map((account) => ({
+        id: account.id,
+        bankCode: account.bankCode,
+        bankName: account.bankName,
+        accountNumber: account.accountNumber,
+        accountType: account.accountType,
+        balance: balances.get(account.id) ?? 0,
+        isActive: account.isActive,
+      }));
     },
   });
 
   const accountSummaryQuery = useQuery({
     queryKey: DASHBOARD_QUERY_KEYS.accountSummary(),
     queryFn: async (): Promise<AccountSummary> => {
-      return accountRepository.getSummary();
+      const summary = await accountRepository.getSummary();
+      const accounts = await accountRepository.findAll();
+
+      if (accounts.length === 0) {
+        return summary;
+      }
+
+      const accountIds = accounts.map((a) => a.id);
+      const balances = await transactionRepository.getBalancesByAccountIds(accountIds);
+
+      let totalBalance = 0;
+      const byBank = { ...summary.byBank };
+
+      for (const bankCode of Object.keys(byBank)) {
+        byBank[bankCode as keyof typeof byBank] = 0;
+      }
+
+      for (const account of accounts) {
+        const balance = balances.get(account.id) ?? 0;
+        totalBalance += balance;
+        byBank[account.bankCode] = (byBank[account.bankCode] ?? 0) + balance;
+      }
+
+      return {
+        ...summary,
+        totalBalance,
+        byBank,
+      };
     },
   });
 

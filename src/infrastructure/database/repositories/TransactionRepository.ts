@@ -310,4 +310,53 @@ export class TransactionRepository {
     const count = await this.collection.query(Q.where('sms_id', smsId)).fetchCount();
     return count > 0;
   }
+
+  async getCalculatedBalanceByAccountId(accountId: string): Promise<number> {
+    const transactions = await this.findByAccountId(accountId);
+    let balance = 0;
+
+    for (const t of transactions) {
+      if (t.type === 'income' || t.type === 'transfer_in') {
+        balance += t.amount;
+      } else if (t.type === 'expense' || t.type === 'transfer_out') {
+        balance -= t.amount;
+      }
+    }
+
+    return balance;
+  }
+
+  async getLatestBalanceAfterByAccountId(accountId: string): Promise<number | null> {
+    const transactions = await this.collection
+      .query(
+        Q.where('account_id', accountId),
+        Q.where('balance_after', Q.notEq(null)),
+        Q.sortBy('transaction_date', Q.desc),
+        Q.take(1)
+      )
+      .fetch();
+
+    const transaction = transactions[0];
+    if (!transaction) {
+      return null;
+    }
+
+    return transaction.balanceAfter ?? null;
+  }
+
+  async getBalancesByAccountIds(accountIds: string[]): Promise<Map<string, number>> {
+    const balances = new Map<string, number>();
+
+    for (const accountId of accountIds) {
+      const latestBalance = await this.getLatestBalanceAfterByAccountId(accountId);
+      if (latestBalance !== null) {
+        balances.set(accountId, latestBalance);
+      } else {
+        const calculatedBalance = await this.getCalculatedBalanceByAccountId(accountId);
+        balances.set(accountId, calculatedBalance);
+      }
+    }
+
+    return balances;
+  }
 }

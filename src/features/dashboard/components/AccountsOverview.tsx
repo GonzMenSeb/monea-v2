@@ -8,10 +8,10 @@ import { LoadingState } from '@/shared/components/feedback/LoadingState';
 import { AccountCard } from '@/shared/components/ui/Card';
 import { colors } from '@/shared/theme';
 
-import type Account from '@/infrastructure/database/models/Account';
+import type { AccountWithBalance } from '../hooks/useDashboardData';
 
 interface AccountsOverviewProps {
-  accounts: Account[];
+  accounts: AccountWithBalance[];
   isLoading?: boolean;
   error?: Error | null;
   onAccountPress?: (accountId: string) => void;
@@ -103,7 +103,7 @@ const AccountRow = memo(function AccountRow({
   onPress,
   isLast,
 }: {
-  account: Account;
+  account: AccountWithBalance;
   formatCurrency: (amount: number) => string;
   onPress?: (id: string) => void;
   isLast: boolean;

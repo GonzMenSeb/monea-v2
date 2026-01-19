@@ -77,19 +77,28 @@ const mockPreviousSummary: TransactionSummary = {
 };
 
 const mockFindActive = jest.fn().mockResolvedValue(mockAccounts);
+const mockFindAll = jest.fn().mockResolvedValue(mockAccounts);
 const mockGetSummary = jest.fn().mockResolvedValue(mockAccountSummary);
 const mockFindByDateRange = jest.fn().mockResolvedValue(mockTransactions);
 const mockGetSummaryByDateRange = jest.fn();
+const mockGetBalancesByAccountIds = jest.fn().mockResolvedValue(
+  new Map([
+    ['1', 5000000],
+    ['2', 1500000],
+  ])
+);
 
 jest.mock('@/infrastructure/database', () => ({
   database: {},
   AccountRepository: jest.fn().mockImplementation(() => ({
     findActive: mockFindActive,
+    findAll: mockFindAll,
     getSummary: mockGetSummary,
   })),
   TransactionRepository: jest.fn().mockImplementation(() => ({
     findByDateRange: mockFindByDateRange,
     getSummaryByDateRange: mockGetSummaryByDateRange,
+    getBalancesByAccountIds: mockGetBalancesByAccountIds,
   })),
 }));
 
