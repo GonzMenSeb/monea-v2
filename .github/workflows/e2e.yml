@@ -272,7 +272,7 @@ jobs:
             adb shell settings put global animator_duration_scale 0
             sleep 10
             adb logcat -c
-            npm run e2e:test:ci -- --headless --retries 2 || (adb logcat -d > artifacts/logcat.txt && exit 1)
+            npm run e2e:test:ci -- --ci --headless --retries 2 || (adb logcat -d > artifacts/logcat.txt && exit 1)
 
       - name: Capture logcat on failure
         if: failure()
