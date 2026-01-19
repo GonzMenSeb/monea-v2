@@ -213,12 +213,26 @@ Dates in SMS messages typically follow these formats:
 
 To add support for a new bank:
 
-1. Collect sample SMS messages from the bank
+1. Collect sample SMS messages from the bank (at least 3-5 real samples)
 2. Identify the message patterns for each transaction type
-3. Create regex patterns in `src/core/parser/BankPatterns.ts`
-4. Add comprehensive tests in `src/core/parser/__tests__/`
-5. Register the bank in `BANK_INFO` and `BANK_PATTERNS`
-6. Update this documentation
+3. Add bank to `BANK_INFO` in `src/core/parser/BankPatterns.ts`:
+   ```typescript
+   [bank-code]: {
+     name: 'Bank Name',
+     senders: ['Sender1', 'ShortCode'],
+   }
+   ```
+4. Add patterns to `BANK_PATTERNS` in the same file:
+   ```typescript
+   [bank-code]: {
+     purchase: /regex-pattern/i,
+     transfer: /regex-pattern/i,
+     // ... other transaction types
+   }
+   ```
+5. Add comprehensive tests in `src/core/parser/__tests__/`
+6. Test with `npm test -- --testPathPatterns="parser"`
+7. Update this documentation with the new bank's patterns
 
 ### Pattern Guidelines
 

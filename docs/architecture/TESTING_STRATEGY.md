@@ -311,30 +311,29 @@ export function createMockBancolombiaMessage(): SmsMessage {
 
 ## CI/CD Integration
 
-### GitHub Actions Workflow
+### GitHub Actions Workflows
 
-```yaml
-# .github/workflows/test.yml
-name: Tests
+The project uses two main workflows:
 
-on: [push, pull_request]
+**E2E Tests** (`.github/workflows/e2e.yml`):
+- Runs on push to `main`/`develop` and pull requests
+- Builds debug APK for x86_64 emulator testing
+- Builds release APK (arm64-v8a) for device downloads
+- Runs Detox E2E tests with API level 34 emulator
+- Uploads artifacts: `device-apk` (14 days), `apks` (7 days)
 
-jobs:
-  unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci --legacy-peer-deps
-      - run: npm test -- --coverage
-
-  e2e-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm run e2e:build:android
-      - run: npm run e2e:test:android
+**Test Script Reference**:
+```bash
+npm run e2e:build:android    # Build debug APK locally
+npm run e2e:test:android     # Run E2E on local emulator (Pixel_4_API_30)
+npm run e2e:test:ci          # Run E2E in CI (uses e2e_avd)
 ```
+
+### Detox Configuration
+
+E2E tests use Detox with different configurations:
+- `android.emu.debug` - Local development (Pixel_4_API_30)
+- `android.ci.debug` - CI environment (e2e_avd via env var)
 
 ## Best Practices
 

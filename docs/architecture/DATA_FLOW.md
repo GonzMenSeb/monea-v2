@@ -62,7 +62,9 @@ This document describes how data flows through the Monea application.
 ┌──────────────────────────────────────────────────────────┐
 │                   TransactionParser                       │
 │  ┌───────────────┐  ┌───────────────┐  ┌──────────────┐ │
-│  │ getBankBySender│─▶│ matchPatterns │─▶│extractDetails│ │
+│  │getBankBySender│─▶│ matchPatterns │─▶│   Extract:   │ │
+│  │(BankPatterns) │  │(BANK_PATTERNS)│  │ Amount, Date │ │
+│  │               │  │               │  │   Merchant   │ │
 │  └───────────────┘  └───────────────┘  └──────────────┘ │
 └──────────────────────────────────────────────────────────┘
        │

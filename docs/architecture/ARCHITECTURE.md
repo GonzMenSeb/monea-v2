@@ -200,17 +200,13 @@ monea/
 │   ├── core/                         # Business logic (domain-pure)
 │   │   └── parser/
 │   │       ├── TransactionParser.ts  # Main parser entry point
-│   │       ├── ParserRegistry.ts     # Strategy registry
-│   │       ├── patterns/             # Bank-specific parsers
-│   │       │   ├── BancolombiaParser.ts
-│   │       │   ├── DaviviendaParser.ts
-│   │       │   ├── BBVAParser.ts
-│   │       │   └── NequiParser.ts
-│   │       ├── extractors/           # Shared extraction logic
-│   │       │   ├── AmountExtractor.ts
-│   │       │   ├── DateExtractor.ts
-│   │       │   └── MerchantExtractor.ts
-│   │       └── types.ts              # Parser interfaces
+│   │       ├── BankPatterns.ts       # Bank info and regex patterns
+│   │       ├── AmountExtractor.ts    # COP amount extraction
+│   │       ├── DateExtractor.ts      # Date/time extraction
+│   │       ├── MerchantExtractor.ts  # Merchant name extraction
+│   │       ├── types.ts              # Parser interfaces
+│   │       ├── index.ts              # Public exports
+│   │       └── __tests__/            # Parser unit tests
 │   │
 │   └── infrastructure/               # External system integrations
 │       ├── database/
@@ -251,36 +247,37 @@ monea/
 
 ## Design Patterns
 
-### 1. Strategy Pattern (SMS Parsing)
+### 1. Pattern-Based Parsing (SMS Parsing)
 
-Each bank has different SMS formats. The parser uses the Strategy pattern to handle this variation:
+Each bank has different SMS formats. The parser uses a pattern-based approach with centralized bank configurations:
 
 ```
 ┌──────────────────────┐
 │  TransactionParser   │
-│  (Context)           │
+│  (Main Entry Point)  │
 └──────────┬───────────┘
            │ uses
            ▼
 ┌──────────────────────┐
-│   ParserStrategy     │
-│   <<interface>>      │
-│  + canParse(sms)     │
-│  + parse(sms)        │
+│    BankPatterns.ts   │
+│  ┌────────────────┐  │
+│  │  BANK_INFO     │  │  Bank identifiers & senders
+│  │  BANK_PATTERNS │  │  Regex patterns per bank
+│  └────────────────┘  │
 └──────────┬───────────┘
-           │ implemented by
+           │ extracts via
      ┌─────┴─────┬─────────────┐
      ▼           ▼             ▼
-┌─────────┐ ┌─────────┐ ┌─────────┐
-│Bancol.  │ │Davivien.│ │  BBVA   │
-│Parser   │ │Parser   │ │ Parser  │
-└─────────┘ └─────────┘ └─────────┘
+┌─────────┐ ┌─────────┐ ┌─────────────┐
+│ Amount  │ │  Date   │ │  Merchant   │
+│Extractor│ │Extractor│ │  Extractor  │
+└─────────┘ └─────────┘ └─────────────┘
 ```
 
 **Benefits:**
-- Adding new banks requires only a new strategy file
-- Each parser can be unit tested in isolation
-- No modification to existing code when extending
+- Adding new banks requires updating BANK_INFO and BANK_PATTERNS
+- Extractors are reusable across all banks
+- Centralized configuration for easy maintenance
 
 ### 2. Repository Pattern (Data Access)
 
@@ -479,7 +476,8 @@ App
 | 2024-01 | Zustand + React Query | Minimal boilerplate, separation | Redux (verbose), MobX (complex) |
 | 2024-01 | NativeWind | Utility-first, fast development | Styled Components (verbose) |
 | 2024-01 | Feature-based structure | Maintainability at scale | Layer-based (harder to navigate) |
-| 2024-01 | Strategy pattern for parsers | Bank extensibility | Switch statement (violates OCP) |
+| 2024-01 | Pattern-based parsing | Centralized config, reusable extractors | Strategy classes (more files) |
+| 2026-01 | Detox E2E testing | Native Android testing, CI support | Maestro (less mature) |
 
 ---
 

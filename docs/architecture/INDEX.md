@@ -33,13 +33,14 @@ The Monea v2 application is built on these core principles:
 
 | Document | Status | Last Updated |
 |----------|--------|--------------|
-| ARCHITECTURE.md | ✅ Complete | 2026-01-16 |
-| DATA_FLOW.md | ✅ Complete | 2026-01-16 |
-| TESTING_STRATEGY.md | ✅ Complete | 2026-01-16 |
+| ARCHITECTURE.md | ✅ Complete | 2026-01-18 |
+| DATA_FLOW.md | ✅ Complete | 2026-01-18 |
+| TESTING_STRATEGY.md | ✅ Complete | 2026-01-18 |
 
 ## Related Files
 
 - `/CLAUDE.md` - Project-specific coding standards and configuration
-- `/README.md` - Project overview and getting started guide (future)
-- `/docs/CONTRIBUTING.md` - Contribution guidelines (future)
-- `/docs/SMS_PATTERNS.md` - Bank SMS format documentation (future)
+- `/docs/CONTRIBUTING.md` - Contribution guidelines
+- `/docs/SMS_PATTERNS.md` - Bank SMS format documentation
+- `/.detoxrc.js` - Detox E2E test configuration
+- `/.github/workflows/e2e.yml` - CI/CD pipeline configuration

@@ -8,9 +8,10 @@ Thank you for your interest in contributing to Monea! This document provides gui
 
 - Node.js 20+
 - npm
-- Android Studio with SDK 30+
+- Android Studio with SDK 34+ (minSdkVersion is 34)
 - Java JDK 17+
 - Git
+- Android Emulator (Pixel 4 API 30 recommended for local E2E tests)
 
 ### Initial Setup
 
@@ -139,11 +140,18 @@ npm run test:coverage # With coverage
 
 - Write E2E tests for critical user flows
 - Use Detox for Android testing
+- Test files live in `e2e/` directory
 
 ```bash
-npm run e2e:build:android  # Build app
-npm run e2e:test:android   # Run tests
+npm run e2e:build:android  # Build debug APK for E2E
+npm run e2e:test:android   # Run tests on local emulator (Pixel_4_API_30)
+npm run e2e:test:ci        # Run tests in CI environment (e2e_avd)
 ```
+
+**Detox Configurations:**
+- `android.emu.debug` - Local development with emulator
+- `android.ci.debug` - CI environment
+- `android.att.debug` - Physical device attached via ADB
 
 ## Adding a New Feature
 

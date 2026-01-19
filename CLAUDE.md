@@ -214,9 +214,16 @@ npm run lint:fix                # ESLint auto-fix
 npm run typecheck               # TypeScript check
 ```
 
-### Database (WatermelonDB)
+### Validation
 ```bash
-npm run db:reset                # Reset local database (dev only)
+npm run validate                # Run typecheck, lint, format check, and tests
+```
+
+### E2E Testing
+```bash
+npm run e2e:build:android       # Build debug APK for E2E tests
+npm run e2e:test:android        # Run E2E tests on local emulator
+npm run e2e:test:ci             # Run E2E tests in CI environment
 ```
 
 ### Build
@@ -302,10 +309,10 @@ describe('TransactionItem', () => {
 
 ### Adding a New Bank Parser
 1. Collect real SMS samples from the bank
-2. Create pattern file in `src/core/parser/patterns/[BankName].ts`
-3. Implement parser strategy following existing patterns
-4. Write comprehensive tests with real message samples
-5. Register parser in `src/core/parser/ParserRegistry.ts`
+2. Add bank info to `src/core/parser/BankPatterns.ts` (BANK_INFO and BANK_PATTERNS)
+3. Implement extraction patterns in the BANK_PATTERNS object
+4. Write comprehensive tests with real message samples in `src/core/parser/__tests__/`
+5. Update `docs/SMS_PATTERNS.md` with the new bank's message formats
 
 ### Creating a Component
 1. Define props interface
@@ -381,3 +388,5 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`
 | `src/app/_layout.tsx` | Root layout with providers |
 | `src/infrastructure/database/schema.ts` | Database schema |
 | `src/core/parser/TransactionParser.ts` | Main SMS parsing engine |
+| `src/shared/utils/formatting.ts` | Currency and date formatting utilities |
+| `.detoxrc.js` | Detox E2E test configuration |
