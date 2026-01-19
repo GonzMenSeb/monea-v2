@@ -9,6 +9,29 @@ module.exports = {
       setupTimeout: 120000,
     },
   },
+  behavior: {
+    init: {
+      exposeGlobals: true,
+      reinstallApp: true,
+    },
+    launchApp: 'auto',
+    cleanup: {
+      shutdownDevice: false,
+    },
+  },
+  artifacts: {
+    rootDir: 'artifacts',
+    plugins: {
+      log: { enabled: true },
+      screenshot: {
+        shouldTakeAutomaticSnapshots: true,
+        takeWhen: {
+          testStart: false,
+          testDone: true,
+        },
+      },
+    },
+  },
   apps: {
     'android.debug': {
       type: 'android.apk',
@@ -16,6 +39,15 @@ module.exports = {
       build:
         'cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug',
       reversePorts: [8081],
+    },
+    'android.ci': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-debug.apk',
+      testBinaryPath:
+        'android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk',
+      launchArgs: {
+        detoxURLBlacklistRegex: '.*bundle.*',
+      },
     },
     'android.release': {
       type: 'android.apk',
@@ -55,7 +87,7 @@ module.exports = {
     },
     'android.ci.debug': {
       device: 'ci',
-      app: 'android.debug',
+      app: 'android.ci',
     },
     'android.att.debug': {
       device: 'attached',
