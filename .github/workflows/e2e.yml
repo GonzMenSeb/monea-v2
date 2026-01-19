@@ -110,6 +110,8 @@ jobs:
           name: prebuild-android
           path: android/
 
+      - run: chmod +x android/gradlew
+
       - name: Build Device APK (arm64-v8a)
         env:
           ORG_GRADLE_PROJECT_reactNativeArchitectures: arm64-v8a
@@ -158,6 +160,8 @@ jobs:
         with:
           name: prebuild-android
           path: android/
+
+      - run: chmod +x android/gradlew
 
       - name: Build E2E APKs (x86_64)
         env:
