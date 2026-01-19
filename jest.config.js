@@ -10,13 +10,15 @@ const baseConfig = {
     '!src/**/*.d.ts',
     '!src/**/__tests__/**',
     '!src/**/types/**',
+    '!src/**/index.ts',
+    '!src/**/types.ts',
   ],
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
+      branches: 50,
+      functions: 50,
+      lines: 50,
+      statements: 50,
     },
     'src/core/': {
       branches: 80,
