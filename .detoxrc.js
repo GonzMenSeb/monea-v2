@@ -14,7 +14,7 @@ module.exports = {
       exposeGlobals: true,
       reinstallApp: true,
     },
-    launchApp: 'manual',
+    launchApp: 'auto',
     cleanup: {
       shutdownDevice: false,
     },
