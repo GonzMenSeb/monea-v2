@@ -443,7 +443,10 @@ describe('AccountsManagement', () => {
 
       await waitFor(() => {
         expect(mockAccountRepository.update).toHaveBeenCalledWith('1', {
+          bankCode: 'bancolombia',
           bankName: 'Bancolombia',
+          accountNumber: '1234567890',
+          accountType: 'savings',
           balance: 200000,
         });
       });

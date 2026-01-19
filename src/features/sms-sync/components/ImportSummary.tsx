@@ -6,6 +6,8 @@ import type { BulkImportResult } from '../services';
 
 interface ImportSummaryProps {
   result: BulkImportResult;
+  canImportMore: boolean;
+  onImportMore: () => void;
   onDone: () => void;
   onViewTransactions: () => void;
 }
@@ -66,6 +68,8 @@ const ButtonRow = styled(XStack, {
 
 export function ImportSummary({
   result,
+  canImportMore,
+  onImportMore,
   onDone,
   onViewTransactions,
 }: ImportSummaryProps): React.ReactElement {
@@ -128,6 +132,12 @@ export function ImportSummary({
         </ErrorList>
       )}
 
+      {canImportMore && (
+        <Button onPress={onImportMore} fullWidth>
+          Import More
+        </Button>
+      )}
+
       <ButtonRow>
         <Stack flex={1}>
           <Button variant="ghost" onPress={onDone} fullWidth>
@@ -136,7 +146,11 @@ export function ImportSummary({
         </Stack>
         {hasImported && (
           <Stack flex={1}>
-            <Button onPress={onViewTransactions} fullWidth>
+            <Button
+              variant={canImportMore ? 'ghost' : undefined}
+              onPress={onViewTransactions}
+              fullWidth
+            >
               View Transactions
             </Button>
           </Stack>

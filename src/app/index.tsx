@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useSyncExternalStore } from 'react';
 
 import { ActivityIndicator } from 'react-native';
 
@@ -9,23 +9,19 @@ import { PermissionsScreen } from '@/features/onboarding';
 import { useAppStore } from '@/shared/store/appStore';
 import { colors } from '@/shared/theme';
 
+function useStoreHydration(): boolean {
+  return useSyncExternalStore(
+    useAppStore.persist.onFinishHydration,
+    () => useAppStore.persist.hasHydrated(),
+    () => false
+  );
+}
+
 export default function HomeScreen(): React.ReactElement {
   const router = useRouter();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = useStoreHydration();
   const hasCompletedOnboarding = useAppStore((state) => state.hasCompletedOnboarding);
   const completeOnboarding = useAppStore((state) => state.completeOnboarding);
-
-  useEffect(() => {
-    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
-      setIsHydrated(true);
-    });
-
-    if (useAppStore.persist.hasHydrated()) {
-      setIsHydrated(true);
-    }
-
-    return unsubscribe;
-  }, []);
 
   useEffect(() => {
     if (isHydrated && hasCompletedOnboarding) {

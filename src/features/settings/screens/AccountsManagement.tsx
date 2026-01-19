@@ -32,6 +32,7 @@ const BANK_OPTIONS: { code: BankCode; name: string; color: string }[] = [
   { code: 'bbva', name: 'BBVA', color: colors.bbva.blue },
   { code: 'nequi', name: 'Nequi', color: colors.nequi.pink },
   { code: 'daviplata', name: 'Daviplata', color: colors.daviplata.orange },
+  { code: 'bancoomeva', name: 'Bancoomeva', color: colors.accent.primary },
 ];
 
 const ACCOUNT_TYPE_OPTIONS: { type: AccountType; label: string }[] = [
@@ -503,27 +504,44 @@ export function AccountsManagement(): React.ReactElement {
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       closeModal();
     },
+    onError: (error) => {
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to create account');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateAccountData }) => {
-      return accountRepository.update(id, data);
+      const result = await accountRepository.update(id, data);
+      if (!result) {
+        throw new Error('Account not found');
+      }
+      return result;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ACCOUNT_QUERY_KEYS.all });
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       closeModal();
+    },
+    onError: (error) => {
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to update account');
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return accountRepository.delete(id);
+      const result = await accountRepository.delete(id);
+      if (!result) {
+        throw new Error('Account not found');
+      }
+      return result;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ACCOUNT_QUERY_KEYS.all });
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       closeModal();
+    },
+    onError: (error) => {
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete account');
     },
   });
 
@@ -604,7 +622,10 @@ export function AccountsManagement(): React.ReactElement {
       updateMutation.mutate({
         id: editingAccountId,
         data: {
+          bankCode: formData.bankCode,
           bankName: formData.bankName,
+          accountNumber: formData.accountNumber,
+          accountType: formData.accountType,
           balance,
         },
       });

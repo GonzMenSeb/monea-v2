@@ -4,14 +4,16 @@ This document describes the SMS message patterns used to parse bank transaction 
 
 ## Supported Banks
 
-| Bank | Code | Short Codes |
-|------|------|-------------|
-| Bancolombia | `bancolombia` | `891333`, `85540`, `85784` |
-| Davivienda | `davivienda` | `85327` |
-| BBVA Colombia | `bbva` | `87703` |
-| Nequi | `nequi` | `85432`, `85954` |
-| Daviplata | `daviplata` | `85255` |
-| Bancoomeva | `bancoomeva` | (name-based only) |
+| Bank | Code | Content Identifier |
+|------|------|-------------------|
+| Bancolombia | `bancolombia` | `Bancolombia le informa...`, `Bancolombia:...` |
+| Davivienda | `davivienda` | `Davivienda:...` |
+| BBVA Colombia | `bbva` | `BBVA:...` |
+| Nequi | `nequi` | `Nequi:...`, `*Nequi*:...` |
+| Daviplata | `daviplata` | `DaviPlata:...` |
+| Bancoomeva | `bancoomeva` | `Bancoomeva informa...` |
+
+**Note:** Bank detection is based on **message content**, not SMS sender. This ensures universal compatibility regardless of carrier short codes.
 
 ## Transaction Types
 
@@ -230,20 +232,23 @@ To add support for a new bank:
 3. Add bank to `BANK_INFO` in `src/core/parser/BankPatterns.ts`:
    ```typescript
    [bank-code]: {
+     code: 'bank-code',
      name: 'Bank Name',
-     senders: ['Sender1', 'ShortCode'],
    }
    ```
 4. Add patterns to `BANK_PATTERNS` in the same file:
    ```typescript
-   [bank-code]: {
-     purchase: /regex-pattern/i,
-     transfer: /regex-pattern/i,
+   [bank-code]: [
+     {
+       type: 'expense',
+       pattern: /regex-pattern/i,
+       groups: { amount: 1, merchant: 2, ... }
+     },
      // ... other transaction types
-   }
+   ]
    ```
 5. Add comprehensive tests in `src/core/parser/__tests__/`
-6. Test with `npm test -- --testPathPatterns="parser"`
+6. Test with `npm test parser`
 7. Update this documentation with the new bank's patterns
 
 ### Pattern Guidelines
@@ -252,13 +257,14 @@ To add support for a new bank:
 - Make optional parts non-capturing where possible
 - Account for variations in spacing
 - Test with real SMS samples
-- Handle both short codes and bank names as senders
+- Bank is detected from **message content** (e.g., "Bancolombia:" prefix), not SMS sender
+- Patterns must uniquely identify the bank within the message body
 
 ## Testing
 
 Run parser tests:
 ```bash
-npm test -- --testPathPatterns="parser"
+npm test parser
 ```
 
 Parser tests should cover:
@@ -267,3 +273,4 @@ Parser tests should cover:
 - Amount parsing accuracy
 - Date extraction
 - Merchant name extraction
+- Content-based bank detection (using `detectBankFromContent()`)

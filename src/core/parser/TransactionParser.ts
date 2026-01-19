@@ -1,7 +1,7 @@
 import {
   BANK_INFO,
   BANK_PATTERNS,
-  getBankBySender,
+  detectBankFromContent,
   parseAmount,
   parseDate,
   type TransactionPattern,
@@ -24,11 +24,7 @@ function createBankParser(bankCode: BankCode): BankParser {
   return {
     bank,
 
-    canParse(sms: string, sender: string): boolean {
-      const detectedBank = getBankBySender(sender);
-      if (!detectedBank || detectedBank.code !== bankCode) {
-        return false;
-      }
+    canParse(sms: string, _sender: string): boolean {
       return patterns.some((pattern) => pattern.pattern.test(sms));
     },
 
@@ -90,8 +86,8 @@ class ParserRegistry {
     return this.parsers.get(bankCode);
   }
 
-  findParser(sms: string, sender: string): BankParser | undefined {
-    return this.getParsers().find((parser) => parser.canParse(sms, sender));
+  findParser(sms: string): BankParser | undefined {
+    return this.getParsers().find((parser) => parser.canParse(sms, ''));
   }
 }
 
@@ -120,11 +116,11 @@ export class TransactionParser {
     this.registry = registry ?? createDefaultRegistry();
   }
 
-  parse(sms: string, sender: string): ParseOutcome {
-    const bank = this.detectBank(sender);
+  parse(sms: string, _sender: string): ParseOutcome {
+    const bank = detectBankFromContent(sms);
 
     if (!bank) {
-      return this.createError('Unknown sender: unable to identify bank', sms);
+      return this.createError('No bank pattern matched this message', sms);
     }
 
     const parser = this.registry.getParser(bank.code);
@@ -133,11 +129,7 @@ export class TransactionParser {
       return this.createError(`No parser registered for bank: ${bank.name}`, sms);
     }
 
-    if (!parser.canParse(sms, sender)) {
-      return this.createError(`Message format not recognized for ${bank.name}`, sms);
-    }
-
-    const transaction = parser.parse(sms, sender);
+    const transaction = parser.parse(sms, _sender);
 
     if (!transaction) {
       return this.createError(`Failed to extract transaction data from ${bank.name} message`, sms);
@@ -146,13 +138,8 @@ export class TransactionParser {
     return this.createSuccess(bank, transaction, sms);
   }
 
-  detectBank(sender: string): BankInfo | null {
-    return getBankBySender(sender);
-  }
-
-  canParse(sms: string, sender: string): boolean {
-    const parser = this.registry.findParser(sms, sender);
-    return parser !== undefined;
+  canParse(sms: string): boolean {
+    return detectBankFromContent(sms) !== null;
   }
 
   private createSuccess(

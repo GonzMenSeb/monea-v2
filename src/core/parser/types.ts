@@ -7,7 +7,6 @@ export type BankCode = 'bancolombia' | 'davivienda' | 'bbva' | 'nequi' | 'davipl
 export interface BankInfo {
   code: BankCode;
   name: string;
-  senderPatterns: RegExp[];
 }
 
 export interface ParsedTransaction {

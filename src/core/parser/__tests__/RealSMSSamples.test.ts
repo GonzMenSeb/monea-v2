@@ -57,10 +57,13 @@ describe('Real SMS Samples - Colombian Banks', () => {
         }
       });
 
-      it('sender code 85954 is now assigned to Nequi', () => {
+      it('detects bank from content regardless of sender', () => {
         const sms = 'Bancolombia le informa compra por $30.000 en TIENDA. Saldo: $170.000';
-        const result = parser.parse(sms, '85954');
-        expect(result.success).toBe(false);
+        const result = parser.parse(sms, 'any-sender');
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.bank.code).toBe('bancolombia');
+        }
       });
     });
 
@@ -620,17 +623,17 @@ describe('Real SMS Samples - Colombian Banks', () => {
   });
 
   describe('Error Cases', () => {
-    describe('unknown sender', () => {
-      it('rejects messages from unknown senders', () => {
+    describe('non-bank messages', () => {
+      it('rejects messages that do not match any bank pattern', () => {
         const sms = 'Tu banco: Compra por $50.000 en TIENDA. Saldo: $450.000';
-        const result = parser.parse(sms, 'UnknownBank');
+        const result = parser.parse(sms, 'any-sender');
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toContain('Unknown sender');
+          expect(result.error).toContain('No bank pattern matched');
         }
       });
 
-      it('rejects messages from numeric unknown senders', () => {
+      it('rejects generic bank messages', () => {
         const sms = 'Banco: Compra por $50.000';
         const result = parser.parse(sms, '99999');
         expect(result.success).toBe(false);
@@ -643,7 +646,7 @@ describe('Real SMS Samples - Colombian Banks', () => {
         const result = parser.parse(sms, 'Bancolombia');
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toContain('not recognized');
+          expect(result.error).toContain('No bank pattern matched');
         }
       });
 

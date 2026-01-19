@@ -10,20 +10,25 @@ interface AppState {
   themeMode: ThemeMode;
   hasCompletedOnboarding: boolean;
   lastSyncTimestamp: number | null;
+  importTierIndex: number;
 }
 
 interface AppActions extends BaseStoreActions {
   setThemeMode: (mode: ThemeMode) => void;
   completeOnboarding: () => void;
   updateLastSyncTimestamp: () => void;
+  advanceImportTier: () => void;
 }
 
 export type AppStore = AppState & AppActions;
+
+const IMPORT_TIER_MAX = 3;
 
 const initialState: AppState = {
   themeMode: 'system',
   hasCompletedOnboarding: false,
   lastSyncTimestamp: null,
+  importTierIndex: 0,
 };
 
 export const useAppStore = create<AppStore>()(
@@ -37,6 +42,11 @@ export const useAppStore = create<AppStore>()(
 
       updateLastSyncTimestamp: () => set({ lastSyncTimestamp: Date.now() }),
 
+      advanceImportTier: () =>
+        set((state) => ({
+          importTierIndex: Math.min(state.importTierIndex + 1, IMPORT_TIER_MAX),
+        })),
+
       reset: () => set(initialState),
     }),
     {
@@ -46,6 +56,7 @@ export const useAppStore = create<AppStore>()(
         themeMode: state.themeMode,
         hasCompletedOnboarding: state.hasCompletedOnboarding,
         lastSyncTimestamp: state.lastSyncTimestamp,
+        importTierIndex: state.importTierIndex,
       }),
     }
   )

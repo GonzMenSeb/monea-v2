@@ -81,6 +81,8 @@ export default function ImportScreen(): React.ReactElement {
     result,
     error,
     estimatedCount,
+    currentLimit,
+    canImportMore,
     hasPermission,
     checkPermission,
     requestPermission,
@@ -88,6 +90,7 @@ export default function ImportScreen(): React.ReactElement {
     startImport,
     cancelImport,
     reset,
+    prepareForMore,
   } = useBulkImport();
 
   useEffect(() => {
@@ -124,6 +127,10 @@ export default function ImportScreen(): React.ReactElement {
     reset();
     router.replace('/(tabs)/transactions');
   }, [reset, router]);
+
+  const handleImportMore = useCallback(() => {
+    prepareForMore();
+  }, [prepareForMore]);
 
   const isImporting = status === 'importing' || status === 'preparing';
   const showProgress = isImporting && progress !== null;
@@ -193,6 +200,8 @@ export default function ImportScreen(): React.ReactElement {
           {showResult && result && (
             <ImportSummary
               result={result}
+              canImportMore={canImportMore}
+              onImportMore={handleImportMore}
               onDone={handleDone}
               onViewTransactions={handleViewTransactions}
             />
@@ -201,6 +210,7 @@ export default function ImportScreen(): React.ReactElement {
           {showCard && (
             <BulkImportCard
               estimatedCount={estimatedCount}
+              importLimit={currentLimit}
               isLoading={status === 'preparing' || status === 'checking'}
               onStartImport={handleStartImport}
             />

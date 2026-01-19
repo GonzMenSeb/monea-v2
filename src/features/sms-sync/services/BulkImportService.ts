@@ -1,6 +1,6 @@
 import { InteractionManager } from 'react-native';
 
-import { BANK_INFO } from '@/core/parser';
+import { detectBankFromContent } from '@/core/parser';
 import { database } from '@/infrastructure/database';
 import { smsReader } from '@/infrastructure/sms';
 
@@ -33,23 +33,6 @@ export type ProgressCallback = (progress: BulkImportProgress) => void;
 
 const BATCH_SIZE = 50;
 
-const BANK_SHORT_CODES = [
-  '891333',
-  '85954', // Bancolombia
-  '85327', // Davivienda
-  '87703', // BBVA
-  '85432', // Nequi
-  '85255', // Daviplata
-];
-
-function getBankSenders(): string[] {
-  const senders: string[] = [...BANK_SHORT_CODES];
-  for (const bankInfo of Object.values(BANK_INFO)) {
-    senders.push(bankInfo.code, bankInfo.name);
-  }
-  return senders;
-}
-
 export class BulkImportService {
   private cancelled = false;
 
@@ -58,12 +41,14 @@ export class BulkImportService {
   }
 
   async getEstimatedCount(): Promise<number> {
-    const bankSenders = getBankSenders();
-    const messages = await smsReader.fetchHistoricalSms({
-      senders: bankSenders,
-      limit: 5000,
-    });
-    return messages.length;
+    const messages = await smsReader.fetchHistoricalSms({ limit: 5000 });
+    let count = 0;
+    for (const msg of messages) {
+      if (detectBankFromContent(msg.body)) {
+        count++;
+      }
+    }
+    return count;
   }
 
   async importHistoricalSms(
@@ -89,10 +74,8 @@ export class BulkImportService {
       errors: 0,
     });
 
-    const bankSenders = getBankSenders();
     const fetchOptions: HistoricalSmsOptions = {
       ...options,
-      senders: options?.senders ?? bankSenders,
       limit: options?.limit ?? 5000,
     };
 
@@ -153,9 +136,7 @@ export class BulkImportService {
             result.imported++;
           } else if (processResult.reason === 'duplicate') {
             result.duplicates++;
-          } else if (processResult.reason === 'not_bank_sms') {
-            // Skip non-bank SMS silently
-          } else {
+          } else if (processResult.reason !== 'not_bank_sms') {
             result.errors++;
             if (processResult.error) {
               result.errorMessages.push(processResult.error);

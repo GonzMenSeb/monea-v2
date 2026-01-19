@@ -9,32 +9,26 @@ export const BANK_INFO: Record<BankCode, BankInfo> = {
   bancolombia: {
     code: 'bancolombia',
     name: 'Bancolombia',
-    senderPatterns: [/^bancolombia$/i, /^891333$/, /^85540$/, /^85784$/],
   },
   davivienda: {
     code: 'davivienda',
     name: 'Davivienda',
-    senderPatterns: [/^davivienda$/i, /^85327$/],
   },
   bbva: {
     code: 'bbva',
     name: 'BBVA',
-    senderPatterns: [/^bbva$/i, /^87703$/],
   },
   nequi: {
     code: 'nequi',
     name: 'Nequi',
-    senderPatterns: [/^nequi$/i, /^85432$/, /^85954$/],
   },
   daviplata: {
     code: 'daviplata',
     name: 'Daviplata',
-    senderPatterns: [/^daviplata$/i, /^85255$/],
   },
   bancoomeva: {
     code: 'bancoomeva',
     name: 'Bancoomeva',
-    senderPatterns: [/^bancoomeva$/i],
   },
 };
 
@@ -57,6 +51,7 @@ const BALANCE_PATTERN = '\\$?([\\d.,]+(?:\\.\\d{2})?)';
 const ACCOUNT_PATTERN = '\\**(\\d{4})';
 const DATE_PATTERN = '(\\d{2}/\\d{2}/\\d{4})';
 const TIME_PATTERN = '(\\d{2}:\\d{2})';
+const FLEXIBLE_TIME_PATTERN = '(\\d{1,2}:\\d{2}(?::\\d{2})?)';
 const MERCHANT_PATTERN = '([A-Za-z0-9][A-Za-z0-9\\s]*[A-Za-z0-9]|[A-Za-z0-9])';
 const _REFERENCE_PATTERN = '(?:Ref\\.?|Referencia:?)\\s*([A-Za-z0-9]+)';
 
@@ -275,7 +270,7 @@ export const BANCOOMEVA_PATTERNS: TransactionPattern[] = [
   {
     type: 'expense',
     pattern: new RegExp(
-      `Bancoomeva\\s+informa\\s+compra\\s+por\\s+Internet\\s+en\\s+(.+?)\\s+por\\s+${AMOUNT_PATTERN}\\s+con\\s+su\\s+tarjeta\\s+Credito\\s+(\\d{4})\\s+el\\s+${FLEXIBLE_DATE_PATTERN}\\s*:?${TIME_PATTERN}?`,
+      `Bancoomeva\\s+informa\\s+compra\\s+por\\s+Internet\\s+en\\s+(.+?)\\s+por\\s+${AMOUNT_PATTERN}\\s+con\\s+su\\s+tarjeta\\s+Credito\\s+(\\d{4})\\s+el\\s+${FLEXIBLE_DATE_PATTERN}\\s+${FLEXIBLE_TIME_PATTERN}`,
       'i'
     ),
     groups: { merchant: 1, amount: 2, accountLast4: 3, date: 4, time: 5 },
@@ -291,11 +286,13 @@ export const BANK_PATTERNS: Record<BankCode, TransactionPattern[]> = {
   bancoomeva: BANCOOMEVA_PATTERNS,
 };
 
-export function matchesSender(sender: string, bank: BankInfo): boolean {
-  return bank.senderPatterns.some((pattern) => pattern.test(sender));
-}
-
-export function getBankBySender(sender: string): BankInfo | null {
-  const banks = Object.values(BANK_INFO);
-  return banks.find((bank) => matchesSender(sender, bank)) ?? null;
+export function detectBankFromContent(smsBody: string): BankInfo | null {
+  for (const [bankCode, patterns] of Object.entries(BANK_PATTERNS)) {
+    for (const pattern of patterns) {
+      if (pattern.pattern.test(smsBody)) {
+        return BANK_INFO[bankCode as BankCode];
+      }
+    }
+  }
+  return null;
 }

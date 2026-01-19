@@ -40,11 +40,15 @@ const SummaryLabel = styled(Text, {
   marginBottom: '$1',
 });
 
-const FAB = styled(Stack, {
-  name: 'FAB',
+const FABContainer = styled(Stack, {
+  name: 'FABContainer',
   position: 'absolute',
   bottom: 24,
   right: 24,
+});
+
+const FAB = styled(Stack, {
+  name: 'FAB',
   width: 56,
   height: 56,
   borderRadius: '$full',
@@ -156,19 +160,21 @@ export default function TransactionsScreen(): React.ReactElement {
         />
       </Stack>
 
-      <Pressable
-        onPress={handleAddTransaction}
-        accessibilityRole="button"
-        accessibilityLabel="Add new transaction"
-      >
-        {({ pressed }) => (
-          <FAB opacity={pressed ? 0.8 : 1} scale={pressed ? 0.95 : 1}>
-            <Text color="$textInverse" fontSize="$6" fontWeight="300">
-              +
-            </Text>
-          </FAB>
-        )}
-      </Pressable>
+      <FABContainer>
+        <Pressable
+          onPress={handleAddTransaction}
+          accessibilityRole="button"
+          accessibilityLabel="Add new transaction"
+        >
+          {({ pressed }) => (
+            <FAB opacity={pressed ? 0.8 : 1} scale={pressed ? 0.95 : 1}>
+              <Text color="$textInverse" fontSize="$6" fontWeight="300">
+                +
+              </Text>
+            </FAB>
+          )}
+        </Pressable>
+      </FABContainer>
     </Screen>
   );
 }

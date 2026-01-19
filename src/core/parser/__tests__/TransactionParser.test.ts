@@ -8,63 +8,26 @@ describe('TransactionParser', () => {
     parser = new TransactionParser();
   });
 
-  describe('detectBank', () => {
-    it('detects Bancolombia from sender name', () => {
-      const bank = parser.detectBank('Bancolombia');
-      expect(bank?.code).toBe('bancolombia');
-    });
-
-    it('detects Bancolombia from short code', () => {
-      const bank = parser.detectBank('891333');
-      expect(bank?.code).toBe('bancolombia');
-    });
-
-    it('detects Nequi', () => {
-      const bank = parser.detectBank('Nequi');
-      expect(bank?.code).toBe('nequi');
-    });
-
-    it('detects Davivienda', () => {
-      const bank = parser.detectBank('Davivienda');
-      expect(bank?.code).toBe('davivienda');
-    });
-
-    it('detects Daviplata', () => {
-      const bank = parser.detectBank('DaviPlata');
-      expect(bank?.code).toBe('daviplata');
-    });
-
-    it('detects BBVA', () => {
-      const bank = parser.detectBank('BBVA');
-      expect(bank?.code).toBe('bbva');
-    });
-
-    it('returns null for unknown sender', () => {
-      const bank = parser.detectBank('UnknownBank');
-      expect(bank).toBeNull();
-    });
-  });
-
   describe('canParse', () => {
     it('returns true for valid Bancolombia purchase message', () => {
       const sms =
         'Bancolombia le informa compra por $50.000 en EXITO 15/03/2024 14:30. T.*1234. Saldo: $500.000';
-      expect(parser.canParse(sms, 'Bancolombia')).toBe(true);
+      expect(parser.canParse(sms)).toBe(true);
     });
 
     it('returns true for valid Nequi payment message', () => {
       const sms = 'Nequi: Pagaste $25.000 en RAPPI. Saldo: $75.000';
-      expect(parser.canParse(sms, 'Nequi')).toBe(true);
+      expect(parser.canParse(sms)).toBe(true);
     });
 
     it('returns false for unrecognized message format', () => {
       const sms = 'Some random text that is not a transaction';
-      expect(parser.canParse(sms, 'Bancolombia')).toBe(false);
+      expect(parser.canParse(sms)).toBe(false);
     });
 
-    it('returns false for unknown sender', () => {
-      const sms = 'Bancolombia le informa compra por $50.000 en EXITO';
-      expect(parser.canParse(sms, 'UnknownBank')).toBe(false);
+    it('returns false for non-bank message', () => {
+      const sms = 'Your OTP code is 123456';
+      expect(parser.canParse(sms)).toBe(false);
     });
   });
 
@@ -248,24 +211,14 @@ describe('TransactionParser', () => {
   });
 
   describe('parse - error cases', () => {
-    it('returns error for unknown sender', () => {
-      const sms = 'Some bank message';
-      const result = parser.parse(sms, 'UnknownBank');
+    it('returns error for non-bank message', () => {
+      const sms = 'Some random message';
+      const result = parser.parse(sms, 'Unknown');
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toContain('Unknown sender');
+        expect(result.error).toContain('No bank pattern matched');
         expect(result.rawSms).toBe(sms);
-      }
-    });
-
-    it('returns error for unrecognized message format', () => {
-      const sms = 'Bancolombia: some random notification that is not a transaction';
-      const result = parser.parse(sms, 'Bancolombia');
-
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toContain('not recognized');
       }
     });
 
@@ -300,7 +253,7 @@ describe('TransactionParser', () => {
       if (result.success) {
         expect(result.bank).toEqual(BANK_INFO.nequi);
         expect(result.bank.name).toBe('Nequi');
-        expect(result.bank.senderPatterns).toBeDefined();
+        expect(result.bank.code).toBe('nequi');
       }
     });
   });

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 import { Pressable } from 'react-native';
 
@@ -71,6 +71,22 @@ const ButtonContainer = styled(XStack, {
   marginTop: '$4',
 });
 
+interface FormState {
+  name: string;
+  icon: CategoryIcon;
+  color: string;
+  isIncome: boolean;
+}
+
+function getInitialFormState(initialData?: Partial<CategoryFormData>): FormState {
+  return {
+    name: initialData?.name ?? '',
+    icon: initialData?.icon ?? 'other',
+    color: initialData?.color ?? CATEGORY_COLORS[0],
+    isIncome: initialData?.isIncome ?? false,
+  };
+}
+
 export function CategoryForm({
   initialData,
   isEditing = false,
@@ -78,20 +94,32 @@ export function CategoryForm({
   onSubmit,
   onCancel,
 }: CategoryFormProps): React.ReactElement {
-  const [name, setName] = useState(initialData?.name ?? '');
-  const [icon, setIcon] = useState<CategoryIcon>(initialData?.icon ?? 'other');
-  const [color, setColor] = useState(initialData?.color ?? CATEGORY_COLORS[0]);
-  const [isIncome, setIsIncome] = useState(initialData?.isIncome ?? false);
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
+  const [formState, setFormState] = useState(() => getInitialFormState(initialData));
   const [nameError, setNameError] = useState<string | undefined>();
 
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name ?? '');
-      setIcon(initialData.icon ?? 'other');
-      setColor(initialData.color ?? CATEGORY_COLORS[0]);
-      setIsIncome(initialData.isIncome ?? false);
-    }
-  }, [initialData]);
+  if (initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
+    setFormState(getInitialFormState(initialData));
+  }
+
+  const { name, icon, color, isIncome } = formState;
+
+  const setName = useCallback((value: string) => {
+    setFormState((prev) => ({ ...prev, name: value }));
+  }, []);
+
+  const setIcon = useCallback((value: CategoryIcon) => {
+    setFormState((prev) => ({ ...prev, icon: value }));
+  }, []);
+
+  const setColor = useCallback((value: string) => {
+    setFormState((prev) => ({ ...prev, color: value }));
+  }, []);
+
+  const setIsIncome = useCallback((value: boolean) => {
+    setFormState((prev) => ({ ...prev, isIncome: value }));
+  }, []);
 
   const validateName = useCallback((value: string): boolean => {
     if (!value.trim()) {
@@ -113,7 +141,7 @@ export function CategoryForm({
         validateName(value);
       }
     },
-    [nameError, validateName]
+    [nameError, validateName, setName]
   );
 
   const handleSubmit = useCallback(() => {

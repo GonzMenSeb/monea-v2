@@ -14,7 +14,10 @@ export interface CreateAccountData {
 }
 
 export interface UpdateAccountData {
+  bankCode?: BankCode;
   bankName?: string;
+  accountNumber?: string;
+  accountType?: AccountType;
   balance?: number;
   isActive?: boolean;
   lastSyncedAt?: number;
@@ -143,8 +146,17 @@ export class AccountRepository {
 
     await this.database.write(async () => {
       await account.update((a) => {
+        if (data.bankCode !== undefined) {
+          a.bankCode = data.bankCode;
+        }
         if (data.bankName !== undefined) {
           a.bankName = data.bankName;
+        }
+        if (data.accountNumber !== undefined) {
+          a.accountNumber = data.accountNumber;
+        }
+        if (data.accountType !== undefined) {
+          a.accountType = data.accountType;
         }
         if (data.balance !== undefined) {
           a.balance = data.balance;

@@ -38,9 +38,14 @@ declare module 'react-native-get-sms-android' {
     link_url: string;
   }
 
-  export type ListCallback = (count: number, smsList: string, error: string | null) => void;
+  export type ErrorCallback = (error: string) => void;
+  export type SuccessCallback = (count: number, smsList: string) => void;
 
-  function list(filter: SmsFilter | string, callback: ListCallback): void;
+  function list(
+    filter: SmsFilter | string,
+    errorCallback: ErrorCallback,
+    successCallback: SuccessCallback
+  ): void;
 
   export default { list };
 }

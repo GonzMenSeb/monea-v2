@@ -2,7 +2,7 @@ import { useCallback, useMemo, memo } from 'react';
 
 import { RefreshControl } from 'react-native';
 
-import { FlashList as FlashListBase, type ListRenderItemInfo } from '@shopify/flash-list';
+import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import { styled, Stack, Text } from 'tamagui';
 
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
@@ -13,9 +13,6 @@ import { formatDateRelative } from '@/shared/utils';
 import { TransactionItem } from './TransactionItem';
 
 import type Transaction from '@/infrastructure/database/models/Transaction';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const FlashList = FlashListBase as React.ComponentType<unknown>;
 
 type TransactionListItem = Transaction | { type: 'section_header'; title: string; key: string };
 
@@ -179,7 +176,6 @@ export function TransactionList({
         refreshControl={refreshControl}
         ListHeaderComponent={ListHeaderComponent}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={80}
       />
     </ListContainer>
   );

@@ -4,6 +4,7 @@ import { Body, Caption, Button } from '@/shared/components/ui';
 
 interface BulkImportCardProps {
   estimatedCount: number | null;
+  importLimit: number;
   isLoading: boolean;
   onStartImport: () => void;
 }
@@ -40,9 +41,13 @@ const CountBadge = styled(XStack, {
 
 export function BulkImportCard({
   estimatedCount,
+  importLimit,
   isLoading,
   onStartImport,
 }: BulkImportCardProps): React.ReactElement {
+  const effectiveLimit =
+    estimatedCount !== null ? Math.min(importLimit, estimatedCount) : importLimit;
+
   return (
     <CardContainer>
       <IconContainer>
@@ -61,10 +66,10 @@ export function BulkImportCard({
       {estimatedCount !== null && (
         <CountBadge>
           <Text color="$accentPrimary" fontWeight="600" fontSize="$4">
-            {estimatedCount.toLocaleString()}
+            {effectiveLimit.toLocaleString()}
           </Text>
           <Caption color="$textSecondary" marginLeft="$2">
-            messages found
+            of {estimatedCount.toLocaleString()} messages
           </Caption>
         </CountBadge>
       )}
@@ -75,7 +80,7 @@ export function BulkImportCard({
         disabled={isLoading || estimatedCount === 0}
         fullWidth
       >
-        {isLoading ? 'Scanning...' : 'Start Import'}
+        {isLoading ? 'Scanning...' : `Import ${effectiveLimit.toLocaleString()} Messages`}
       </Button>
     </CardContainer>
   );

@@ -112,36 +112,32 @@ class SmsReader implements SmsReaderInterface {
         filter.maxDate = options.endDate.getTime();
       }
 
-      SmsAndroid.list(
-        JSON.stringify(filter),
-        (count: number, smsList: string, error: string | null) => {
-          if (error) {
+      try {
+        SmsAndroid.list(
+          JSON.stringify(filter),
+          (error: string) => {
             reject(new Error(error));
-            return;
-          }
+          },
+          (_count: number, smsList: string) => {
+            try {
+              const messages = JSON.parse(smsList) as SmsMessage[];
 
-          try {
-            const messages: SmsMessage[] = JSON.parse(smsList);
-            let filteredMessages = messages;
+              const historicalMessages: HistoricalSmsMessage[] = messages.map((m) => ({
+                id: m._id,
+                sender: m.address,
+                body: m.body,
+                date: new Date(parseInt(m.date, 10)),
+              }));
 
-            if (options?.senders && options.senders.length > 0) {
-              const senderSet = new Set(options.senders.map((s) => s.toLowerCase()));
-              filteredMessages = messages.filter((m) => senderSet.has(m.address.toLowerCase()));
+              resolve(historicalMessages);
+            } catch {
+              reject(new Error('Failed to parse SMS messages'));
             }
-
-            const historicalMessages: HistoricalSmsMessage[] = filteredMessages.map((m) => ({
-              id: m._id,
-              sender: m.address,
-              body: m.body,
-              date: new Date(parseInt(m.date, 10)),
-            }));
-
-            resolve(historicalMessages);
-          } catch (parseError) {
-            reject(new Error('Failed to parse SMS messages'));
           }
-        }
-      );
+        );
+      } catch (syncError) {
+        reject(syncError instanceof Error ? syncError : new Error(String(syncError)));
+      }
     });
   }
 
@@ -159,11 +155,10 @@ class SmsReader implements SmsReaderInterface {
 
       SmsAndroid.list(
         JSON.stringify(filter),
-        (count: number, _smsList: string, error: string | null) => {
-          if (error) {
-            resolve(0);
-            return;
-          }
+        (_error: string) => {
+          resolve(0);
+        },
+        (count: number, _smsList: string) => {
           resolve(count);
         }
       );

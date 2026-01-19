@@ -1,5 +1,5 @@
 export { TransactionParser, transactionParser } from './TransactionParser';
-export { BANK_INFO, BANK_PATTERNS, getBankBySender } from './BankPatterns';
+export { BANK_INFO, BANK_PATTERNS, detectBankFromContent } from './BankPatterns';
 export {
   extractAmount,
   formatCOP,

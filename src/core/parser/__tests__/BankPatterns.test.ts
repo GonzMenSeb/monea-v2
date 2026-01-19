@@ -3,8 +3,7 @@ import {
   BANK_PATTERNS,
   parseAmount,
   parseDate,
-  matchesSender,
-  getBankBySender,
+  detectBankFromContent,
 } from '../BankPatterns';
 
 describe('BankPatterns', () => {
@@ -22,9 +21,6 @@ describe('BankPatterns', () => {
       Object.values(BANK_INFO).forEach((bank) => {
         expect(bank).toHaveProperty('code');
         expect(bank).toHaveProperty('name');
-        expect(bank).toHaveProperty('senderPatterns');
-        expect(Array.isArray(bank.senderPatterns)).toBe(true);
-        expect(bank.senderPatterns.length).toBeGreaterThan(0);
       });
     });
   });
@@ -107,54 +103,47 @@ describe('BankPatterns', () => {
     });
   });
 
-  describe('matchesSender', () => {
-    it('matches Bancolombia sender patterns', () => {
-      const bank = BANK_INFO.bancolombia;
-      expect(matchesSender('Bancolombia', bank)).toBe(true);
-      expect(matchesSender('BANCOLOMBIA', bank)).toBe(true);
-      expect(matchesSender('891333', bank)).toBe(true);
-      expect(matchesSender('85540', bank)).toBe(true);
-      expect(matchesSender('85784', bank)).toBe(true);
+  describe('detectBankFromContent', () => {
+    it('detects Bancolombia from message content', () => {
+      const sms = 'Bancolombia le informa compra por $50.000 en EXITO. Saldo: $500.000';
+      expect(detectBankFromContent(sms)?.code).toBe('bancolombia');
     });
 
-    it('matches Nequi sender patterns', () => {
-      const bank = BANK_INFO.nequi;
-      expect(matchesSender('Nequi', bank)).toBe(true);
-      expect(matchesSender('NEQUI', bank)).toBe(true);
-      expect(matchesSender('85432', bank)).toBe(true);
-      expect(matchesSender('85954', bank)).toBe(true);
+    it('detects Bancolombia from Compraste format', () => {
+      const sms =
+        'Bancolombia: Compraste COP14.580,00 en DLO*Didi con tu T.Cred *1194, el 17/01/2026 a las 16:38.';
+      expect(detectBankFromContent(sms)?.code).toBe('bancolombia');
     });
 
-    it('matches Bancoomeva sender patterns', () => {
-      const bank = BANK_INFO.bancoomeva;
-      expect(matchesSender('Bancoomeva', bank)).toBe(true);
-      expect(matchesSender('BANCOOMEVA', bank)).toBe(true);
+    it('detects Nequi from message content', () => {
+      const sms = 'Nequi: Pagaste $25.000 en RAPPI. Saldo: $75.000';
+      expect(detectBankFromContent(sms)?.code).toBe('nequi');
     });
 
-    it('does not match unrelated senders', () => {
-      const bank = BANK_INFO.bancolombia;
-      expect(matchesSender('Davivienda', bank)).toBe(false);
-      expect(matchesSender('12345', bank)).toBe(false);
-    });
-  });
-
-  describe('getBankBySender', () => {
-    it('returns correct bank for known senders', () => {
-      expect(getBankBySender('Bancolombia')?.code).toBe('bancolombia');
-      expect(getBankBySender('891333')?.code).toBe('bancolombia');
-      expect(getBankBySender('85540')?.code).toBe('bancolombia');
-      expect(getBankBySender('85784')?.code).toBe('bancolombia');
-      expect(getBankBySender('Davivienda')?.code).toBe('davivienda');
-      expect(getBankBySender('BBVA')?.code).toBe('bbva');
-      expect(getBankBySender('Nequi')?.code).toBe('nequi');
-      expect(getBankBySender('85954')?.code).toBe('nequi');
-      expect(getBankBySender('DaviPlata')?.code).toBe('daviplata');
-      expect(getBankBySender('Bancoomeva')?.code).toBe('bancoomeva');
+    it('detects Daviplata from message content', () => {
+      const sms = 'DaviPlata: Pago $15.000 en TIENDA. Saldo: $35.000';
+      expect(detectBankFromContent(sms)?.code).toBe('daviplata');
     });
 
-    it('returns null for unknown senders', () => {
-      expect(getBankBySender('Unknown')).toBeNull();
-      expect(getBankBySender('99999')).toBeNull();
+    it('detects Davivienda from message content', () => {
+      const sms = 'Davivienda: compra por $80.000 en ALMACEN. Disponible: $420.000';
+      expect(detectBankFromContent(sms)?.code).toBe('davivienda');
+    });
+
+    it('detects BBVA from message content', () => {
+      const sms = 'BBVA: compra por $60.000 en SUPERMERCADO Cta. 1234. Disponible: $340.000';
+      expect(detectBankFromContent(sms)?.code).toBe('bbva');
+    });
+
+    it('detects Bancoomeva from message content', () => {
+      const sms =
+        'Bancoomeva informa compra por Internet en DLO*Didi por $12,300.00 con su tarjeta Credito 2566 el 2026/01/17 8:25:07.';
+      expect(detectBankFromContent(sms)?.code).toBe('bancoomeva');
+    });
+
+    it('returns null for non-bank messages', () => {
+      expect(detectBankFromContent('Random message')).toBeNull();
+      expect(detectBankFromContent('Your OTP is 123456')).toBeNull();
     });
   });
 
@@ -179,6 +168,25 @@ describe('BankPatterns', () => {
         'Bancolombia le informa transferencia recibida por $100.000 de JUAN PEREZ 15/03/2024. Cuenta *5678. Saldo: $600.000';
       const match = incomePattern!.pattern.exec(sms);
       expect(match).not.toBeNull();
+    });
+
+    it('matches Compraste COP format (credit card)', () => {
+      const sms =
+        'Bancolombia: Compraste COP14.580,00 en DLO*Didi con tu T.Cred *1194, el 17/01/2026 a las 16:38. Si tienes dudas, encuentranos aqui: 6045109095 o 018000931987. Estamos cerca.';
+      const matched = patterns.some((p) => p.pattern.test(sms));
+      expect(matched).toBe(true);
+    });
+
+    it('extracts correct data from Compraste COP format', () => {
+      const sms =
+        'Bancolombia: Compraste COP22.800,00 en DLO*Didi con tu T.Cred *1194, el 17/01/2026 a las 17:40.';
+      const pattern = patterns.find((p) => p.pattern.test(sms));
+      expect(pattern).toBeDefined();
+      expect(pattern!.type).toBe('expense');
+
+      const match = pattern!.pattern.exec(sms);
+      expect(match).not.toBeNull();
+      expect(parseAmount(match![pattern!.groups.amount]!)).toBe(22800);
     });
   });
 
@@ -223,6 +231,38 @@ describe('BankPatterns', () => {
       const sms = 'DaviPlata: Recibiste $20.000 de Pedro Lopez. Disponible: $55.000';
       const match = incomePattern!.pattern.exec(sms);
       expect(match).not.toBeNull();
+    });
+  });
+
+  describe('Bancoomeva patterns', () => {
+    const patterns = BANK_PATTERNS.bancoomeva;
+
+    it('matches internet purchase with single-digit hour time', () => {
+      const sms =
+        'Bancoomeva informa compra por Internet en DLO*Didi Bogo por $12,300.00 con su tarjeta Credito 2566 el 2026/01/17 8:25:07. +Info al 3009109898 opc * 3.';
+      const matched = patterns.some((p) => p.pattern.test(sms));
+      expect(matched).toBe(true);
+    });
+
+    it('matches internet purchase with two-digit hour time', () => {
+      const sms =
+        'Bancoomeva informa compra por Internet en DLO*Platzi Colombia BOGO por $281,065.00 con su tarjeta Credito 2566 el 2026/01/18 8:06:03. +Info al 3009109898 opc * 3.';
+      const matched = patterns.some((p) => p.pattern.test(sms));
+      expect(matched).toBe(true);
+    });
+
+    it('extracts correct data from Bancoomeva messages', () => {
+      const sms =
+        'Bancoomeva informa compra por Internet en DLO*Didi Bogo por $12,300.00 con su tarjeta Credito 2566 el 2026/01/17 8:25:07.';
+      const pattern = patterns.find((p) => p.pattern.test(sms));
+      expect(pattern).toBeDefined();
+      expect(pattern!.type).toBe('expense');
+
+      const match = pattern!.pattern.exec(sms);
+      expect(match).not.toBeNull();
+      expect(match![pattern!.groups.merchant!]).toContain('DLO*Didi');
+      expect(parseAmount(match![pattern!.groups.amount]!)).toBe(12300);
+      expect(match![pattern!.groups.accountLast4!]).toBe('2566');
     });
   });
 });

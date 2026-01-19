@@ -1,13 +1,16 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 
 import { smsPermissions } from '@/infrastructure/sms';
+import { useAppStore } from '@/shared/store';
 
 import { bulkImportService } from '../services';
 
 import type { BulkImportProgress, BulkImportResult } from '../services';
 import type { HistoricalSmsOptions } from '@/infrastructure/sms';
+
+const IMPORT_TIERS = [200, 500, 1000, 5000] as const;
 
 export type BulkImportStatus =
   | 'idle'
@@ -24,6 +27,8 @@ interface UseBulkImportReturn {
   result: BulkImportResult | null;
   error: string | null;
   estimatedCount: number | null;
+  currentLimit: number;
+  canImportMore: boolean;
   hasPermission: boolean | null;
   checkPermission: () => Promise<boolean>;
   requestPermission: () => Promise<boolean>;
@@ -31,10 +36,13 @@ interface UseBulkImportReturn {
   startImport: (options?: HistoricalSmsOptions) => Promise<void>;
   cancelImport: () => void;
   reset: () => void;
+  prepareForMore: () => void;
 }
 
 export function useBulkImport(): UseBulkImportReturn {
   const queryClient = useQueryClient();
+  const tierIndex = useAppStore((state) => state.importTierIndex);
+  const advanceImportTier = useAppStore((state) => state.advanceImportTier);
   const [status, setStatus] = useState<BulkImportStatus>('idle');
   const [progress, setProgress] = useState<BulkImportProgress | null>(null);
   const [result, setResult] = useState<BulkImportResult | null>(null);
@@ -42,6 +50,17 @@ export function useBulkImport(): UseBulkImportReturn {
   const [estimatedCount, setEstimatedCount] = useState<number | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const importServiceRef = useRef(bulkImportService);
+
+  const currentLimit = useMemo((): number => {
+    const maxTier = IMPORT_TIERS[IMPORT_TIERS.length - 1] as number;
+    const tierLimit = IMPORT_TIERS[tierIndex] ?? maxTier;
+    if (estimatedCount === null) {
+      return tierLimit;
+    }
+    return Math.min(tierLimit, estimatedCount);
+  }, [tierIndex, estimatedCount]);
+
+  const canImportMore = tierIndex < IMPORT_TIERS.length - 1;
 
   const checkPermission = useCallback(async (): Promise<boolean> => {
     setStatus('checking');
@@ -88,9 +107,11 @@ export function useBulkImport(): UseBulkImportReturn {
       setError(null);
       setResult(null);
 
+      const tierLimit = IMPORT_TIERS[tierIndex] ?? IMPORT_TIERS[IMPORT_TIERS.length - 1];
+
       try {
         const importResult = await importServiceRef.current.importHistoricalSms(
-          options,
+          { ...options, limit: tierLimit },
           (progressUpdate) => {
             setProgress(progressUpdate);
             if (progressUpdate.phase === 'complete') {
@@ -106,13 +127,17 @@ export function useBulkImport(): UseBulkImportReturn {
           setError(importResult.errorMessages[0] ?? null);
         }
 
+        if (importResult.success && tierIndex < IMPORT_TIERS.length - 1) {
+          advanceImportTier();
+        }
+
         void queryClient.invalidateQueries();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Import failed');
         setStatus('error');
       }
     },
-    [queryClient]
+    [queryClient, tierIndex, advanceImportTier]
   );
 
   const cancelImport = useCallback(() => {
@@ -128,12 +153,21 @@ export function useBulkImport(): UseBulkImportReturn {
     setEstimatedCount(null);
   }, []);
 
+  const prepareForMore = useCallback(() => {
+    setStatus('idle');
+    setProgress(null);
+    setResult(null);
+    setError(null);
+  }, []);
+
   return {
     status,
     progress,
     result,
     error,
     estimatedCount,
+    currentLimit,
+    canImportMore,
     hasPermission,
     checkPermission,
     requestPermission,
@@ -141,5 +175,6 @@ export function useBulkImport(): UseBulkImportReturn {
     startImport,
     cancelImport,
     reset,
+    prepareForMore,
   };
 }

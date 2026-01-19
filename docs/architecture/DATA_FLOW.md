@@ -61,11 +61,12 @@ This document describes how data flows through the Monea application.
        ▼
 ┌──────────────────────────────────────────────────────────┐
 │                   TransactionParser                       │
-│  ┌───────────────┐  ┌───────────────┐  ┌──────────────┐ │
-│  │getBankBySender│─▶│ BANK_PATTERNS │─▶│   Extract:   │ │
-│  │ (identifies   │  │ (matches SMS  │  │ Amount, Date │ │
-│  │  bank)        │  │   patterns)   │  │   Merchant   │ │
-│  └───────────────┘  └───────────────┘  └──────────────┘ │
+│  ┌────────────────────┐  ┌───────────────┐  ┌─────────┐ │
+│  │detectBankFromContent│─▶│ BANK_PATTERNS │─▶│ Extract │ │
+│  │ (identifies bank    │  │ (matches SMS  │  │ Amount, │ │
+│  │  from message body) │  │   patterns)   │  │ Date,   │ │
+│  └────────────────────┘  └───────────────┘  │ Merchant│ │
+│                                              └─────────┘ │
 └──────────────────────────────────────────────────────────┘
        │
        ▼
@@ -83,6 +84,8 @@ This document describes how data flows through the Monea application.
 │  }                                                        │
 └──────────────────────────────────────────────────────────┘
 ```
+
+**Note:** Bank detection is content-based, not sender-based. The parser identifies banks by matching patterns in the SMS body (e.g., "Bancolombia le informa..." or "Nequi: Pagaste..."), making it universal across all carriers and short codes.
 
 ### 3. Data Persistence
 
