@@ -82,6 +82,7 @@ export default function DashboardScreen(): React.ReactElement {
 
   return (
     <Screen
+      testID="dashboard-screen"
       variant="fixed"
       backgroundColor={colors.background.primary}
       edges={['top', 'left', 'right']}
