@@ -62,6 +62,7 @@
         }
       ],
       "./plugins/withGradleOptimizations.js",
+      "./plugins/withBundleInDebug.js",
       "./plugins/withSmsReader.js"
     ],
     "experiments": {
