@@ -1,4 +1,4 @@
-.PHONY: help dev android test test-watch test-coverage typecheck lint lint-fix format format-check validate e2e-build e2e-test e2e-build-release e2e-test-release e2e-test-ci clean
+.PHONY: help dev android test test-watch test-coverage typecheck lint lint-fix format format-check validate e2e-build e2e-test e2e-build-release e2e-test-release e2e-test-ci clean clean-all reset
 
 help:
 	@echo "Monea v2 - Available Commands"
@@ -29,6 +29,8 @@ help:
 	@echo ""
 	@echo "Maintenance:"
 	@echo "  make clean            Remove build artifacts and caches"
+	@echo "  make clean-all        Clean everything including node_modules"
+	@echo "  make reset            Clean all and reinstall dependencies"
 
 # Development
 dev:
@@ -87,4 +89,18 @@ clean:
 	rm -rf node_modules/.cache
 	rm -rf .expo
 	rm -rf android/app/build
+	rm -rf android/build
+	rm -rf android/.gradle
 	rm -rf coverage
+	rm -rf /tmp/metro-*
+	rm -rf /tmp/haste-map-*
+	rm -f tsconfig.tsbuildinfo
+	rm -rf .jest
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete 2>/dev/null || true
+
+clean-all: clean
+	rm -rf node_modules
+
+reset: clean-all
+	npm install
