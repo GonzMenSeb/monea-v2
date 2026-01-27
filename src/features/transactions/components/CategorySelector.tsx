@@ -6,7 +6,6 @@ import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { useCategories, getCategoryEmoji } from '@/features/categories';
 import { Body, Caption, Button } from '@/shared/components/ui';
-import { colors } from '@/shared/theme';
 
 import type Category from '@/infrastructure/database/models/Category';
 

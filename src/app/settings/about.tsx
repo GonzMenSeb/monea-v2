@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { Pressable, ScrollView, Linking } from 'react-native';
 
-import Constants from 'expo-constants';
+import ExpoConstants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
@@ -67,8 +67,8 @@ const LinkRow = styled(XStack, {
 export default function AboutScreen(): React.ReactElement {
   const router = useRouter();
 
-  const appVersion = Constants.expoConfig?.version ?? '1.0.0';
-  const buildNumber = Constants.expoConfig?.android?.versionCode ?? '1';
+  const appVersion = ExpoConstants.expoConfig?.version ?? '1.0.0';
+  const buildNumber = ExpoConstants.expoConfig?.android?.versionCode ?? '1';
 
   const handleBack = useCallback(() => {
     router.back();

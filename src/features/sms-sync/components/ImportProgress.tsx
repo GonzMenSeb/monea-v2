@@ -1,7 +1,6 @@
 import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { Body, Caption, Button } from '@/shared/components/ui';
-import { colors } from '@/shared/theme';
 
 import type { BulkImportProgress } from '../services';
 

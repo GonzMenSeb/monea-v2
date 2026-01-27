@@ -1,6 +1,6 @@
 import { ActivityIndicator } from 'react-native';
 
-import { styled, Stack, Text, XStack, YStack } from 'tamagui';
+import { styled, Stack, Text, XStack } from 'tamagui';
 
 import { colors } from '@/shared/theme';
 

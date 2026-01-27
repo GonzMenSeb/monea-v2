@@ -4,7 +4,6 @@ import { useQuery, useQueries } from '@tanstack/react-query';
 
 import { database, TransactionRepository, AccountRepository } from '@/infrastructure/database';
 
-import type Account from '@/infrastructure/database/models/Account';
 import type { BankCode, AccountType } from '@/infrastructure/database/models/Account';
 import type Transaction from '@/infrastructure/database/models/Transaction';
 import type { TransactionSummary, AccountSummary } from '@/infrastructure/database/repositories';

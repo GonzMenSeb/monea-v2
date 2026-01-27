@@ -117,7 +117,7 @@ export function TransactionList({
 }: TransactionListProps): React.ReactElement {
   const items = useMemo(() => groupTransactionsByDate(transactions), [transactions]);
 
-  const keyExtractor = useCallback((item: TransactionListItem, index: number): string => {
+  const keyExtractor = useCallback((item: TransactionListItem, _index: number): string => {
     if (isSectionHeader(item)) {
       return item.key;
     }

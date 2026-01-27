@@ -168,12 +168,12 @@ export function StatementFilePicker({
         multiple: false,
       });
 
-      if (result.canceled || !result.assets || result.assets.length === 0) {
+      const asset = result.assets?.[0];
+      if (result.canceled || !asset) {
         setIsLoading(false);
         return;
       }
 
-      const asset = result.assets[0]!;
       let fileType: SupportedFileType | null = null;
 
       if (asset.mimeType && MIME_TO_FILE_TYPE[asset.mimeType]) {

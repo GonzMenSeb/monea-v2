@@ -30,7 +30,7 @@ export default function NewTransactionScreen(): React.ReactElement {
   const router = useRouter();
   const { success } = useHaptics();
   const createMutation = useCreateTransaction();
-  const { formData, errors, setField, setAmount, validate, getCreateData } = useTransactionForm();
+  const { formData, errors, setField, setAmount, getCreateData } = useTransactionForm();
 
   const handleBack = useCallback(() => {
     router.back();

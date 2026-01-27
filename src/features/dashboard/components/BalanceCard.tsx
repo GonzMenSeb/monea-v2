@@ -1,5 +1,4 @@
-import { styled, Stack, Text, XStack, YStack } from 'tamagui';
-import { LinearGradient } from 'tamagui/linear-gradient';
+import { styled, Text, XStack, YStack } from 'tamagui';
 
 import { Card } from '@/shared/components/ui';
 import { colors } from '@/shared/theme';

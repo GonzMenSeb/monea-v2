@@ -79,7 +79,6 @@ export default function ImportScreen(): React.ReactElement {
     status,
     progress,
     result,
-    error,
     estimatedCount,
     currentLimit,
     canImportMore,

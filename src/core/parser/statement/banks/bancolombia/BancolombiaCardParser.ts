@@ -398,20 +398,20 @@ export class BancolombiaCardParser extends BaseStatementParser {
 
     const format1 = /^(\d{1,2})\s+(\w{3})\.\s+(\d{4})$/i;
     const match1 = cleanStr.match(format1);
-    if (match1) {
-      const day = parseInt(match1[1]!, 10);
-      const monthKey = match1[2]!.toLowerCase();
-      const year = parseInt(match1[3]!, 10);
+    if (match1 && match1[1] && match1[2] && match1[3]) {
+      const day = parseInt(match1[1], 10);
+      const monthKey = match1[2].toLowerCase();
+      const year = parseInt(match1[3], 10);
       const month = spanishMonths[monthKey] ?? 0;
       return new Date(year, month, day);
     }
 
     const format2 = /^(\w{3})\.\s+(\d{1,2}),\s+(\d{4})$/i;
     const match2 = cleanStr.match(format2);
-    if (match2) {
-      const monthKey = match2[1]!.toLowerCase();
-      const day = parseInt(match2[2]!, 10);
-      const year = parseInt(match2[3]!, 10);
+    if (match2 && match2[1] && match2[2] && match2[3]) {
+      const monthKey = match2[1].toLowerCase();
+      const day = parseInt(match2[2], 10);
+      const year = parseInt(match2[3], 10);
       const month = spanishMonths[monthKey] ?? 0;
       return new Date(year, month, day);
     }
@@ -419,15 +419,15 @@ export class BancolombiaCardParser extends BaseStatementParser {
     return new Date();
   }
 
-  private parseTransactionDate(dateStr: string, periodEnd: Date): Date {
+  private parseTransactionDate(dateStr: string, _periodEnd: Date): Date {
     const parts = dateStr.split('/');
-    if (parts.length !== 3) {
+    if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) {
       throw new Error(`Invalid transaction date format: ${dateStr}`);
     }
 
-    const day = parseInt(parts[0]!, 10);
-    const month = parseInt(parts[1]!, 10) - 1;
-    const year = parseInt(parts[2]!, 10);
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
 
     if (isNaN(day) || isNaN(month) || isNaN(year)) {
       throw new Error(`Invalid date components: ${dateStr}`);

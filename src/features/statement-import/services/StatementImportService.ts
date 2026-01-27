@@ -485,29 +485,35 @@ export class StatementImportService {
       ? overlappingImports.filter((imp) => imp.bankCode === bankCode)
       : overlappingImports;
 
-    return filteredImports.map((imp) => {
-      const overlap = getOverlapRange(
-        periodStart,
-        periodEnd,
-        imp.statementPeriodStart,
-        imp.statementPeriodEnd
-      )!;
-
-      return {
-        importId: imp.id,
-        fileName: imp.fileName,
-        periodStart: imp.statementPeriodStart,
-        periodEnd: imp.statementPeriodEnd,
-        overlapStart: overlap.start,
-        overlapEnd: overlap.end,
-        overlapDays: calculateOverlapDays(
+    return filteredImports
+      .map((imp) => {
+        const overlap = getOverlapRange(
           periodStart,
           periodEnd,
           imp.statementPeriodStart,
           imp.statementPeriodEnd
-        ),
-      };
-    });
+        );
+
+        if (!overlap) {
+          return null;
+        }
+
+        return {
+          importId: imp.id,
+          fileName: imp.fileName,
+          periodStart: imp.statementPeriodStart,
+          periodEnd: imp.statementPeriodEnd,
+          overlapStart: overlap.start,
+          overlapEnd: overlap.end,
+          overlapDays: calculateOverlapDays(
+            periodStart,
+            periodEnd,
+            imp.statementPeriodStart,
+            imp.statementPeriodEnd
+          ),
+        };
+      })
+      .filter((item): item is PeriodOverlapInfo => item !== null);
   }
 
   private findMatchingTransaction(
