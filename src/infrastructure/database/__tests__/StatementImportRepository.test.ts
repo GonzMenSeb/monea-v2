@@ -113,10 +113,7 @@ describe('StatementImportRepository', () => {
     });
 
     it('returns imports that overlap with date range', async () => {
-      const result = await repository.findByPeriod(
-        new Date('2024-01-15'),
-        new Date('2024-02-15')
-      );
+      const result = await repository.findByPeriod(new Date('2024-01-15'), new Date('2024-02-15'));
 
       expect(result).toHaveLength(2);
       const fileNames = result.map((r) => r.fileName);
@@ -125,29 +122,20 @@ describe('StatementImportRepository', () => {
     });
 
     it('returns imports that fully contain date range', async () => {
-      const result = await repository.findByPeriod(
-        new Date('2024-01-10'),
-        new Date('2024-01-20')
-      );
+      const result = await repository.findByPeriod(new Date('2024-01-10'), new Date('2024-01-20'));
 
       expect(result).toHaveLength(1);
       expect(result[0]?.fileName).toBe('jan.xlsx');
     });
 
     it('returns imports when date range fully contains statement period', async () => {
-      const result = await repository.findByPeriod(
-        new Date('2023-12-01'),
-        new Date('2024-04-30')
-      );
+      const result = await repository.findByPeriod(new Date('2023-12-01'), new Date('2024-04-30'));
 
       expect(result).toHaveLength(3);
     });
 
     it('returns empty array when no overlap', async () => {
-      const result = await repository.findByPeriod(
-        new Date('2024-04-01'),
-        new Date('2024-04-30')
-      );
+      const result = await repository.findByPeriod(new Date('2024-04-01'), new Date('2024-04-30'));
 
       expect(result).toEqual([]);
     });

@@ -1,7 +1,7 @@
 import { Q } from '@nozbe/watermelondb';
 
-import type StatementImport from '../models/StatementImport';
 import type { BankCode } from '../models/Account';
+import type StatementImport from '../models/StatementImport';
 import type { Database, Query } from '@nozbe/watermelondb';
 
 export interface CreateStatementImportData {
@@ -37,15 +37,11 @@ export class StatementImportRepository {
   }
 
   async findAll(): Promise<StatementImport[]> {
-    return this.collection
-      .query(Q.sortBy('imported_at', Q.desc))
-      .fetch();
+    return this.collection.query(Q.sortBy('imported_at', Q.desc)).fetch();
   }
 
   async findByFileHash(fileHash: string): Promise<StatementImport | null> {
-    const results = await this.collection
-      .query(Q.where('file_hash', fileHash))
-      .fetch();
+    const results = await this.collection.query(Q.where('file_hash', fileHash)).fetch();
     return results[0] ?? null;
   }
 
@@ -65,10 +61,7 @@ export class StatementImportRepository {
 
   async findByBankCode(bankCode: BankCode): Promise<StatementImport[]> {
     return this.collection
-      .query(
-        Q.where('bank_code', bankCode),
-        Q.sortBy('statement_period_start', Q.desc)
-      )
+      .query(Q.where('bank_code', bankCode), Q.sortBy('statement_period_start', Q.desc))
       .fetch();
   }
 
@@ -138,9 +131,7 @@ export class StatementImportRepository {
   }
 
   async existsByFileHash(fileHash: string): Promise<boolean> {
-    const count = await this.collection
-      .query(Q.where('file_hash', fileHash))
-      .fetchCount();
+    const count = await this.collection.query(Q.where('file_hash', fileHash)).fetchCount();
     return count > 0;
   }
 
@@ -151,11 +142,7 @@ export class StatementImportRepository {
 
   async getLatestByBankCode(bankCode: BankCode): Promise<StatementImport | null> {
     const results = await this.collection
-      .query(
-        Q.where('bank_code', bankCode),
-        Q.sortBy('statement_period_end', Q.desc),
-        Q.take(1)
-      )
+      .query(Q.where('bank_code', bankCode), Q.sortBy('statement_period_end', Q.desc), Q.take(1))
       .fetch();
     return results[0] ?? null;
   }

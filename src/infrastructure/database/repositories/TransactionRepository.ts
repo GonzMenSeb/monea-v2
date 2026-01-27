@@ -77,7 +77,10 @@ export class TransactionRepository {
 
   async findByStatementImportId(statementImportId: string): Promise<Transaction[]> {
     return this.collection
-      .query(Q.where('statement_import_id', statementImportId), Q.sortBy('transaction_date', Q.desc))
+      .query(
+        Q.where('statement_import_id', statementImportId),
+        Q.sortBy('transaction_date', Q.desc)
+      )
       .fetch();
   }
 
