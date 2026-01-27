@@ -7,6 +7,8 @@ import {
   type CreateTransactionData,
 } from '@/infrastructure/database/repositories/TransactionRepository';
 
+import { BalanceReconciliationService } from './BalanceReconciliationService';
+
 import type {
   ImportResult,
   ImportOptions,
@@ -19,6 +21,7 @@ import type {
   FileImportInput,
   ParsedImportData,
   PeriodOverlapInfo,
+  ReconciliationSummary,
 } from '../types';
 import type {
   StatementMetadata,
@@ -116,12 +119,14 @@ export class StatementImportService {
   private readonly accountRepo: AccountRepository;
   private readonly transactionRepo: TransactionRepository;
   private readonly statementImportRepo: StatementImportRepository;
+  private readonly reconciliationService: BalanceReconciliationService;
 
   constructor(private readonly database: Database) {
     this.statementParser = createStatementParser();
     this.accountRepo = new AccountRepository(database);
     this.transactionRepo = new TransactionRepository(database);
     this.statementImportRepo = new StatementImportRepository(database);
+    this.reconciliationService = new BalanceReconciliationService(database);
   }
 
   async importStatement(
@@ -255,16 +260,32 @@ export class StatementImportService {
       phase: 'updating_balances',
       currentStep: 4,
       totalSteps: 5,
-      message: 'Updating account balance...',
+      message: 'Reconciling account balance...',
     });
 
+    let reconciliationSummary: ReconciliationSummary | null = null;
     let previousBalance: number | undefined;
-    const newBalance = parsed.account.closingBalance;
+    let newBalance = parsed.account.closingBalance;
 
-    if (!opts.dryRun && opts.updateAccountBalance && accountMatch.account) {
-      previousBalance = accountMatch.account.balance;
-      await this.accountRepo.updateBalance(accountMatch.account.id, newBalance);
-      await this.accountRepo.updateLastSynced(accountMatch.account.id);
+    if (opts.updateAccountBalance && accountMatch.account) {
+      reconciliationSummary = await this.reconciliationService.reconcile({
+        accountId: accountMatch.account.id,
+        statementAccount: parsed.account,
+        transactions: transactionsToImport,
+        statementImportId,
+        dryRun: opts.dryRun,
+      });
+
+      if (reconciliationSummary.result) {
+        previousBalance = reconciliationSummary.result.previousBalance;
+        newBalance = reconciliationSummary.result.newBalance;
+      }
+
+      if (!reconciliationSummary.success) {
+        for (const recError of reconciliationSummary.errors) {
+          errors.push({ message: `Reconciliation failed: ${recError.message}` });
+        }
+      }
     }
 
     notify({
@@ -300,6 +321,7 @@ export class StatementImportService {
       errors,
       duplicates: deduplication.duplicates,
       periodOverlaps: deduplication.periodOverlaps,
+      reconciliation: reconciliationSummary ?? undefined,
     };
   }
 

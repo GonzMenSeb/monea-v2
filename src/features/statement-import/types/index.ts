@@ -42,6 +42,7 @@ export interface ImportResult {
   errors: ImportError[];
   duplicates: DuplicateInfo[];
   periodOverlaps: PeriodOverlapInfo[];
+  reconciliation?: ReconciliationSummary;
 }
 
 export interface ImportError {
@@ -96,6 +97,42 @@ export interface FileImportInput {
 export interface ParsedImportData {
   result: ParsedStatementResult;
   fileHash: string;
+}
+
+export interface ReconciliationResult {
+  accountId: string;
+  previousBalance: number;
+  newBalance: number;
+  balanceSource: 'statement_closing' | 'latest_transaction' | 'calculated';
+  discrepancy: number;
+  reconciledAt: Date;
+  statementPeriodEnd: Date;
+}
+
+export interface ReconciliationSummary {
+  success: boolean;
+  result: ReconciliationResult | null;
+  errors: ReconciliationError[];
+  warnings: ReconciliationWarning[];
+}
+
+export interface ReconciliationError {
+  code: 'account_not_found' | 'balance_update_failed' | 'invalid_balance';
+  message: string;
+}
+
+export interface ReconciliationWarning {
+  code: 'balance_discrepancy' | 'future_transactions_exist' | 'stale_reconciliation';
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+export interface BalanceCheckpoint {
+  date: Date;
+  balance: number;
+  source: 'transaction' | 'statement';
+  transactionId?: string;
+  statementImportId?: string;
 }
 
 export type { ParsedStatementResult, StatementTransaction };
