@@ -137,8 +137,8 @@ describe('BancolombiaCardParser', () => {
 
         expect(result.transactions.length).toBeGreaterThan(20);
 
-        const didiTransactions = result.transactions.filter((t) =>
-          t.description?.includes('Didi') || t.description?.includes('DiDi')
+        const didiTransactions = result.transactions.filter(
+          (t) => t.description?.includes('Didi') || t.description?.includes('DiDi')
         );
         expect(didiTransactions.length).toBeGreaterThan(5);
 
@@ -162,13 +162,11 @@ describe('BancolombiaCardParser', () => {
         );
         expect(payment?.type).toBe('income');
 
-        const interest = result.transactions.find((t) =>
-          t.description?.includes('INTERESES')
-        );
+        const interest = result.transactions.find((t) => t.description?.includes('INTERESES'));
         expect(interest?.type).toBe('expense');
 
-        const purchase = result.transactions.find((t) =>
-          t.description?.includes('RAPPI') || t.description?.includes('Didi')
+        const purchase = result.transactions.find(
+          (t) => t.description?.includes('RAPPI') || t.description?.includes('Didi')
         );
         expect(purchase?.type).toBe('expense');
       });
@@ -187,9 +185,7 @@ describe('BancolombiaCardParser', () => {
         );
         expect(rappiTransaction?.merchant).toBe('RAPPI COLOMBIA*DL');
 
-        const didiTransaction = result.transactions.find((t) =>
-          t.merchant?.includes('Didi')
-        );
+        const didiTransaction = result.transactions.find((t) => t.merchant?.includes('Didi'));
         expect(didiTransaction?.merchant).toBeTruthy();
 
         const interestTransaction = result.transactions.find((t) =>
@@ -212,9 +208,7 @@ describe('BancolombiaCardParser', () => {
         );
         expect(usdTransaction).toBeTruthy();
 
-        const pesosTransaction = result.transactions.find((t) =>
-          t.description?.includes('RAPPI')
-        );
+        const pesosTransaction = result.transactions.find((t) => t.description?.includes('RAPPI'));
         expect(pesosTransaction).toBeTruthy();
       });
 
@@ -407,7 +401,7 @@ describe('BancolombiaCardParser', () => {
         const result = await parser.parseStatement(data, metadata);
 
         const payments = result.transactions.filter(
-          (t) => t.type === 'income' && t.description.includes('ABONO')
+          (t) => t.type === 'income' && t.description?.includes('ABONO')
         );
         expect(payments.length).toBeGreaterThan(0);
 
@@ -426,9 +420,7 @@ describe('BancolombiaCardParser', () => {
 
         const result = await parser.parseStatement(data, metadata);
 
-        const interests = result.transactions.filter((t) =>
-          t.description.includes('INTERESES')
-        );
+        const interests = result.transactions.filter((t) => t.description?.includes('INTERESES'));
 
         interests.forEach((interest) => {
           expect(interest.type).toBe('expense');
@@ -444,9 +436,7 @@ describe('BancolombiaCardParser', () => {
 
         const result = await parser.parseStatement(data, metadata);
 
-        const purchases = result.transactions.filter(
-          (t) => t.merchant && t.type === 'expense'
-        );
+        const purchases = result.transactions.filter((t) => t.merchant && t.type === 'expense');
         expect(purchases.length).toBeGreaterThan(0);
 
         purchases.forEach((purchase) => {
@@ -463,9 +453,7 @@ describe('BancolombiaCardParser', () => {
 
         const result = await parser.parseStatement(data, metadata);
 
-        const fees = result.transactions.filter((t) =>
-          t.description.includes('CUOTA DE MANEJO')
-        );
+        const fees = result.transactions.filter((t) => t.description?.includes('CUOTA DE MANEJO'));
 
         fees.forEach((fee) => {
           expect(fee.type).toBe('expense');
@@ -502,9 +490,7 @@ describe('BancolombiaCardParser', () => {
 
         const result = await parser.parseStatement(data, metadata);
 
-        const interests = result.transactions.filter((t) =>
-          t.description.includes('INTERESES')
-        );
+        const interests = result.transactions.filter((t) => t.description?.includes('INTERESES'));
 
         interests.forEach((interest) => {
           expect(interest.merchant).toBeUndefined();
@@ -520,9 +506,7 @@ describe('BancolombiaCardParser', () => {
 
         const result = await parser.parseStatement(data, metadata);
 
-        const payments = result.transactions.filter((t) =>
-          t.description.includes('ABONO')
-        );
+        const payments = result.transactions.filter((t) => t.description?.includes('ABONO'));
 
         payments.forEach((payment) => {
           expect(payment.merchant).toBeUndefined();
@@ -555,7 +539,7 @@ describe('BancolombiaCardParser', () => {
         const result = await parser.parseStatement(data, metadata);
 
         const mercadoPago = result.transactions.find((t) =>
-          t.description.includes('MERCADO PAGO')
+          t.description?.includes('MERCADO PAGO')
         );
 
         if (mercadoPago && mercadoPago.merchant) {
@@ -619,13 +603,13 @@ describe('BancolombiaCardParser', () => {
 
         const hasUsdTransactions = result.transactions.some(
           (t) =>
-            t.description.includes('CLAUDE') ||
-            t.description.includes('STEAM') ||
-            t.description.includes('VR MONEDA ORIG')
+            t.description?.includes('CLAUDE') ||
+            t.description?.includes('STEAM') ||
+            t.description?.includes('VR MONEDA ORIG')
         );
 
         const hasCopTransactions = result.transactions.some(
-          (t) => t.description.includes('RAPPI') || t.description.includes('Didi')
+          (t) => t.description?.includes('RAPPI') || t.description?.includes('Didi')
         );
 
         expect(hasUsdTransactions || hasCopTransactions).toBe(true);

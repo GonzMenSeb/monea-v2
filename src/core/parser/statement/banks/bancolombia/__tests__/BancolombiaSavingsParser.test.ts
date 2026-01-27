@@ -243,7 +243,6 @@ describe('BancolombiaSavingsParser', () => {
         expect(result.account.periodEnd).toEqual(new Date(2025, 8, 30));
       });
 
-
       it('parses account with no transactions (A LA MANO - December 2024)', async () => {
         const data = loadSampleFile('Extracto_202412_Cuentas_de ahorro_9855.xlsx');
         const metadata: StatementMetadata = {
@@ -286,11 +285,19 @@ describe('BancolombiaSavingsParser', () => {
         const transactionsFromDec = result.transactions.filter(
           (t) => t.transactionDate.getMonth() === 11
         );
-        const transactionsFromJan = result.transactions.filter((t) => t.transactionDate.getMonth() === 0);
-        const transactionsFromFeb = result.transactions.filter((t) => t.transactionDate.getMonth() === 1);
-        const transactionsFromMar = result.transactions.filter((t) => t.transactionDate.getMonth() === 2);
+        const transactionsFromJan = result.transactions.filter(
+          (t) => t.transactionDate.getMonth() === 0
+        );
+        const transactionsFromFeb = result.transactions.filter(
+          (t) => t.transactionDate.getMonth() === 1
+        );
+        const transactionsFromMar = result.transactions.filter(
+          (t) => t.transactionDate.getMonth() === 2
+        );
 
-        expect(transactionsFromJan.length + transactionsFromFeb.length + transactionsFromMar.length).toBeGreaterThan(0);
+        expect(
+          transactionsFromJan.length + transactionsFromFeb.length + transactionsFromMar.length
+        ).toBeGreaterThan(0);
 
         if (transactionsFromDec.length > 0) {
           transactionsFromDec.forEach((t) => {
@@ -347,7 +354,9 @@ describe('BancolombiaSavingsParser', () => {
           expect(t.transactionDate.getTime()).toBeGreaterThanOrEqual(
             result.account.periodStart.getTime()
           );
-          expect(t.transactionDate.getTime()).toBeLessThanOrEqual(result.account.periodEnd.getTime());
+          expect(t.transactionDate.getTime()).toBeLessThanOrEqual(
+            result.account.periodEnd.getTime()
+          );
         });
       });
 
@@ -360,8 +369,12 @@ describe('BancolombiaSavingsParser', () => {
 
         const result = await parser.parseStatement(data, metadata);
 
-        const incomeTransactions = result.transactions.filter((t) => t.type === 'income' || t.type === 'transfer_in');
-        const expenseTransactions = result.transactions.filter((t) => t.type === 'expense' || t.type === 'transfer_out');
+        const incomeTransactions = result.transactions.filter(
+          (t) => t.type === 'income' || t.type === 'transfer_in'
+        );
+        const expenseTransactions = result.transactions.filter(
+          (t) => t.type === 'expense' || t.type === 'transfer_out'
+        );
 
         expect(incomeTransactions.length).toBeGreaterThan(0);
         expect(expenseTransactions.length).toBeGreaterThan(0);
@@ -459,9 +472,7 @@ describe('BancolombiaSavingsParser', () => {
           });
         }
 
-        const qrPayments = result.transactions.filter(
-          (t) => t.description?.includes('PAGO QR')
-        );
+        const qrPayments = result.transactions.filter((t) => t.description?.includes('PAGO QR'));
         if (qrPayments.length > 0) {
           qrPayments.forEach((t) => {
             expect(t.type).toBe('expense');
@@ -521,8 +532,8 @@ describe('BancolombiaSavingsParser', () => {
 
         const result = await parser.parseStatement(data, metadata);
 
-        const compraEnTransactions = result.transactions.filter(
-          (t) => t.description?.startsWith('COMPRA EN')
+        const compraEnTransactions = result.transactions.filter((t) =>
+          t.description?.startsWith('COMPRA EN')
         );
 
         compraEnTransactions.forEach((t) => {
@@ -583,7 +594,9 @@ describe('BancolombiaSavingsParser', () => {
         const result = await parser.parseStatement(data, metadata);
 
         const incomeTransactions = result.transactions.filter(
-          (t) => t.type === 'income' && (t.description?.includes('NOMI') || t.description?.includes('INTERESES'))
+          (t) =>
+            t.type === 'income' &&
+            (t.description?.includes('NOMI') || t.description?.includes('INTERESES'))
         );
 
         incomeTransactions.forEach((t) => {
@@ -620,8 +633,16 @@ describe('BancolombiaSavingsParser', () => {
 
         if (result.transactions.length > 0) {
           const firstTransaction = result.transactions[0]!;
-          const expectedBalanceBefore = firstTransaction.balanceAfter - firstTransaction.amount * (firstTransaction.type === 'expense' || firstTransaction.type === 'transfer_out' ? -1 : 1);
-          expect(Math.abs(expectedBalanceBefore - result.account.openingBalance)).toBeLessThan(0.01);
+          const balanceAfter = firstTransaction.balanceAfter ?? 0;
+          const expectedBalanceBefore =
+            balanceAfter -
+            firstTransaction.amount *
+              (firstTransaction.type === 'expense' || firstTransaction.type === 'transfer_out'
+                ? -1
+                : 1);
+          expect(Math.abs(expectedBalanceBefore - result.account.openingBalance)).toBeLessThan(
+            0.01
+          );
         }
       });
 

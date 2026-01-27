@@ -141,7 +141,9 @@ export class BancolombiaCardParser extends BaseStatementParser {
 
     for (let i = 0; i < Math.min(rows.length, 15); i++) {
       const row = rows[i];
-      if (!row) continue;
+      if (!row) {
+        continue;
+      }
 
       const firstCell = this.cellToString(row[0]);
 
@@ -188,7 +190,9 @@ export class BancolombiaCardParser extends BaseStatementParser {
 
     for (let i = 0; i < Math.min(rows.length, 25); i++) {
       const row = rows[i];
-      if (!row) continue;
+      if (!row) {
+        continue;
+      }
 
       const col3 = this.cellToString(row[3]);
       const col4Value = this.parseAmount(this.cellToString(row[4]));
@@ -243,7 +247,11 @@ export class BancolombiaCardParser extends BaseStatementParser {
 
         while (i < rows.length) {
           const transactionRow = rows[i];
-          if (!transactionRow || this.isMovementsHeader(transactionRow) || this.isEmpty(transactionRow)) {
+          if (
+            !transactionRow ||
+            this.isMovementsHeader(transactionRow) ||
+            this.isEmpty(transactionRow)
+          ) {
             break;
           }
 
@@ -262,19 +270,25 @@ export class BancolombiaCardParser extends BaseStatementParser {
   }
 
   private isMovementsHeader(row: RawRow | undefined): boolean {
-    if (!row) return false;
+    if (!row) {
+      return false;
+    }
     const firstCell = this.cellToString(row[0]);
     return firstCell.startsWith('Movimientos durante') || firstCell.startsWith('Movimientos antes');
   }
 
   private isTransactionHeaderRow(row: RawRow | undefined): boolean {
-    if (!row) return false;
+    if (!row) {
+      return false;
+    }
     const firstCell = this.cellToString(row[0]);
     return firstCell === 'Número de autorización';
   }
 
   private isEmpty(row: RawRow): boolean {
-    return row.every((cell) => cell === null || cell === undefined || this.cellToString(cell) === '');
+    return row.every(
+      (cell) => cell === null || cell === undefined || this.cellToString(cell) === ''
+    );
   }
 
   private parseTransactionRow(
