@@ -6,7 +6,6 @@ import { styled, Stack, Text, XStack, YStack } from 'tamagui';
 
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
 import { AccountCard } from '@/shared/components/ui/Card';
-import { colors } from '@/shared/theme';
 
 import type { AccountWithBalance } from '../hooks/useDashboardData';
 

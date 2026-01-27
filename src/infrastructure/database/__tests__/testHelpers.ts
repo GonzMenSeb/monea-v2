@@ -2,6 +2,7 @@ import { Database } from '@nozbe/watermelondb';
 import LokiJSAdapter from '@nozbe/watermelondb/adapters/lokijs';
 
 import { Account, Category, Transaction, SmsMessage } from '../models';
+import StatementImport from '../models/StatementImport';
 import { schema } from '../schema';
 
 import type { BankCode, AccountType } from '../models/Account';
@@ -17,7 +18,7 @@ export function createTestDatabase(): Database {
 
   return new Database({
     adapter,
-    modelClasses: [Account, Category, Transaction, SmsMessage],
+    modelClasses: [Account, Category, Transaction, SmsMessage, StatementImport],
   });
 }
 
@@ -123,6 +124,34 @@ export async function createMockCategory(
       category.color = data.color ?? '#FF5733';
       category.isSystem = data.isSystem ?? false;
       category.isIncome = data.isIncome ?? false;
+    });
+  });
+}
+
+export interface MockStatementImportData {
+  fileName?: string;
+  fileHash?: string;
+  bankCode?: BankCode;
+  statementPeriodStart?: Date;
+  statementPeriodEnd?: Date;
+  transactionsImported?: number;
+  importedAt?: Date;
+}
+
+export async function createMockStatementImport(
+  database: Database,
+  data: MockStatementImportData = {}
+): Promise<StatementImport> {
+  const collection = database.get<StatementImport>('statement_imports');
+  return database.write(async () => {
+    return collection.create((statementImport) => {
+      statementImport.fileName = data.fileName ?? 'statement_202401.xlsx';
+      statementImport.fileHash = data.fileHash ?? 'abc123def456';
+      statementImport.bankCode = data.bankCode ?? 'bancolombia';
+      statementImport.statementPeriodStart = data.statementPeriodStart ?? new Date('2024-01-01');
+      statementImport.statementPeriodEnd = data.statementPeriodEnd ?? new Date('2024-01-31');
+      statementImport.transactionsImported = data.transactionsImported ?? 50;
+      statementImport.importedAt = data.importedAt ?? new Date();
     });
   });
 }

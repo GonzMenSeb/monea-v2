@@ -260,6 +260,10 @@ export function SettingsScreen(): React.ReactElement {
     router.push('/settings/backup');
   }, [router]);
 
+  const handleImportStatementsPress = useCallback(() => {
+    router.push('/settings/import-statement' as never);
+  }, [router]);
+
   const sections: SettingSection[] = [
     {
       title: 'Bank & SMS',
@@ -278,6 +282,13 @@ export function SettingsScreen(): React.ReactElement {
           title: 'Import Historical SMS',
           description: 'Import transactions from past SMS messages',
           onPress: handleImportSmsPress,
+        },
+        {
+          id: 'import-statements',
+          icon: '📄',
+          title: 'Import Bank Statements',
+          description: 'Import transactions from bank statements (PDF/XLSX)',
+          onPress: handleImportStatementsPress,
         },
         {
           id: 'accounts',

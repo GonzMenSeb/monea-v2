@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 
-import { styled, Stack, Text, XStack, YStack } from 'tamagui';
+import { styled, Text, XStack, YStack } from 'tamagui';
 
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
 import { TransactionCard } from '@/shared/components/ui/Card';

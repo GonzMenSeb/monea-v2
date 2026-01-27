@@ -75,6 +75,31 @@ export default function ClearDataScreen(): React.ReactElement {
     router.back();
   }, [router]);
 
+  const performClearData = useCallback(async () => {
+    setIsClearing(true);
+    try {
+      await database.write(async () => {
+        await database.unsafeResetDatabase();
+      });
+
+      queryClient.clear();
+
+      Alert.alert('Data Cleared', 'All your data has been deleted successfully.', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/(tabs)'),
+        },
+      ]);
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to clear data. Please try again.'
+      );
+    } finally {
+      setIsClearing(false);
+    }
+  }, [queryClient, router]);
+
   const handleClearData = useCallback(() => {
     Alert.alert(
       'Clear All Data',
@@ -101,32 +126,7 @@ export default function ClearDataScreen(): React.ReactElement {
         },
       ]
     );
-  }, []);
-
-  const performClearData = useCallback(async () => {
-    setIsClearing(true);
-    try {
-      await database.write(async () => {
-        await database.unsafeResetDatabase();
-      });
-
-      queryClient.clear();
-
-      Alert.alert('Data Cleared', 'All your data has been deleted successfully.', [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/(tabs)'),
-        },
-      ]);
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Failed to clear data. Please try again.'
-      );
-    } finally {
-      setIsClearing(false);
-    }
-  }, [queryClient, router]);
+  }, [performClearData]);
 
   return (
     <Screen

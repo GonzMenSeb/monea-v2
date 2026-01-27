@@ -127,6 +127,18 @@ describe('SettingsScreen', () => {
 
       expect(mockRouter.push).toHaveBeenCalledWith('/settings/clear-data');
     });
+
+    it('navigates to import bank statements when pressed', async () => {
+      render(<SettingsScreen />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Import Bank Statements')).toBeTruthy();
+      });
+
+      fireEvent.press(screen.getByText('Import Bank Statements'));
+
+      expect(mockRouter.push).toHaveBeenCalledWith('/settings/import-statement');
+    });
   });
 
   describe('external links', () => {

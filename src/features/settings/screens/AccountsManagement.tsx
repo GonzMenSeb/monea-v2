@@ -13,7 +13,6 @@ import { Button, Input, Heading, Body, Caption } from '@/shared/components/ui';
 import { colors } from '@/shared/theme';
 
 import type { CreateAccountData, UpdateAccountData } from '@/infrastructure/database';
-import type Account from '@/infrastructure/database/models/Account';
 import type { BankCode, AccountType } from '@/infrastructure/database/models/Account';
 
 interface AccountWithCalculatedBalance {
