@@ -16,6 +16,7 @@ export interface CreateTransactionData {
   reference?: string;
   smsId?: string;
   rawSms?: string;
+  statementImportId?: string;
 }
 
 export interface UpdateTransactionData {
@@ -72,6 +73,12 @@ export class TransactionRepository {
   async findBySmsId(smsId: string): Promise<Transaction | null> {
     const results = await this.collection.query(Q.where('sms_id', smsId)).fetch();
     return results[0] ?? null;
+  }
+
+  async findByStatementImportId(statementImportId: string): Promise<Transaction[]> {
+    return this.collection
+      .query(Q.where('statement_import_id', statementImportId), Q.sortBy('transaction_date', Q.desc))
+      .fetch();
   }
 
   async findByFilters(filters: TransactionFilters): Promise<Transaction[]> {
@@ -160,6 +167,9 @@ export class TransactionRepository {
         if (data.rawSms) {
           transaction.rawSms = data.rawSms;
         }
+        if (data.statementImportId) {
+          transaction.statementImportId = data.statementImportId;
+        }
       });
     });
   }
@@ -193,6 +203,9 @@ export class TransactionRepository {
             }
             if (data.rawSms) {
               transaction.rawSms = data.rawSms;
+            }
+            if (data.statementImportId) {
+              transaction.statementImportId = data.statementImportId;
             }
           })
         )
