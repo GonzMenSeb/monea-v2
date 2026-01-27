@@ -694,7 +694,7 @@ describe('NequiStatementParser', () => {
       mockRead.mockRestore();
     });
 
-    const createTestResult = (description: string) =>
+    const createTestResult = (description: string): FileReadResult =>
       createMockFileReadResult({
         sheets: [
           {
@@ -886,7 +886,7 @@ describe('NequiStatementParser', () => {
       mockRead.mockRestore();
     });
 
-    const createTestResult = (description: string, amount: string) =>
+    const createTestResult = (description: string, amount: string): FileReadResult =>
       createMockFileReadResult({
         sheets: [
           {
@@ -1066,7 +1066,7 @@ describe('NequiStatementParser', () => {
       mockRead.mockRestore();
     });
 
-    const createTestResult = (amount: string, balance: string) =>
+    const createTestResult = (amount: string, balance: string): FileReadResult =>
       createMockFileReadResult({
         sheets: [
           {
