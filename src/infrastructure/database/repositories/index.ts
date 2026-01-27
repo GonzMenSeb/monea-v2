@@ -16,3 +16,6 @@ export type {
   TransactionFilters,
   TransactionSummary,
 } from './TransactionRepository';
+
+export { StatementImportRepository } from './StatementImportRepository';
+export type { CreateStatementImportData, StatementImportFilters } from './StatementImportRepository';
