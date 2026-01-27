@@ -18,6 +18,7 @@ import type {
   ProgressCallback,
   FileImportInput,
   ParsedImportData,
+  PeriodOverlapInfo,
 } from '../types';
 import type {
   StatementMetadata,
@@ -34,6 +35,7 @@ const DEFAULT_OPTIONS: Required<ImportOptions> = {
   skipDuplicates: true,
   updateAccountBalance: true,
   dryRun: false,
+  allowPeriodOverlap: true,
 };
 
 const DUPLICATE_TIME_TOLERANCE_MS = 60 * 1000; // 1 minute
@@ -66,7 +68,8 @@ function createEmptyResult(
   bankCode: BankCode,
   periodStart: Date,
   periodEnd: Date,
-  errors: ImportError[] = []
+  errors: ImportError[] = [],
+  periodOverlaps: PeriodOverlapInfo[] = []
 ): ImportResult {
   return {
     success: errors.length === 0,
@@ -77,7 +80,35 @@ function createEmptyResult(
     periodEnd,
     errors,
     duplicates: [],
+    periodOverlaps,
   };
+}
+
+function calculateOverlapDays(start1: Date, end1: Date, start2: Date, end2: Date): number {
+  const overlapStart = new Date(Math.max(start1.getTime(), start2.getTime()));
+  const overlapEnd = new Date(Math.min(end1.getTime(), end2.getTime()));
+
+  if (overlapStart > overlapEnd) {
+    return 0;
+  }
+
+  return Math.ceil((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+function getOverlapRange(
+  start1: Date,
+  end1: Date,
+  start2: Date,
+  end2: Date
+): { start: Date; end: Date } | null {
+  const overlapStart = new Date(Math.max(start1.getTime(), start2.getTime()));
+  const overlapEnd = new Date(Math.min(end1.getTime(), end2.getTime()));
+
+  if (overlapStart > overlapEnd) {
+    return null;
+  }
+
+  return { start: overlapStart, end: overlapEnd };
 }
 
 export class StatementImportService {
@@ -158,8 +189,24 @@ export class StatementImportService {
       parsed.transactions,
       accountMatch.account.id,
       parsed.account.periodStart,
-      parsed.account.periodEnd
+      parsed.account.periodEnd,
+      parsed.bank.code
     );
+
+    if (!opts.allowPeriodOverlap && deduplication.periodOverlaps.length > 0) {
+      const overlappingFiles = deduplication.periodOverlaps.map((o) => o.fileName).join(', ');
+      return createEmptyResult(
+        parsed.bank.code,
+        parsed.account.periodStart,
+        parsed.account.periodEnd,
+        [
+          {
+            message: `Statement period overlaps with previously imported statements: ${overlappingFiles}`,
+          },
+        ],
+        deduplication.periodOverlaps
+      );
+    }
 
     const transactionsToImport = opts.skipDuplicates
       ? deduplication.uniqueTransactions
@@ -252,6 +299,7 @@ export class StatementImportService {
       periodEnd: parsed.account.periodEnd,
       errors,
       duplicates: deduplication.duplicates,
+      periodOverlaps: deduplication.periodOverlaps,
     };
   }
 
@@ -269,6 +317,14 @@ export class StatementImportService {
       return this.statementImportRepo.findByBankCode(bankCode);
     }
     return this.statementImportRepo.findAll();
+  }
+
+  async checkPeriodOverlaps(
+    periodStart: Date,
+    periodEnd: Date,
+    bankCode?: BankCode
+  ): Promise<PeriodOverlapInfo[]> {
+    return this.detectPeriodOverlaps(periodStart, periodEnd, bankCode);
   }
 
   private async parseFile(input: FileImportInput): Promise<ParsedImportData | null> {
@@ -362,7 +418,8 @@ export class StatementImportService {
     transactions: StatementTransaction[],
     accountId: string,
     periodStart: Date,
-    periodEnd: Date
+    periodEnd: Date,
+    bankCode?: BankCode
   ): Promise<DeduplicationResult> {
     const searchStart = new Date(periodStart.getTime() - 24 * 60 * 60 * 1000);
     const searchEnd = new Date(periodEnd.getTime() + 24 * 60 * 60 * 1000);
@@ -372,6 +429,8 @@ export class StatementImportService {
       startDate: searchStart,
       endDate: searchEnd,
     });
+
+    const periodOverlaps = await this.detectPeriodOverlaps(periodStart, periodEnd, bankCode);
 
     const duplicates: DuplicateInfo[] = [];
     const uniqueTransactions: StatementTransaction[] = [];
@@ -390,7 +449,43 @@ export class StatementImportService {
       }
     }
 
-    return { duplicates, uniqueTransactions };
+    return { duplicates, uniqueTransactions, periodOverlaps };
+  }
+
+  private async detectPeriodOverlaps(
+    periodStart: Date,
+    periodEnd: Date,
+    bankCode?: BankCode
+  ): Promise<PeriodOverlapInfo[]> {
+    const overlappingImports = await this.statementImportRepo.findByPeriod(periodStart, periodEnd);
+
+    const filteredImports = bankCode
+      ? overlappingImports.filter((imp) => imp.bankCode === bankCode)
+      : overlappingImports;
+
+    return filteredImports.map((imp) => {
+      const overlap = getOverlapRange(
+        periodStart,
+        periodEnd,
+        imp.statementPeriodStart,
+        imp.statementPeriodEnd
+      )!;
+
+      return {
+        importId: imp.id,
+        fileName: imp.fileName,
+        periodStart: imp.statementPeriodStart,
+        periodEnd: imp.statementPeriodEnd,
+        overlapStart: overlap.start,
+        overlapEnd: overlap.end,
+        overlapDays: calculateOverlapDays(
+          periodStart,
+          periodEnd,
+          imp.statementPeriodStart,
+          imp.statementPeriodEnd
+        ),
+      };
+    });
   }
 
   private findMatchingTransaction(

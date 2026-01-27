@@ -41,6 +41,7 @@ export interface ImportResult {
   periodEnd: Date;
   errors: ImportError[];
   duplicates: DuplicateInfo[];
+  periodOverlaps: PeriodOverlapInfo[];
 }
 
 export interface ImportError {
@@ -50,15 +51,27 @@ export interface ImportError {
   amount?: number;
 }
 
+export interface PeriodOverlapInfo {
+  importId: string;
+  fileName: string;
+  periodStart: Date;
+  periodEnd: Date;
+  overlapStart: Date;
+  overlapEnd: Date;
+  overlapDays: number;
+}
+
 export interface ImportOptions {
   skipDuplicates?: boolean;
   updateAccountBalance?: boolean;
   dryRun?: boolean;
+  allowPeriodOverlap?: boolean;
 }
 
 export interface DeduplicationResult {
   duplicates: DuplicateInfo[];
   uniqueTransactions: StatementTransaction[];
+  periodOverlaps: PeriodOverlapInfo[];
 }
 
 export interface AccountMatchResult {

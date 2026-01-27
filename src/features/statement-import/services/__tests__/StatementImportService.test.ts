@@ -408,4 +408,158 @@ describe('StatementImportService', () => {
       expect(result.transactions.imported).toBe(2);
     });
   });
+
+  describe('period overlap detection', () => {
+    it('detects overlapping statement periods', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-01-01'),
+        statementPeriodEnd: new Date('2024-01-31'),
+        fileName: 'jan_statement.xlsx',
+      });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.periodOverlaps.length).toBe(1);
+      expect(result.periodOverlaps[0]?.fileName).toBe('jan_statement.xlsx');
+      expect(result.periodOverlaps[0]?.overlapDays).toBeGreaterThan(0);
+    });
+
+    it('allows import with period overlap when allowPeriodOverlap is true', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-01-01'),
+        statementPeriodEnd: new Date('2024-01-31'),
+      });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input, { allowPeriodOverlap: true });
+
+      expect(result.success).toBe(true);
+      expect(result.transactions.imported).toBe(2);
+    });
+
+    it('blocks import with period overlap when allowPeriodOverlap is false', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-01-01'),
+        statementPeriodEnd: new Date('2024-01-31'),
+        fileName: 'jan_statement.xlsx',
+      });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input, { allowPeriodOverlap: false });
+
+      expect(result.success).toBe(false);
+      expect(result.errors[0]?.message).toContain('overlaps with previously imported statements');
+      expect(result.periodOverlaps.length).toBe(1);
+    });
+
+    it('returns empty period overlaps when no overlapping imports exist', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-02-01'),
+        statementPeriodEnd: new Date('2024-02-28'),
+      });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.periodOverlaps.length).toBe(0);
+    });
+
+    it('only considers overlaps from the same bank', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'nequi',
+        statementPeriodStart: new Date('2024-01-01'),
+        statementPeriodEnd: new Date('2024-01-31'),
+      });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.periodOverlaps.length).toBe(0);
+    });
+
+    it('calculates overlap days correctly for partial overlap', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-01-15'),
+        statementPeriodEnd: new Date('2024-02-15'),
+        fileName: 'overlap_statement.xlsx',
+      });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.periodOverlaps.length).toBe(1);
+      const overlap = result.periodOverlaps[0];
+      expect(overlap?.overlapStart).toEqual(new Date('2024-01-15'));
+      expect(overlap?.overlapEnd).toEqual(new Date('2024-01-31'));
+      expect(overlap?.overlapDays).toBe(17);
+    });
+  });
+
+  describe('checkPeriodOverlaps', () => {
+    it('returns overlapping imports for given period', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-01-01'),
+        statementPeriodEnd: new Date('2024-01-31'),
+        fileName: 'jan.xlsx',
+      });
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-02-01'),
+        statementPeriodEnd: new Date('2024-02-28'),
+        fileName: 'feb.xlsx',
+      });
+
+      const overlaps = await service.checkPeriodOverlaps(
+        new Date('2024-01-15'),
+        new Date('2024-02-15'),
+        'bancolombia'
+      );
+
+      expect(overlaps.length).toBe(2);
+    });
+
+    it('returns empty array when no overlaps exist', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-03-01'),
+        statementPeriodEnd: new Date('2024-03-31'),
+      });
+
+      const overlaps = await service.checkPeriodOverlaps(
+        new Date('2024-01-01'),
+        new Date('2024-01-31'),
+        'bancolombia'
+      );
+
+      expect(overlaps.length).toBe(0);
+    });
+
+    it('filters by bank code when provided', async () => {
+      await createMockStatementImport(database, {
+        bankCode: 'bancolombia',
+        statementPeriodStart: new Date('2024-01-01'),
+        statementPeriodEnd: new Date('2024-01-31'),
+      });
+      await createMockStatementImport(database, {
+        bankCode: 'nequi',
+        statementPeriodStart: new Date('2024-01-01'),
+        statementPeriodEnd: new Date('2024-01-31'),
+      });
+
+      const overlaps = await service.checkPeriodOverlaps(
+        new Date('2024-01-01'),
+        new Date('2024-01-31'),
+        'bancolombia'
+      );
+
+      expect(overlaps.length).toBe(1);
+    });
+  });
 });
