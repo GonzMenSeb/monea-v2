@@ -495,4 +495,742 @@ describe('NequiStatementParser', () => {
       );
     });
   });
+
+  describe('edge cases with mocked data', () => {
+    let mockRead: jest.SpyInstance;
+
+    beforeEach(() => {
+      const pdfReader = (
+        parser as unknown as { pdfReader: { read: () => Promise<FileReadResult> } }
+      ).pdfReader;
+      mockRead = jest.spyOn(pdfReader, 'read');
+    });
+
+    afterEach(() => {
+      mockRead.mockRestore();
+    });
+
+    it('handles multi-page statements', async () => {
+      const multiPageResult = createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['01/10/2025', 'Para BEATRIZ ELENA GAVIRIA', '$-3,600.00', '$351,188.42'],
+              ['Saldo anterior', '$354,788.42'],
+              ['Saldo actual', '$351,188.42'],
+            ],
+            rowCount: 8,
+            columnCount: 4,
+          },
+          {
+            name: 'Page 2',
+            rows: [
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['02/10/2025', 'RECARGA DESDE', '$30,000.00', '$381,188.42'],
+            ],
+            rowCount: 2,
+            columnCount: 4,
+          },
+        ],
+      });
+
+      mockRead.mockResolvedValue(multiPageResult);
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions).toHaveLength(2);
+    });
+
+    it('sorts transactions by date chronologically', async () => {
+      const unsortedResult = createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['15/10/2025', 'Transaction 3', '$100.00', '$400.00'],
+              ['05/10/2025', 'Transaction 2', '$100.00', '$300.00'],
+              ['01/10/2025', 'Transaction 1', '$100.00', '$200.00'],
+              ['Saldo anterior', '$100.00'],
+              ['Saldo actual', '$400.00'],
+            ],
+            rowCount: 10,
+            columnCount: 4,
+          },
+        ],
+      });
+
+      mockRead.mockResolvedValue(unsortedResult);
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions).toHaveLength(3);
+      expect(result.transactions[0]?.transactionDate).toEqual(new Date(2025, 9, 1));
+      expect(result.transactions[1]?.transactionDate).toEqual(new Date(2025, 9, 5));
+      expect(result.transactions[2]?.transactionDate).toEqual(new Date(2025, 9, 15));
+    });
+
+    it('handles transactions with missing amounts', async () => {
+      const missingAmountResult = createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['01/10/2025', 'Test Transaction', '', '$100.00'],
+              ['Saldo anterior', '$100.00'],
+              ['Saldo actual', '$100.00'],
+            ],
+            rowCount: 8,
+            columnCount: 4,
+          },
+        ],
+      });
+
+      mockRead.mockResolvedValue(missingAmountResult);
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions).toHaveLength(1);
+      expect(result.transactions[0]?.amount).toBe(0);
+    });
+
+    it('throws error when opening balance cannot be extracted', async () => {
+      mockRead.mockResolvedValue(
+        createMockFileReadResult({
+          sheets: [
+            {
+              name: 'Page 1',
+              rows: [
+                ['Extracto de cuenta de ahorro de:'],
+                ['SEBASTIAN MENDOZA GONZALEZ'],
+                ['Número de cuenta de ahorro: 3052269855'],
+                ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+                ['Saldo actual', '$100.00'],
+              ],
+              rowCount: 5,
+              columnCount: 2,
+            },
+          ],
+        })
+      );
+
+      await expect(
+        parser.parseStatement(Buffer.from('test'), {
+          fileName: 'extracto_cuenta202510.pdf',
+          fileType: 'pdf',
+          password: SAMPLE_PASSWORD,
+        })
+      ).rejects.toThrow('Could not extract opening balance');
+    });
+
+    it('throws error when closing balance cannot be extracted', async () => {
+      mockRead.mockResolvedValue(
+        createMockFileReadResult({
+          sheets: [
+            {
+              name: 'Page 1',
+              rows: [
+                ['Extracto de cuenta de ahorro de:'],
+                ['SEBASTIAN MENDOZA GONZALEZ'],
+                ['Número de cuenta de ahorro: 3052269855'],
+                ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+                ['Saldo anterior', '$100.00'],
+              ],
+              rowCount: 5,
+              columnCount: 2,
+            },
+          ],
+        })
+      );
+
+      await expect(
+        parser.parseStatement(Buffer.from('test'), {
+          fileName: 'extracto_cuenta202510.pdf',
+          fileType: 'pdf',
+          password: SAMPLE_PASSWORD,
+        })
+      ).rejects.toThrow('Could not extract closing balance');
+    });
+  });
+
+  describe('merchant extraction', () => {
+    let mockRead: jest.SpyInstance;
+
+    beforeEach(() => {
+      const pdfReader = (
+        parser as unknown as { pdfReader: { read: () => Promise<FileReadResult> } }
+      ).pdfReader;
+      mockRead = jest.spyOn(pdfReader, 'read');
+    });
+
+    afterEach(() => {
+      mockRead.mockRestore();
+    });
+
+    const createTestResult = (description: string) =>
+      createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['01/10/2025', description, '$-1,000.00', '$100.00'],
+              ['Saldo anterior', '$1,100.00'],
+              ['Saldo actual', '$100.00'],
+            ],
+            rowCount: 8,
+            columnCount: 4,
+          },
+        ],
+      });
+
+    it('extracts merchant from COMPRA EN pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('COMPRA EN TIENDA ABC'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('TIENDA ABC');
+    });
+
+    it('extracts merchant from COMPRA PSE EN pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('COMPRA PSE EN MERCADO XYZ'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('MERCADO XYZ');
+    });
+
+    it('extracts merchant from PAGO EN pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('PAGO EN RESTAURANTE DEL VALLE'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('RESTAURANTE DEL VALLE');
+    });
+
+    it('extracts merchant from PAGO EN QR BRE-B pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('PAGO EN QR BRE-B: FARMACIA CRUZ'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('FARMACIA CRUZ');
+    });
+
+    it('extracts merchant from PAGO FACTURA pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('PAGO FACTURA ENEL COLOMBIA'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('ENEL COLOMBIA');
+    });
+
+    it('extracts merchant from Para pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('Para JUAN PEREZ GARCIA'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('JUAN PEREZ GARCIA');
+    });
+
+    it('extracts merchant from Envio a otros bancos pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('Envio a otros bancos a MARIA LOPEZ'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('MARIA LOPEZ');
+    });
+
+    it('extracts merchant from ENVIO CON BRE-B A pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('ENVIO CON BRE-B A: PEDRO RAMIREZ'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('PEDRO RAMIREZ');
+    });
+
+    it('extracts merchant from ENVIO CON BRE-B DE pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('ENVIO CON BRE-B DE: SOFIA TORRES'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('SOFIA TORRES');
+    });
+
+    it('extracts merchant from De pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('De CARLOS MENDEZ'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('CARLOS MENDEZ');
+    });
+
+    it('extracts merchant from Otros bancos de pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('Otros bancos de LAURA CASTRO'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('LAURA CASTRO');
+    });
+
+    it('extracts merchant from RECIBÍ A MI LLAVE DE pattern', async () => {
+      mockRead.mockResolvedValue(createTestResult('RECIBÍ A MI LLAVE DE: ANDREA GOMEZ'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBe('ANDREA GOMEZ');
+    });
+
+    it('returns undefined merchant for unmatched patterns', async () => {
+      mockRead.mockResolvedValue(createTestResult('Some random transaction description'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.merchant).toBeUndefined();
+    });
+  });
+
+  describe('transaction type detection', () => {
+    let mockRead: jest.SpyInstance;
+
+    beforeEach(() => {
+      const pdfReader = (
+        parser as unknown as { pdfReader: { read: () => Promise<FileReadResult> } }
+      ).pdfReader;
+      mockRead = jest.spyOn(pdfReader, 'read');
+    });
+
+    afterEach(() => {
+      mockRead.mockRestore();
+    });
+
+    const createTestResult = (description: string, amount: string) =>
+      createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['01/10/2025', description, amount, '$100.00'],
+              ['Saldo anterior', '$50.00'],
+              ['Saldo actual', '$100.00'],
+            ],
+            rowCount: 8,
+            columnCount: 4,
+          },
+        ],
+      });
+
+    it('identifies transfer_in for positive amount with recibí', async () => {
+      mockRead.mockResolvedValue(createTestResult('recibí dinero de alguien', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_in');
+    });
+
+    it('identifies transfer_in for positive amount with "de "', async () => {
+      mockRead.mockResolvedValue(createTestResult('De JUAN PEREZ', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_in');
+    });
+
+    it('identifies transfer_in for positive amount with otros bancos de', async () => {
+      mockRead.mockResolvedValue(createTestResult('otros bancos de MARIA', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_in');
+    });
+
+    it('identifies transfer_in for recarga desde', async () => {
+      mockRead.mockResolvedValue(createTestResult('recarga desde bancolombia', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_in');
+    });
+
+    it('identifies transfer_in for pago de intereses (contains "de")', async () => {
+      mockRead.mockResolvedValue(createTestResult('pago de intereses generados', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_in');
+    });
+
+    it('identifies transfer_in for reverso de transaccion (contains "de")', async () => {
+      mockRead.mockResolvedValue(createTestResult('reverso de transaccion', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_in');
+    });
+
+    it('identifies income for reverso without "de"', async () => {
+      mockRead.mockResolvedValue(createTestResult('reverso transaccion', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('income');
+    });
+
+    it('identifies income for generic positive amount', async () => {
+      mockRead.mockResolvedValue(createTestResult('Some generic income', '$50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('income');
+    });
+
+    it('identifies transfer_out for negative amount with "para "', async () => {
+      mockRead.mockResolvedValue(createTestResult('Para BEATRIZ GOMEZ', '$-50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_out');
+    });
+
+    it('identifies transfer_out for negative amount with envio', async () => {
+      mockRead.mockResolvedValue(createTestResult('envio de dinero', '$-50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_out');
+    });
+
+    it('identifies transfer_out for negative amount with enviado a', async () => {
+      mockRead.mockResolvedValue(createTestResult('enviado a PEDRO LOPEZ', '$-50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('transfer_out');
+    });
+
+    it('identifies expense for generic negative amount', async () => {
+      mockRead.mockResolvedValue(createTestResult('COMPRA EN TIENDA', '$-50.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.type).toBe('expense');
+    });
+  });
+
+  describe('amount parsing', () => {
+    let mockRead: jest.SpyInstance;
+
+    beforeEach(() => {
+      const pdfReader = (
+        parser as unknown as { pdfReader: { read: () => Promise<FileReadResult> } }
+      ).pdfReader;
+      mockRead = jest.spyOn(pdfReader, 'read');
+    });
+
+    afterEach(() => {
+      mockRead.mockRestore();
+    });
+
+    const createTestResult = (amount: string, balance: string) =>
+      createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['01/10/2025', 'Test Transaction', amount, balance],
+              ['Saldo anterior', '1000.00'],
+              ['Saldo actual', '1000.00'],
+            ],
+            rowCount: 8,
+            columnCount: 4,
+          },
+        ],
+      });
+
+    it('parses positive amounts with dollar sign and commas', async () => {
+      mockRead.mockResolvedValue(createTestResult('$1,234.56', '$2,234.56'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.amount).toBe(1234.56);
+    });
+
+    it('parses negative amounts with dollar sign and commas', async () => {
+      mockRead.mockResolvedValue(createTestResult('$-1,234.56', '$765.44'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.amount).toBe(1234.56);
+    });
+
+    it('parses amounts without dollar sign', async () => {
+      mockRead.mockResolvedValue(createTestResult('1,234.56', '$2,234.56'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.amount).toBe(1234.56);
+    });
+
+    it('parses amounts with multiple commas', async () => {
+      mockRead.mockResolvedValue(createTestResult('$1,234,567.89', '$2,234,567.89'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.amount).toBe(1234567.89);
+    });
+
+    it('handles zero amounts', async () => {
+      mockRead.mockResolvedValue(createTestResult('$0.00', '$1000.00'));
+
+      const result = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(result.transactions[0]?.amount).toBe(0);
+    });
+  });
+
+  describe('balance calculation', () => {
+    let mockRead: jest.SpyInstance;
+
+    beforeEach(() => {
+      const pdfReader = (
+        parser as unknown as { pdfReader: { read: () => Promise<FileReadResult> } }
+      ).pdfReader;
+      mockRead = jest.spyOn(pdfReader, 'read');
+    });
+
+    afterEach(() => {
+      mockRead.mockRestore();
+    });
+
+    it('calculates balanceBefore using opening balance for first transaction', async () => {
+      const result = createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['01/10/2025', 'First Transaction', '$100.00', '$1,100.00'],
+              ['02/10/2025', 'Second Transaction', '$-50.00', '$1,050.00'],
+              ['Saldo anterior', '$1,000.00'],
+              ['Saldo actual', '$1,050.00'],
+            ],
+            rowCount: 9,
+            columnCount: 4,
+          },
+        ],
+      });
+
+      mockRead.mockResolvedValue(result);
+
+      const parseResult = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(parseResult.transactions[0]?.balanceBefore).toBe(1000);
+      expect(parseResult.transactions[0]?.balanceAfter).toBe(1100);
+    });
+
+    it('calculates balanceBefore using previous transaction balanceAfter', async () => {
+      const result = createMockFileReadResult({
+        sheets: [
+          {
+            name: 'Page 1',
+            rows: [
+              ['Extracto de cuenta de ahorro de:'],
+              ['SEBASTIAN MENDOZA GONZALEZ'],
+              ['Número de cuenta de ahorro: 3052269855'],
+              ['Estado de cuenta para el período de: 2025/10/01 a 2025/10/31'],
+              ['Fecha del movimiento', 'Descripción', 'Valor', 'Saldo'],
+              ['01/10/2025', 'First Transaction', '$100.00', '$1,100.00'],
+              ['02/10/2025', 'Second Transaction', '$-50.00', '$1,050.00'],
+              ['03/10/2025', 'Third Transaction', '$25.00', '$1,075.00'],
+              ['Saldo anterior', '$1,000.00'],
+              ['Saldo actual', '$1,075.00'],
+            ],
+            rowCount: 10,
+            columnCount: 4,
+          },
+        ],
+      });
+
+      mockRead.mockResolvedValue(result);
+
+      const parseResult = await parser.parseStatement(Buffer.from('test'), {
+        fileName: 'extracto_cuenta202510.pdf',
+        fileType: 'pdf',
+        password: SAMPLE_PASSWORD,
+      });
+
+      expect(parseResult.transactions[1]?.balanceBefore).toBe(1100);
+      expect(parseResult.transactions[1]?.balanceAfter).toBe(1050);
+      expect(parseResult.transactions[2]?.balanceBefore).toBe(1050);
+      expect(parseResult.transactions[2]?.balanceAfter).toBe(1075);
+    });
+  });
 });
