@@ -18,5 +18,23 @@ export const migrations = schemaMigrations({
         }),
       ],
     },
+    {
+      toVersion: 3,
+      steps: [
+        createTable({
+          name: 'statement_imports',
+          columns: [
+            { name: 'file_name', type: 'string' },
+            { name: 'file_hash', type: 'string', isIndexed: true },
+            { name: 'bank_code', type: 'string', isIndexed: true },
+            { name: 'statement_period_start', type: 'number', isIndexed: true },
+            { name: 'statement_period_end', type: 'number', isIndexed: true },
+            { name: 'transactions_imported', type: 'number' },
+            { name: 'imported_at', type: 'number' },
+            { name: 'created_at', type: 'number' },
+          ],
+        }),
+      ],
+    },
   ],
 });

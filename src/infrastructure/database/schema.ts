@@ -1,6 +1,6 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const schema = appSchema({
   version: SCHEMA_VERSION,
@@ -57,6 +57,19 @@ export const schema = appSchema({
         { name: 'date', type: 'number', isIndexed: true },
         { name: 'is_processed', type: 'boolean' },
         { name: 'processing_error', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+      ],
+    }),
+    tableSchema({
+      name: 'statement_imports',
+      columns: [
+        { name: 'file_name', type: 'string' },
+        { name: 'file_hash', type: 'string', isIndexed: true },
+        { name: 'bank_code', type: 'string', isIndexed: true },
+        { name: 'statement_period_start', type: 'number', isIndexed: true },
+        { name: 'statement_period_end', type: 'number', isIndexed: true },
+        { name: 'transactions_imported', type: 'number' },
+        { name: 'imported_at', type: 'number' },
         { name: 'created_at', type: 'number' },
       ],
     }),
