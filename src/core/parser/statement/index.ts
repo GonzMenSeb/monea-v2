@@ -5,6 +5,12 @@ export {
   PdfPasswordRequiredError,
   PdfInvalidPasswordError,
 } from './readers';
+export {
+  StatementParserRegistry,
+  statementParserRegistry,
+} from './StatementParserRegistry';
+
+export type { BankDetectionResult } from './StatementParserRegistry';
 
 export type {
   AccountType,
