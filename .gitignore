@@ -114,3 +114,7 @@ Thumbs.db
 
 # Claude task tracking
 .claude-task-master/
+
+# Local files
+.tmp/
+tmp/
