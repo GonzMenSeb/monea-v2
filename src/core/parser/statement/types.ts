@@ -61,3 +61,33 @@ export interface StatementParser {
   canParse(metadata: StatementMetadata): boolean;
   parseStatement(data: Buffer, metadata: StatementMetadata): Promise<ParsedStatementResult>;
 }
+
+export type CellValue = string | number | boolean | Date | null | undefined;
+
+export type RawRow = CellValue[];
+
+export interface SheetData {
+  name: string;
+  rows: RawRow[];
+  rowCount: number;
+  columnCount: number;
+}
+
+export interface FileReadMetadata {
+  fileName: string;
+  fileType: StatementFileType;
+  fileSize: number;
+  sheetCount?: number;
+  sheetNames?: string[];
+}
+
+export interface FileReadResult {
+  metadata: FileReadMetadata;
+  sheets: SheetData[];
+}
+
+export interface FileReader {
+  readonly supportedTypes: StatementFileType[];
+  canRead(fileType: StatementFileType): boolean;
+  read(data: Buffer, fileName: string, password?: string): Promise<FileReadResult>;
+}
