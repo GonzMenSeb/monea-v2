@@ -15,10 +15,7 @@ class TestStatementParser extends BaseStatementParser {
     return metadata.fileName.toLowerCase().includes('extracto');
   }
 
-  async parseStatement(
-    _data: Buffer,
-    metadata: StatementMetadata
-  ): Promise<ParsedStatementResult> {
+  async parseStatement(_data: Buffer, metadata: StatementMetadata): Promise<ParsedStatementResult> {
     return {
       bank: this.bank,
       account: {
