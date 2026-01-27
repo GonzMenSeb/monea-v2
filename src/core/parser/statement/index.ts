@@ -5,12 +5,11 @@ export {
   PdfPasswordRequiredError,
   PdfInvalidPasswordError,
 } from './readers';
-export {
-  StatementParserRegistry,
-  statementParserRegistry,
-} from './StatementParserRegistry';
+export { StatementParserRegistry, statementParserRegistry } from './StatementParserRegistry';
+export { StatementParser, createStatementParser, defaultStatementParser } from './StatementParser';
 
 export type { BankDetectionResult } from './StatementParserRegistry';
+export type { StatementParserOptions } from './StatementParser';
 
 export type {
   AccountType,
@@ -29,7 +28,7 @@ export type {
   StatementParseError,
   StatementParseOutcome,
   StatementParseSuccess,
-  StatementParser,
+  StatementParser as StatementParserInterface,
   StatementTransaction,
   TransactionType,
 } from './types';
