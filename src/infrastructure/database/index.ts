@@ -1,8 +1,13 @@
 export { database, getDatabase } from './database';
 export { schema, SCHEMA_VERSION } from './schema';
-export { Account, Transaction, SmsMessage } from './models';
+export { Account, Category, Transaction, SmsMessage, StatementImport } from './models';
 export { WatermelonDBProvider } from './DatabaseProvider';
-export { AccountRepository, CategoryRepository, TransactionRepository } from './repositories';
+export {
+  AccountRepository,
+  CategoryRepository,
+  TransactionRepository,
+  StatementImportRepository,
+} from './repositories';
 export type { TransactionType } from './models';
 export type { CategoryIcon } from './models/Category';
 export type {
@@ -12,6 +17,8 @@ export type {
   CreateAccountData,
   CreateCategoryData,
   CreateTransactionData,
+  CreateStatementImportData,
+  StatementImportFilters,
   TransactionFilters,
   TransactionSummary,
   UpdateAccountData,
