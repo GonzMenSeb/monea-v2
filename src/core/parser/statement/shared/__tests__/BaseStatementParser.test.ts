@@ -1,11 +1,11 @@
-import { BaseStatementParser } from '../shared/BaseStatementParser';
+import { BaseStatementParser } from '../BaseStatementParser';
 
 import type {
   BankCode,
   ParsedStatementResult,
   StatementFileType,
   StatementMetadata,
-} from '../types';
+} from '../../types';
 
 class TestStatementParser extends BaseStatementParser {
   readonly bankCode: BankCode = 'bancolombia';
