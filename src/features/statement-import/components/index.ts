@@ -6,3 +6,6 @@ export type { ImportProgressCardProps } from './ImportProgressCard';
 
 export { ImportResultCard } from './ImportResultCard';
 export type { ImportResultCardProps } from './ImportResultCard';
+
+export { PasswordPrompt } from './PasswordPrompt';
+export type { PasswordPromptProps } from './PasswordPrompt';
