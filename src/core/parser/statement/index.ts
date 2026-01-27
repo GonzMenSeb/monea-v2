@@ -1,5 +1,10 @@
 export { BaseStatementParser } from './shared';
-export { XlsxFileReader } from './readers';
+export {
+  XlsxFileReader,
+  PdfFileReader,
+  PdfPasswordRequiredError,
+  PdfInvalidPasswordError,
+} from './readers';
 
 export type {
   AccountType,
