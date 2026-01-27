@@ -2,7 +2,7 @@
 
 ## Project Context
 
-Monea is a React Native Android application serving as a centralized digital wallet. It reads SMS messages to automatically track bank transactions from Colombian financial institutions (Bancolombia, Davivienda, BBVA, Nequi, Daviplata).
+Monea is a React Native Android application serving as a centralized digital wallet. It reads SMS messages and bank statements to automatically track bank transactions from Colombian financial institutions (Bancolombia, Davivienda, BBVA, Nequi, Daviplata). Bank statements provide authoritative balance information and comprehensive transaction history.
 
 **Platform**: Android only (no iOS)
 **Framework**: React Native with Expo (managed workflow + dev-client)
@@ -58,9 +58,13 @@ src/
 │   ├── hooks/              # Shared hooks
 │   ├── utils/              # Utility functions
 │   └── theme/              # Design tokens, colors, typography
-├── core/                   # Business logic (SMS parsing engine)
+├── core/                   # Business logic (SMS & statement parsing)
 │   └── parser/             # Modular bank parsers (strategy pattern)
-│       ├── banks/          # Per-bank parser implementations
+│       ├── banks/          # Per-bank SMS parser implementations
+│       ├── statement/      # Statement parsing engine
+│       │   ├── banks/      # Per-bank statement parsers
+│       │   ├── readers/    # File readers (XLSX, PDF)
+│       │   └── shared/     # BaseStatementParser
 │       ├── shared/         # BaseBankParser, pattern helpers
 │       └── extractors/     # Amount, date, merchant extractors
 └── infrastructure/         # External integrations
@@ -297,8 +301,11 @@ describe('TransactionItem', () => {
 | Term | Definition |
 |------|------------|
 | Transaction | A single bank operation (income, expense, transfer) |
-| Account | A user's bank account linked via SMS |
+| Account | A user's bank account linked via SMS or statement import |
 | Bank Pattern | Regex pattern to parse a specific bank's SMS format |
+| Statement | Official bank document (PDF/XLSX) with transaction history and balances |
+| Statement Import | Process of reading bank statement files and extracting transactions |
+| Running Balance | Sequential balance recorded after each transaction in a statement |
 | Sync | Process of reading SMS and extracting transactions |
 | COP | Colombian Peso currency code |
 
@@ -332,6 +339,37 @@ describe('TransactionItem', () => {
 7. Add bank code to `BankCode` type in `src/core/parser/types.ts`
 8. Write tests in `banks/{bankcode}/__tests__/{BankName}Parser.test.ts`
 9. Update `docs/SMS_PATTERNS.md` with the new bank's message formats
+
+### Adding a New Bank Statement Parser
+1. Collect real bank statement samples (PDF/XLSX) with diverse transaction patterns
+2. Create bank-specific parser directory: `src/core/parser/statement/banks/{bankcode}/`
+3. Create parser class `{BankName}{Type}Parser.ts` extending `BaseStatementParser`:
+   - Implement `bankCode` property
+   - Implement `supportedFileTypes` property (e.g., `['xlsx']`, `['pdf']`)
+   - Implement `matchesFilePattern(metadata)` for file identification
+   - Implement `parseStatement(data, metadata)` with:
+     - Section extraction (headers, general info, movements, summary)
+     - Transaction parsing with running balances
+     - Account information extraction (period, account number, opening/closing balances)
+   - Use file readers: `XlsxFileReader` for Excel, `PdfFileReader` for PDF
+   - Return `ParsedStatementResult` with transactions including `balanceBefore` and `balanceAfter`
+4. Create `index.ts` exporting all statement parsers for the bank
+5. Register parser in `src/core/parser/statement/banks/index.ts` via `createDefaultStatementRegistry()`
+6. Write comprehensive tests in `banks/{bankcode}/__tests__/{BankName}{Type}Parser.test.ts`:
+   - Test file pattern matching
+   - Test parsing with real sample data structures
+   - Test error handling for malformed statements
+   - Test balance calculations and transaction type determination
+7. Update `docs/STATEMENT_FORMATS.md` with format specifications and sample structure
+8. Verify with `npm test` - ensure >80% coverage for parser code
+
+**Statement Parser Guidelines:**
+- Statement parsers provide authoritative balance information
+- Always extract `balanceBefore` and `balanceAfter` for each transaction
+- Handle multiple statement types per bank (savings, credit card, etc.)
+- Use descriptive class names: `BancolombiaSavingsParser`, `BancolombiaCardParser`
+- Reuse existing date/amount extraction logic from base class where possible
+- Support password-protected PDFs when applicable (use `PdfFileReader` options)
 
 ### Creating a Component
 1. Define props interface
@@ -407,8 +445,14 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`
 | `src/app/_layout.tsx` | Root layout with providers |
 | `src/infrastructure/database/schema.ts` | Database schema |
 | `src/core/parser/TransactionParser.ts` | Main SMS parsing engine |
-| `src/core/parser/ParserRegistry.ts` | Bank parser registry |
-| `src/core/parser/shared/BaseBankParser.ts` | Abstract base class for bank parsers |
-| `src/core/parser/banks/index.ts` | Bank parser auto-registration |
+| `src/core/parser/ParserRegistry.ts` | Bank SMS parser registry |
+| `src/core/parser/shared/BaseBankParser.ts` | Abstract base class for SMS bank parsers |
+| `src/core/parser/banks/index.ts` | Bank SMS parser auto-registration |
+| `src/core/parser/statement/StatementParser.ts` | Main statement parsing engine |
+| `src/core/parser/statement/StatementParserRegistry.ts` | Bank statement parser registry |
+| `src/core/parser/statement/shared/BaseStatementParser.ts` | Abstract base class for statement parsers |
+| `src/core/parser/statement/banks/index.ts` | Statement parser auto-registration |
+| `src/core/parser/statement/readers/XlsxFileReader.ts` | Excel file reader |
+| `src/core/parser/statement/readers/PdfFileReader.ts` | PDF file reader with password support |
 | `src/shared/utils/formatting.ts` | Currency and date formatting utilities |
 | `.detoxrc.js` | Detox E2E test configuration |

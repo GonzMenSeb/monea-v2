@@ -742,10 +742,7 @@ describe('StatementImportService', () => {
     it('handles transaction creation failure gracefully', async () => {
       jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      const transactionRepoMock = jest.spyOn(
-        service['transactionRepo'],
-        'createBatch'
-      );
+      const transactionRepoMock = jest.spyOn(service['transactionRepo'], 'createBatch');
       transactionRepoMock.mockRejectedValue(new Error('Database connection failed'));
 
       const input = createValidInput();
