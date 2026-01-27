@@ -1,4 +1,8 @@
-import { schemaMigrations, createTable } from '@nozbe/watermelondb/Schema/migrations';
+import {
+  schemaMigrations,
+  createTable,
+  addColumns,
+} from '@nozbe/watermelondb/Schema/migrations';
 
 export const migrations = schemaMigrations({
   migrations: [
@@ -32,6 +36,17 @@ export const migrations = schemaMigrations({
             { name: 'transactions_imported', type: 'number' },
             { name: 'imported_at', type: 'number' },
             { name: 'created_at', type: 'number' },
+          ],
+        }),
+      ],
+    },
+    {
+      toVersion: 4,
+      steps: [
+        addColumns({
+          table: 'transactions',
+          columns: [
+            { name: 'statement_import_id', type: 'string', isOptional: true, isIndexed: true },
           ],
         }),
       ],

@@ -1,10 +1,16 @@
-import { Model } from '@nozbe/watermelondb';
-import { field, date, readonly } from '@nozbe/watermelondb/decorators';
+import { Model, associations, type Query } from '@nozbe/watermelondb';
+import { field, date, readonly, children } from '@nozbe/watermelondb/decorators';
 
 import type { BankCode } from './Account';
+import type Transaction from './Transaction';
 
 export default class StatementImport extends Model {
   static table = 'statement_imports';
+
+  static associations = associations([
+    'transactions',
+    { type: 'has_many', foreignKey: 'statement_import_id' },
+  ]);
 
   @field('file_name') fileName!: string;
   @field('file_hash') fileHash!: string;
@@ -14,4 +20,6 @@ export default class StatementImport extends Model {
   @field('transactions_imported') transactionsImported!: number;
   @date('imported_at') importedAt!: Date;
   @readonly @date('created_at') createdAt!: Date;
+
+  @children('transactions') transactions!: Query<Transaction>;
 }

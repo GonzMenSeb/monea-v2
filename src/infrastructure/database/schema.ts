@@ -1,6 +1,6 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb';
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export const schema = appSchema({
   version: SCHEMA_VERSION,
@@ -31,6 +31,7 @@ export const schema = appSchema({
         { name: 'description', type: 'string', isOptional: true },
         { name: 'reference', type: 'string', isOptional: true },
         { name: 'sms_id', type: 'string', isOptional: true },
+        { name: 'statement_import_id', type: 'string', isOptional: true, isIndexed: true },
         { name: 'transaction_date', type: 'number' },
         { name: 'raw_sms', type: 'string', isOptional: true },
         { name: 'created_at', type: 'number' },
