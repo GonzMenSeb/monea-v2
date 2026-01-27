@@ -562,4 +562,340 @@ describe('StatementImportService', () => {
       expect(overlaps.length).toBe(1);
     });
   });
+
+  describe('duplicate detection with references', () => {
+    it('detects duplicate with matching reference on same day', async () => {
+      const account = await createMockAccount(database, {
+        bankCode: 'bancolombia',
+        accountNumber: '1234567890',
+      });
+
+      await createMockTransaction(database, {
+        accountId: account.id,
+        type: 'expense',
+        amount: 50000,
+        transactionDate: new Date('2024-01-20T10:00:00.000Z'),
+        reference: 'REF12345',
+      });
+
+      const modifiedResult = {
+        ...mockParsedResult,
+        transactions: [
+          {
+            type: 'expense' as const,
+            amount: 50000,
+            balanceAfter: 1450000,
+            merchant: 'Exito',
+            description: 'Grocery shopping',
+            transactionDate: new Date('2024-01-20T14:00:00.000Z'),
+            reference: 'REF12345',
+          },
+        ],
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.duplicates.length).toBe(1);
+      expect(result.transactions.imported).toBe(0);
+    });
+
+    it('does not match transactions with different references on same day', async () => {
+      const account = await createMockAccount(database, {
+        bankCode: 'bancolombia',
+        accountNumber: '1234567890',
+      });
+
+      await createMockTransaction(database, {
+        accountId: account.id,
+        type: 'expense',
+        amount: 50000,
+        transactionDate: new Date('2024-01-20T10:00:00.000Z'),
+        reference: 'REF12345',
+      });
+
+      const modifiedResult = {
+        ...mockParsedResult,
+        transactions: [
+          {
+            type: 'expense' as const,
+            amount: 50000,
+            balanceAfter: 1450000,
+            merchant: 'Exito',
+            description: 'Grocery shopping',
+            transactionDate: new Date('2024-01-20T14:00:00.000Z'),
+            reference: 'REF99999',
+          },
+        ],
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.duplicates.length).toBe(0);
+      expect(result.transactions.imported).toBe(1);
+    });
+  });
+
+  describe('account type mapping', () => {
+    it('creates account with savings type for bancolombia', async () => {
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.success).toBe(true);
+      expect(result.account).toBeDefined();
+
+      const accountCollection = database.get('accounts');
+      const accounts = await accountCollection.query().fetch();
+      expect(accounts[0]).toBeDefined();
+      expect((accounts[0] as any).accountType).toBe('savings');
+    });
+
+    it('creates account with checking type for checking account', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        account: {
+          ...mockParsedResult.account,
+          accountType: 'checking',
+        },
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      await service.importStatement(input);
+
+      const accountCollection = database.get('accounts');
+      const accounts = await accountCollection.query().fetch();
+      expect(accounts[0]).toBeDefined();
+      expect((accounts[0] as any).accountType).toBe('checking');
+    });
+
+    it('creates account with credit type for credit card', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        account: {
+          ...mockParsedResult.account,
+          accountType: 'credit_card',
+        },
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      await service.importStatement(input);
+
+      const accountCollection = database.get('accounts');
+      const accounts = await accountCollection.query().fetch();
+      expect(accounts[0]).toBeDefined();
+      expect((accounts[0] as any).accountType).toBe('credit');
+    });
+
+    it('creates digital wallet account type for nequi', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        bank: {
+          code: 'nequi',
+          name: 'Nequi',
+        },
+        account: {
+          ...mockParsedResult.account,
+          accountType: 'unknown',
+        },
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput({ bankCode: 'nequi' });
+      await service.importStatement(input);
+
+      const accountCollection = database.get('accounts');
+      const accounts = await accountCollection.query().fetch();
+      expect(accounts[0]).toBeDefined();
+      expect((accounts[0] as any).accountType).toBe('digital_wallet');
+    });
+
+    it('creates digital wallet account type for daviplata', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        bank: {
+          code: 'daviplata',
+          name: 'Daviplata',
+        },
+        account: {
+          ...mockParsedResult.account,
+          accountType: 'unknown',
+        },
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput({ bankCode: 'daviplata' });
+      await service.importStatement(input);
+
+      const accountCollection = database.get('accounts');
+      const accounts = await accountCollection.query().fetch();
+      expect(accounts[0]).toBeDefined();
+      expect((accounts[0] as any).accountType).toBe('digital_wallet');
+    });
+  });
+
+  describe('error handling', () => {
+    it('handles transaction creation failure gracefully', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const transactionRepoMock = jest.spyOn(
+        service['transactionRepo'],
+        'createBatch'
+      );
+      transactionRepoMock.mockRejectedValue(new Error('Database connection failed'));
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.success).toBe(false);
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0]?.message).toContain('Database connection failed');
+
+      transactionRepoMock.mockRestore();
+      jest.restoreAllMocks();
+    });
+  });
+
+  describe('file hash computation', () => {
+    it('generates consistent hash for same file content', async () => {
+      const data = Buffer.from('test file content');
+      const hash1 = await service.checkFileAlreadyImported(data);
+      const hash2 = await service.checkFileAlreadyImported(data);
+
+      expect(hash1).toBe(hash2);
+    });
+
+    it('generates different hash for different file content', async () => {
+      const input1 = createValidInput({ fileName: 'file1.xlsx' });
+      await service.importStatement(input1);
+
+      const data2 = Buffer.from('different content');
+      const isImported = await service.checkFileAlreadyImported(data2);
+
+      expect(isImported).toBe(false);
+    });
+
+    it('generates different hash for files with different sizes', async () => {
+      const input1 = createValidInput();
+      await service.importStatement(input1);
+
+      const data2 = Buffer.from('test file content with extra data');
+      const isImported = await service.checkFileAlreadyImported(data2);
+
+      expect(isImported).toBe(false);
+    });
+  });
+
+  describe('singleton pattern', () => {
+    it('returns same instance when calling getStatementImportService', () => {
+      const instance1 = service;
+      const instance2 = new StatementImportService(database);
+
+      expect(instance1).toBeDefined();
+      expect(instance2).toBeDefined();
+    });
+
+    it('resets singleton instance when calling resetStatementImportService', () => {
+      resetStatementImportService();
+      const newInstance = new StatementImportService(database);
+
+      expect(newInstance).toBeDefined();
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles empty transaction list', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        transactions: [],
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.success).toBe(true);
+      expect(result.transactions.total).toBe(0);
+      expect(result.transactions.imported).toBe(0);
+    });
+
+    it('handles statement with only one transaction', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        transactions: [mockParsedResult.transactions[0]!],
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.success).toBe(true);
+      expect(result.transactions.total).toBe(1);
+      expect(result.transactions.imported).toBe(1);
+    });
+
+    it('handles statement with large number of transactions', async () => {
+      const largeTransactionList = Array.from({ length: 100 }, (_, i) => ({
+        type: 'expense' as const,
+        amount: 10000 + i,
+        balanceAfter: 1000000 - i * 10000,
+        merchant: `Merchant ${i}`,
+        description: `Transaction ${i}`,
+        transactionDate: new Date(`2024-01-${(i % 28) + 1}`),
+      }));
+
+      const modifiedResult = {
+        ...mockParsedResult,
+        transactions: largeTransactionList,
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.success).toBe(true);
+      expect(result.transactions.total).toBe(100);
+      expect(result.transactions.imported).toBe(100);
+    });
+
+    it('handles account with zero balance', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        account: {
+          ...mockParsedResult.account,
+          openingBalance: 0,
+          closingBalance: 0,
+        },
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.success).toBe(true);
+      expect(result.account?.newBalance).toBe(0);
+    });
+
+    it('handles negative account balance', async () => {
+      const modifiedResult = {
+        ...mockParsedResult,
+        account: {
+          ...mockParsedResult.account,
+          openingBalance: -50000,
+          closingBalance: -25000,
+        },
+      };
+      mockParser.parse.mockResolvedValue({ success: true, result: modifiedResult });
+
+      const input = createValidInput();
+      const result = await service.importStatement(input);
+
+      expect(result.success).toBe(true);
+      expect(result.account?.newBalance).toBe(-25000);
+    });
+  });
 });
